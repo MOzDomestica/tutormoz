@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TutorMoz – Matemática</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; min-height: 100vh; color: #1a1a2e; }
+  .screen { display: none; max-width: 480px; margin: 0 auto; padding: 16px; }
+  .screen.active { display: block; }
+  h1 { color: #2563eb; font-size: 1.6rem; }
+  h2 { color: #1e40af; font-size: 1.2rem; margin-bottom: 12px; }
+  .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1rem; margin-bottom: 10px; }
+  input:focus { outline: none; border-color: #2563eb; }
+  .btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-bottom: 8px; transition: all 0.2s; }
+  .btn-primary { background: #2563eb; color: white; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-secondary { background: #e0e7ff; color: #2563eb; }
+  .btn-secondary:hover { background: #c7d2fe; }
+  .btn-sm { width: auto; padding: 8px 14px; font-size: 0.85rem; }
+  .logo { text-align: center; margin: 24px 0 20px; }
+  .logo .icon { font-size: 3rem; }
+  .logo p { color: #64748b; margin-top: 4px; }
+  .error { background: #fee2e2; color: #dc2626; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9rem; }
+  .aluno-card { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: #f8faff; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e0e7ff; cursor: pointer; }
+  .aluno-info h3 { font-size: 1rem; color: #1e40af; }
+  .aluno-info p { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+  .topic-card { padding: 14px; background: #f8faff; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e0e7ff; cursor: pointer; transition: all 0.2s; }
+  .topic-card:hover { border-color: #2563eb; background: #eff6ff; }
+  .topic-card h3 { color: #1e40af; font-size: 0.95rem; }
+  .topic-card p { color: #64748b; font-size: 0.8rem; margin-top: 3px; }
+  .quiz-question { font-size: 1.05rem; font-weight: 600; color: #1e40af; margin-bottom: 16px; line-height: 1.4; }
+  .option-btn { width: 100%; padding: 12px; border: 2px solid #e0e7ff; border-radius: 10px; background: white; text-align: left; cursor: pointer; margin-bottom: 8px; font-size: 0.95rem; transition: all 0.2s; }
+  .option-btn:hover { border-color: #2563eb; background: #eff6ff; }
+  .option-btn.correct { border-color: #10b981; background: #d1fae5; color: #065f46; }
+  .option-btn.wrong { border-color: #ef4444; background: #fee2e2; color: #dc2626; }
+  .explanation { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 10px; padding: 12px; margin-top: 10px; font-size: 0.9rem; color: #78350f; line-height: 1.5; }
+  .score-circle { width: 100px; height: 100px; border-radius: 50%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 16px auto; font-size: 2rem; font-weight: 700; }
+  .score-circle span { font-size: 0.75rem; font-weight: 400; }
+  .chat-box { height: 340px; overflow-y: auto; padding: 10px; background: #f8faff; border-radius: 12px; margin-bottom: 10px; }
+  .msg { margin-bottom: 12px; display: flex; }
+  .msg.user { justify-content: flex-end; }
+  .msg.ai { justify-content: flex-start; }
+  .msg.user .bubble { background: #2563eb; color: white; max-width: 80%; }
+  .msg.ai .bubble { background: white; color: #1a1a2e; border: 1px solid #e0e7ff; max-width: 85%; }
+  .bubble { padding: 10px 14px; border-radius: 14px; font-size: 0.9rem; line-height: 1.5; word-break: break-word; }
+  .chat-input-row { display: flex; gap: 8px; }
+  .chat-input-row input { margin-bottom: 0; flex: 1; }
+  .tab-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab { flex: 1; padding: 10px; border: none; border-radius: 8px; background: #e0e7ff; color: #1d4ed8; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+  .tab.active { background: #2563eb; color: white; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid #c7d2fe; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .header h2 { margin-bottom: 0; flex: 1; }
+  .back-btn { background: none; border: none; color: #2563eb; cursor: pointer; font-size: 1.5rem; padding: 0; }
+  .stat-row { display: flex; gap: 10px; margin-bottom: 14px; }
+  .stat-box { flex: 1; background: #eff6ff; border-radius: 10px; padding: 12px; text-align: center; }
+  .stat-box .num { font-size: 1.4rem; font-weight: 700; color: #2563eb; }
+  .stat-box .lbl { font-size: 0.75rem; color: #64748b; }
+  .classe-toggle { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f4ff; }
+  .toggle { position: relative; width: 44px; height: 24px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: #cbd5e1; border-radius: 24px; cursor: pointer; transition: 0.3s; }
+  .slider:before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+  .toggle input:checked + .slider { background: #2563eb; }
+  .toggle input:checked + .slider:before { transform: translateX(20px); }
+  .sugestoes { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .sug-btn { padding: 6px 12px; background: #e0e7ff; color: #1d4ed8; border: none; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+  .intro-box { background: #eff6ff; border-radius: 10px; padding: 14px; margin-bottom: 14px; font-size: 0.9rem; line-height: 1.6; color: #1e40af; }
+  .progress-bar { background: #e0e7ff; border-radius: 10px; height: 8px; margin-top: 6px; overflow: hidden; }
+  .progress-fill { background: #2563eb; height: 100%; border-radius: 10px; transition: width 0.3s; }
+</style>
+</head>
+<body>
+
+<!-- INICIO -->
+<div id="screen-home" class="screen active">
+  <div class="logo">
+    <div class="icon">📐</div>
+    <h1>TutorMoz</h1>
+    <p>Matemática para o ensino primário</p>
+  </div>
+  <div class="card">
+    <button class="btn btn-primary" onclick="goTo('screen-guardian-login')">👨‍👩‍👧 Sou Encarregado</button>
+    <button class="btn btn-secondary" onclick="goTo('screen-student-select')">🎒 Sou Aluno</button>
+  </div>
+  <p style="text-align:center;color:#94a3b8;font-size:0.8rem;">mozdomestica.github.io/tutormoz</p>
+</div>
+
+<!-- LOGIN ENCARREGADO -->
+<div id="screen-guardian-login" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('screen-home')">←</button>
+    <h2>Área do Encarregado</h2>
+  </div>
+  <div class="card">
+    <div id="gl-error" class="error" style="display:none"></div>
+    <div class="tab-bar">
+      <button class="tab active" id="tab-btn-login" onclick="switchTab('login')">Entrar</button>
+      <button class="tab" id="tab-btn-register" onclick="switchTab('register')">Criar Conta</button>
+    </div>
+    <div id="tab-login">
+      <input id="gl-telefone" type="tel" placeholder="Telefone (ex: 84xxxxxxx)">
+      <input id="gl-pin" type="password" maxlength="4" placeholder="PIN (4 dígitos)">
+      <button class="btn btn-primary" onclick="loginGuardian()">Entrar</button>
+    </div>
+    <div id="tab-register" style="display:none">
+      <input id="gr-nome" type="text" placeholder="Nome completo">
+      <input id="gr-telefone" type="tel" placeholder="Telefone (ex: 84xxxxxxx)">
+      <input id="gr-pin" type="password" maxlength="4" placeholder="Criar PIN (4 dígitos)">
+      <button class="btn btn-primary" onclick="registerGuardian()">Criar Conta</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD ENCARREGADO -->
+<div id="screen-guardian-dash" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="logoutGuardian()">←</button>
+    <h2 id="gd-nome">Dashboard</h2>
+  </div>
+  <div id="gd-error" class="error" style="display:none"></div>
+  <div id="gd-alunos"></div>
+  <div class="card">
+    <h2>➕ Adicionar Aluno</h2>
+    <input id="na-nome" type="text" placeholder="Nome do aluno">
+    <input id="na-pin" type="password" maxlength="4" placeholder="PIN do aluno (4 dígitos)">
+    <button class="btn btn-primary" onclick="addAluno()">Adicionar</button>
+  </div>
+</div>
+
+<!-- DETALHE ALUNO (encarregado) -->
+<div id="screen-aluno-detail" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="loadGuardianDash()">←</button>
+    <h2 id="ad-nome">Aluno</h2>
+  </div>
+  <div class="card">
+    <div class="stat-row">
+      <div class="stat-box"><div class="num" id="ad-sessoes">0</div><div class="lbl">Sessões</div></div>
+      <div class="stat-box"><div class="num" id="ad-certas">0</div><div class="lbl">Certas</div></div>
+      <div class="stat-box"><div class="num" id="ad-precisao">0%</div><div class="lbl">Precisão</div></div>
+    </div>
+    <h2 style="margin-bottom:10px">Classes Activas</h2>
+    <div id="ad-classes"></div>
+  </div>
+</div>
+
+<!-- SELECCIONAR ALUNO -->
+<div id="screen-student-select" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('screen-home')">←</button>
+    <h2>Qual é o teu nome?</h2>
+  </div>
+  <div id="ss-error" class="error" style="display:none"></div>
+  <div class="card">
+    <div id="ss-alunos"><p style="color:#64748b;text-align:center">A carregar...</p></div>
+  </div>
+  <div class="card" id="ss-pin-box" style="display:none">
+    <h2 id="ss-pin-title">Insere o teu PIN</h2>
+    <input id="ss-pin" type="password" maxlength="4" placeholder="PIN (4 dígitos)">
+    <button class="btn btn-primary" onclick="loginAluno()">Entrar</button>
+  </div>
+</div>
+
+<!-- DASHBOARD ALUNO -->
+<div id="screen-student-dash" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="logoutAluno()">←</button>
+    <h2 id="sd-nome">Olá!</h2>
+  </div>
+  <div class="tab-bar">
+    <button class="tab active" id="tab-temas" onclick="showStudentTab('temas')">📚 Temas</button>
+    <button class="tab" id="tab-chat" onclick="showStudentTab('chat')">🤖 Tutor IA</button>
+  </div>
+  <div id="sd-temas"><div id="sd-classes"></div></div>
+  <div id="sd-chat" style="display:none">
+    <div class="card">
+      <div class="sugestoes">
+        <button class="sug-btn" onclick="sendSugestao('O que são fracções?')">O que são fracções?</button>
+        <button class="sug-btn" onclick="sendSugestao('Como somo números grandes?')">Como somar grandes?</button>
+        <button class="sug-btn" onclick="sendSugestao('O que é o perímetro?')">O que é perímetro?</button>
+        <button class="sug-btn" onclick="sendSugestao('Como faço divisão?')">Como faço divisão?</button>
+      </div>
+      <div class="chat-box" id="chat-box"></div>
+      <div class="chat-input-row">
+        <input id="chat-input" type="text" placeholder="Escreve a tua dúvida..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn btn-primary btn-sm" onclick="sendChat()" id="chat-send-btn">Enviar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TEMA -->
+<div id="screen-topic" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('screen-student-dash')">←</button>
+    <h2 id="topic-title">Tema</h2>
+  </div>
+  <div class="card">
+    <div class="intro-box" id="topic-intro"></div>
+    <button class="btn btn-primary" onclick="startQuiz()">Começar Exercícios →</button>
+    <button class="btn btn-secondary" onclick="showStudentTab('chat'); goTo('screen-student-dash')">💬 Tenho dúvidas</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('screen-topic')">←</button>
+    <h2 id="quiz-title">Exercício</h2>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+      <span id="quiz-prog" style="color:#64748b;font-size:0.85rem"></span>
+      <span id="quiz-score" style="color:#2563eb;font-weight:600;font-size:0.85rem"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="quiz-bar"></div></div>
+    <br>
+    <div class="quiz-question" id="quiz-q"></div>
+    <div id="quiz-opts"></div>
+    <div id="quiz-expl" class="explanation" style="display:none"></div>
+    <button class="btn btn-primary" id="quiz-next" style="display:none;margin-top:10px" onclick="nextQuestion()">Próxima →</button>
+  </div>
+</div>
+
+<!-- RESULTADO -->
+<div id="screen-result" class="screen">
+  <div class="card" style="text-align:center">
+    <h2 id="res-title">Resultado</h2>
+    <div class="score-circle" id="res-circle">
+      <div id="res-score"></div>
+      <span id="res-total"></span>
+    </div>
+    <p id="res-msg" style="color:#64748b;margin-bottom:16px"></p>
+    <button class="btn btn-primary" onclick="goTo('screen-student-dash')">Voltar aos Temas</button>
+    <button class="btn btn-secondary" onclick="showStudentTab('chat'); goTo('screen-student-dash')">💬 Pedir ajuda ao Tutor IA</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://sacgiyeekwzxcgyceocz.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_GyP1cwoTRovYiqOrmy28wA_MEnOhZq1';
+const GROQ_KEY = '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';
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentGuardian = null;
+let currentAluno = null;
+let currentTopic = null;
+let quizData = { questions: [], current: 0, score: 0 };
+let chatHistory = [];
+let selectedAlunoId = null;
+
+const CURRICULUM = {
+  '4ª Classe': [
+    { title: 'Números até 1000', intro: 'Os números até 1000 ajudam-nos a contar coisas do dia-a-dia. Por exemplo: uma loja tem 850 sacos de arroz. O número 850 tem 8 centenas, 5 dezenas e 0 unidades.',
+      questions: [
+        { q: 'Quanto é 400 + 350?', opts: ['650','750','700','800'], ans: 1, expl: '400 + 350 = 750. Somamos as centenas (4+3=7) e as dezenas (0+5=5). Resultado: 750.' },
+        { q: 'O número 637 tem quantas dezenas?', opts: ['6','3','7','63'], ans: 1, expl: 'No 637: 6=centenas, 3=dezenas, 7=unidades. Resposta: 3 dezenas.' },
+        { q: 'Qual é o maior número? 489, 498, 849, 894', opts: ['489','498','849','894'], ans: 3, expl: 'Comparamos as centenas: 8 > 4. Entre 849 e 894, as dezenas: 9 > 4. Logo 894 é o maior.' },
+        { q: 'Quanto é 1000 - 250?', opts: ['650','700','750','850'], ans: 2, expl: '1000 - 250 = 750. Verificação: 250 + 750 = 1000 ✓' },
+        { q: 'Uma vendedora tem 425 laranjas e recebe 375 mais. Quantas ao total?', opts: ['700','800','750','780'], ans: 1, expl: '425 + 375 = 800. Unidades: 5+5=10 (transporta 1). Dezenas: 2+7+1=10 (transporta 1). Centenas: 4+3+1=8.' }
+      ]
+    },
+    { title: 'Adição e Subtracção', intro: 'A adição junta quantidades e a subtracção tira quantidades. São as operações mais usadas no mercado quando compramos e recebemos troco.',
+      questions: [
+        { q: 'Compras uma manga por 15 Mt e um pão por 8 Mt. Quanto gastas?', opts: ['20 Mt','23 Mt','22 Mt','25 Mt'], ans: 1, expl: '15 + 8 = 23 Mt.' },
+        { q: 'Tens 100 Mt e gastas 37 Mt. Quanto fica?', opts: ['63 Mt','73 Mt','67 Mt','53 Mt'], ans: 0, expl: '100 - 37 = 63 Mt. Verificação: 37 + 63 = 100 ✓' },
+        { q: 'Uma turma tem 45 rapazes e 38 raparigas. Quantos alunos?', opts: ['73','83','93','63'], ans: 1, expl: '45 + 38 = 83 alunos.' },
+        { q: 'Qual é o resultado de 356 + 244?', opts: ['590','600','580','610'], ans: 1, expl: '356 + 244 = 600.' },
+        { q: 'Há 500 sacos de milho. Vendem-se 185. Quantos ficam?', opts: ['305','315','325','295'], ans: 1, expl: '500 - 185 = 315. Verificação: 185 + 315 = 500 ✓' }
+      ]
+    },
+    { title: 'Multiplicação', intro: 'A multiplicação é uma forma rápida de somar grupos iguais. 4 × 6 significa 4 grupos de 6, ou seja 6+6+6+6 = 24.',
+      questions: [
+        { q: 'Quanto é 7 × 8?', opts: ['54','56','58','52'], ans: 1, expl: '7 × 8 = 56. Tabuada do 7: ...7×7=49, 7×8=56.' },
+        { q: 'Uma caixa tem 6 laranjas. Quantas há em 9 caixas?', opts: ['48','54','56','45'], ans: 1, expl: '6 × 9 = 54 laranjas.' },
+        { q: 'Quanto é 5 × 7?', opts: ['30','35','40','25'], ans: 1, expl: '5 × 7 = 35. A tabuada do 5 termina sempre em 0 ou 5.' },
+        { q: 'Qual o resultado de 4 × 25?', opts: ['80','90','100','120'], ans: 2, expl: '4 × 25 = 100. Cálculo: 4×20=80, 4×5=20. Total: 80+20=100.' },
+        { q: 'Uma carteira custa 150 Mt. Qual o preço de 3 carteiras?', opts: ['350 Mt','400 Mt','450 Mt','500 Mt'], ans: 2, expl: '3 × 150 = 450 Mt. Cálculo: 3×100=300, 3×50=150. Total: 300+150=450 Mt.' }
+      ]
+    },
+    { title: 'Divisão', intro: 'A divisão reparte uma quantidade em partes iguais. Se tens 20 mangas para 4 amigos, cada um fica com 20÷4 = 5 mangas.',
+      questions: [
+        { q: 'Quanto é 48 ÷ 6?', opts: ['6','7','8','9'], ans: 2, expl: '48 ÷ 6 = 8. Verificação: 6 × 8 = 48 ✓' },
+        { q: 'Tens 35 Mt para dividir por 5 pessoas. Quanto fica cada um?', opts: ['5 Mt','6 Mt','7 Mt','8 Mt'], ans: 2, expl: '35 ÷ 5 = 7 Mt. Verificação: 5 × 7 = 35 ✓' },
+        { q: 'Quanto é 72 ÷ 9?', opts: ['6','7','8','9'], ans: 2, expl: '72 ÷ 9 = 8. Verificação: 9 × 8 = 72 ✓' },
+        { q: 'Uma corda de 56 cm é cortada em 7 pedaços iguais. Quanto mede cada um?', opts: ['6 cm','7 cm','8 cm','9 cm'], ans: 2, expl: '56 ÷ 7 = 8 cm. Verificação: 7 × 8 = 56 ✓' },
+        { q: 'Quanto é 90 ÷ 3?', opts: ['20','25','30','35'], ans: 2, expl: '90 ÷ 3 = 30. Dica: 9÷3=3, logo 90÷3=30.' }
+      ]
+    },
+    { title: 'Fracções Simples', intro: 'Uma fracção representa uma parte de um todo. Se cortas uma laranja ao meio, cada parte é 1/2. O número de baixo diz em quantas partes dividiste.',
+      questions: [
+        { q: 'Uma pizza tem 4 partes iguais. Comes 1 parte. Que fracção comeste?', opts: ['1/2','1/3','1/4','2/4'], ans: 2, expl: '1/4 (um quarto). A pizza tem 4 partes e comeste 1.' },
+        { q: 'Qual fracção representa metade?', opts: ['1/4','1/2','2/3','3/4'], ans: 1, expl: '1/2 representa metade. Dividimos em 2 partes e tomamos 1.' },
+        { q: 'Qual fracção é maior: 1/2 ou 1/4?', opts: ['1/4','São iguais','1/2','Não se compara'], ans: 2, expl: '1/2 é maior. Metade de uma laranja é maior que um quarto. Quanto maior o denominador, menor a parte.' },
+        { q: 'Um bolo tem 8 fatias. Comes 3. Que fracção comeste?', opts: ['3/5','3/8','5/8','8/3'], ans: 1, expl: '3/8 (três oitavos). Total=8 fatias, comeste=3.' },
+        { q: 'Quanto é 1/2 de 20 Mt?', opts: ['5 Mt','8 Mt','10 Mt','15 Mt'], ans: 2, expl: '1/2 de 20 = 20 ÷ 2 = 10 Mt.' }
+      ]
+    },
+    { title: 'Medidas de Comprimento', intro: 'Usamos cm e m para medir comprimentos. 100 cm = 1 m. Usamos estas medidas para medir o comprimento de uma mesa, a altura de uma pessoa, etc.',
+      questions: [
+        { q: 'Quantos cm tem 2 metros?', opts: ['20 cm','100 cm','200 cm','2000 cm'], ans: 2, expl: '2 m = 200 cm. Como 1 m = 100 cm, então 2 × 100 = 200 cm.' },
+        { q: 'Uma corda tem 350 cm. Quantos metros tem?', opts: ['3 m','3,5 m','35 m','0,35 m'], ans: 1, expl: '350 cm = 3,5 m. Dividimos por 100: 350 ÷ 100 = 3,5 m.' },
+        { q: 'Uma sala mede 5 m × 4 m. Qual é o perímetro?', opts: ['9 m','18 m','20 m','16 m'], ans: 1, expl: 'Perímetro = 2 × (5+4) = 2 × 9 = 18 m.' },
+        { q: 'João tem 1,50 m e Maria 1,35 m. Qual a diferença?', opts: ['10 cm','15 cm','20 cm','25 cm'], ans: 1, expl: '1,50 - 1,35 = 0,15 m = 15 cm.' },
+        { q: 'Uma régua tem 30 cm. Três réguas em fila têm quantos metros?', opts: ['0,3 m','0,9 m','9 m','90 m'], ans: 1, expl: '3 × 30 = 90 cm = 0,9 m.' }
+      ]
+    },
+    { title: 'Geometria Básica', intro: 'As formas geométricas estão em todo o lado! Um quadrado tem 4 lados iguais, um triângulo tem 3 lados e um círculo é redondo.',
+      questions: [
+        { q: 'Quantos lados tem um triângulo?', opts: ['2','3','4','5'], ans: 1, expl: 'Um triângulo tem 3 lados. "Tri" significa três.' },
+        { q: 'Qual a forma de uma moeda de 1 Mt?', opts: ['Quadrado','Triângulo','Círculo','Rectângulo'], ans: 2, expl: 'Uma moeda tem forma de círculo.' },
+        { q: 'Um quadrado tem lado de 5 cm. Qual é o perímetro?', opts: ['10 cm','15 cm','20 cm','25 cm'], ans: 2, expl: 'Perímetro = 4 × lado = 4 × 5 = 20 cm.' },
+        { q: 'Qual forma tem 4 lados iguais e 4 ângulos rectos?', opts: ['Triângulo','Rectângulo','Círculo','Quadrado'], ans: 3, expl: 'O quadrado tem 4 lados iguais e 4 ângulos de 90°.' },
+        { q: 'Um rectângulo tem 8 cm × 3 cm. Qual é a área?', opts: ['11 cm²','22 cm²','24 cm²','32 cm²'], ans: 2, expl: 'Área = 8 × 3 = 24 cm².' }
+      ]
+    }
+  ],
+  '5ª Classe': [
+    { title: 'Números até 1 000 000', intro: 'Os números até um milhão usam-se para coisas grandes, como habitantes de uma cidade. Maputo tem mais de 1 000 000 de habitantes!',
+      questions: [
+        { q: 'Como se escreve por extenso 350 000?', opts: ['Trezentos e cinco mil','Trinta e cinco mil','Trezentos e cinquenta mil','Três mil e quinhentos'], ans: 2, expl: '350 000 = Trezentos e cinquenta mil. Temos 3 centenas de milhar e 5 dezenas de milhar.' },
+        { q: 'Qual o valor do algarismo 7 em 574 320?', opts: ['7','700','7000','70 000'], ans: 3, expl: 'O 7 está na posição das dezenas de milhar. Valor = 7 × 10 000 = 70 000.' },
+        { q: 'Quanto é 500 000 + 250 000?', opts: ['650 000','700 000','750 000','800 000'], ans: 2, expl: '500 000 + 250 000 = 750 000.' },
+        { q: 'Ordena do menor ao maior: 432 000, 243 000, 342 000', opts: ['432<342<243','243<342<432','342<243<432','243<432<342'], ans: 1, expl: '243 000 < 342 000 < 432 000. Comparamos as centenas de milhar: 2 < 3 < 4.' },
+        { q: 'Quanto é 1 000 000 - 375 000?', opts: ['615 000','625 000','635 000','645 000'], ans: 1, expl: '1 000 000 - 375 000 = 625 000. Verificação: 375 000 + 625 000 = 1 000 000 ✓' }
+      ]
+    },
+    { title: 'Múltiplos e Divisores', intro: 'Os múltiplos de um número são os resultados da sua tabuada: múltiplos de 3 são 3, 6, 9, 12... Os divisores dividem o número exactamente.',
+      questions: [
+        { q: 'Qual dos seguintes é múltiplo de 4?', opts: ['14','18','24','30'], ans: 2, expl: '24 é múltiplo de 4 porque 4 × 6 = 24.' },
+        { q: 'Quais são os divisores de 12?', opts: ['1,2,3,4,6,12','1,2,4,6,12','1,3,4,6,12','2,3,4,6,12'], ans: 0, expl: 'Divisores de 12: 1,2,3,4,6,12. Cada um divide 12 exactamente.' },
+        { q: 'O número 15 é múltiplo de qual número?', opts: ['4','6','5','8'], ans: 2, expl: '15 é múltiplo de 5 porque 5 × 3 = 15.' },
+        { q: 'Qual é o mínimo múltiplo comum (MMC) de 4 e 6?', opts: ['8','12','18','24'], ans: 1, expl: 'MMC(4,6) = 12. Múltiplos de 4: 4,8,12... Múltiplos de 6: 6,12... O primeiro comum é 12.' },
+        { q: 'Qual é o máximo divisor comum (MDC) de 18 e 24?', opts: ['3','4','6','9'], ans: 2, expl: 'MDC(18,24) = 6. Divisores de 18: 1,2,3,6,9,18. Divisores de 24: 1,2,3,4,6,8,12,24. Maior comum: 6.' }
+      ]
+    },
+    { title: 'Fracções Equivalentes', intro: 'Fracções equivalentes representam a mesma quantidade com números diferentes. 1/2 = 2/4 = 3/6. São como dizer "meio pão" de formas diferentes.',
+      questions: [
+        { q: 'Qual fracção é equivalente a 1/2?', opts: ['1/3','2/3','2/4','3/4'], ans: 2, expl: '2/4 = 1/2. Multiplicamos numerador e denominador por 2: (1×2)/(2×2) = 2/4.' },
+        { q: 'Simplifica a fracção 6/8:', opts: ['2/3','3/4','4/6','1/2'], ans: 1, expl: '6/8 = 3/4. Dividimos por MDC(6,8)=2: (6÷2)/(8÷2) = 3/4.' },
+        { q: 'Qual é maior: 3/4 ou 2/3?', opts: ['2/3','São iguais','3/4','Não se compara'], ans: 2, expl: '3/4 > 2/3. Convertemos: 3/4 = 9/12 e 2/3 = 8/12. Como 9>8, então 3/4 > 2/3.' },
+        { q: 'Quanto é 1/4 + 1/4?', opts: ['1/8','2/4','1/2','2/8'], ans: 1, expl: '1/4 + 1/4 = 2/4 = 1/2. Denominadores iguais: somamos só os numeradores.' },
+        { q: 'Quanto é 3/4 de 40 Mt?', opts: ['10 Mt','20 Mt','30 Mt','35 Mt'], ans: 2, expl: '3/4 de 40 = (40÷4)×3 = 10×3 = 30 Mt.' }
+      ]
+    },
+    { title: 'Números Decimais', intro: 'Os números decimais têm uma vírgula que separa a parte inteira da parte decimal. 2,5 lê-se "dois vírgula cinco". Usamos no dinheiro: 15,50 Mt.',
+      questions: [
+        { q: 'Como se lê 3,7?', opts: ['Três e sete','Trinta e sete','Três vírgula sete','Três sétimos'], ans: 2, expl: '3,7 = "três vírgula sete". Parte inteira=3, parte decimal=7 décimas.' },
+        { q: 'Quanto é 2,5 + 1,3?', opts: ['3,5','3,8','4,0','3,2'], ans: 1, expl: '2,5 + 1,3 = 3,8. Alinhamos as vírgulas: 5+3=8 décimas, 2+1=3 unidades.' },
+        { q: 'Uma laranja pesa 0,250 kg. Quanto pesam 4 laranjas?', opts: ['0,750 kg','1,000 kg','1,250 kg','0,500 kg'], ans: 1, expl: '4 × 0,250 = 1,000 kg.' },
+        { q: 'Ordena do menor ao maior: 1,5; 1,05; 1,50', opts: ['1,50<1,5<1,05','1,05<1,50<1,5','1,05<1,5=1,50','1,5<1,05<1,50'], ans: 2, expl: '1,05 < 1,5 = 1,50. Nota: 1,5 e 1,50 são o mesmo número.' },
+        { q: 'Quanto é 5,60 - 2,35?', opts: ['3,25','3,15','3,35','2,25'], ans: 0, expl: '5,60 - 2,35 = 3,25.' }
+      ]
+    },
+    { title: 'Percentagem', intro: 'A percentagem (%) significa "por cada 100". 50% quer dizer 50 em cada 100. Usamos em descontos nas lojas: 20% de desconto numa camisa de 500 Mt = poupar 100 Mt.',
+      questions: [
+        { q: 'Quanto é 50% de 80 Mt?', opts: ['20 Mt','30 Mt','40 Mt','50 Mt'], ans: 2, expl: '50% de 80 = 80 ÷ 2 = 40 Mt. 50% é sempre metade.' },
+        { q: 'Uma camisa de 400 Mt tem 25% de desconto. Qual o desconto?', opts: ['75 Mt','100 Mt','125 Mt','150 Mt'], ans: 1, expl: '25% de 400 = (400×25)÷100 = 100 Mt.' },
+        { q: 'Qual é 10% de 350 Mt?', opts: ['3,5 Mt','35 Mt','30 Mt','70 Mt'], ans: 1, expl: '10% de 350 = 350÷10 = 35 Mt. Para 10% basta dividir por 10.' },
+        { q: 'Em 100 alunos, 60% são raparigas. Quantas raparigas?', opts: ['40','50','60','65'], ans: 2, expl: '60% de 100 = 60 raparigas.' },
+        { q: 'Um produto de 200 Mt tem 15% de IVA. Qual o preço final?', opts: ['215 Mt','220 Mt','230 Mt','250 Mt'], ans: 2, expl: 'IVA = 15% de 200 = 30 Mt. Preço final = 200+30 = 230 Mt.' }
+      ]
+    },
+    { title: 'Medidas de Massa e Capacidade', intro: 'A massa mede o peso de um objecto (kg, g). A capacidade mede líquidos (litros, ml). 1 kg = 1000 g. 1 litro = 1000 ml.',
+      questions: [
+        { q: 'Quantos gramas tem 2,5 kg?', opts: ['250 g','2500 g','25 g','2050 g'], ans: 1, expl: '2,5 kg = 2500 g. Como 1 kg=1000 g, então 2,5×1000=2500 g.' },
+        { q: 'Uma garrafa tem 1,5 litros. Quantos ml tem?', opts: ['150 ml','1050 ml','1500 ml','15000 ml'], ans: 2, expl: '1,5 litros = 1500 ml. Como 1 litro=1000 ml, então 1,5×1000=1500 ml.' },
+        { q: 'Compras 3 embalagens de 500 g de açúcar. Quantos kg tens?', opts: ['1 kg','1,5 kg','2 kg','2,5 kg'], ans: 1, expl: '3 × 500g = 1500g = 1,5 kg.' },
+        { q: 'Que unidade usas para medir o leite numa garrafa?', opts: ['kg','cm','litros','km'], ans: 2, expl: 'Usamos litros (ou ml) para medir líquidos.' },
+        { q: 'Uma receita precisa de 250 ml de óleo. Tens 1 litro. Quantas vezes usas?', opts: ['2 vezes','3 vezes','4 vezes','5 vezes'], ans: 2, expl: '1000 ml ÷ 250 ml = 4 vezes.' }
+      ]
+    },
+    { title: 'Gráficos e Tabelas', intro: 'Os gráficos e tabelas mostram informação de forma organizada e visual. São usados em jornais e televisão para mostrar resultados, preços, etc.',
+      questions: [
+        { q: 'Tabela: Manga=30, Laranja=45, Banana=25. Qual a fruta mais vendida?', opts: ['Manga','Laranja','Banana','Todas iguais'], ans: 1, expl: 'A Laranja com 45 é a mais vendida. 45 > 30 > 25.' },
+        { q: 'Num gráfico de barras, a barra mais alta representa:', opts: ['O menor valor','O maior valor','O valor médio','O total'], ans: 1, expl: 'A barra mais alta = o maior valor.' },
+        { q: 'Temperaturas: 28°, 30°, 27°, 32°, 29°. Qual a temperatura média?', opts: ['28°','29°','29,2°','30°'], ans: 2, expl: 'Média = (28+30+27+32+29)÷5 = 146÷5 = 29,2°C.' },
+        { q: 'Num gráfico circular, 50% é representado por qual ângulo?', opts: ['90°','120°','150°','180°'], ans: 3, expl: '50% de 360° = 180°. Metade do círculo.' },
+        { q: 'Para que serve uma tabela de frequência?', opts: ['Para calcular áreas','Para contar quantas vezes algo acontece','Para medir comprimentos','Para somar fracções'], ans: 1, expl: 'A tabela de frequência conta quantas vezes cada valor aparece.' }
+      ]
+    }
+  ],
+  '6ª Classe': [
+    { title: 'Números Inteiros', intro: 'Os números inteiros incluem os positivos, o zero e os negativos (-1, -2...). Usamos negativos para temperaturas, dívidas ou altitudes abaixo do nível do mar.',
+      questions: [
+        { q: 'Qual é o oposto de -8?', opts: ['-8','0','+8','1/8'], ans: 2, expl: 'O oposto de -8 é +8. Dois números opostos têm o mesmo valor absoluto mas sinais diferentes.' },
+        { q: 'Quanto é -5 + 3?', opts: ['-8','-2','2','8'], ans: 1, expl: '-5 + 3 = -2. Partimos de -5 e avançamos 3: -5,-4,-3,-2.' },
+        { q: 'Ordena do menor ao maior: 3, -5, 0, -1, 7', opts: ['-5,-1,0,3,7','7,3,0,-1,-5','-5,0,-1,3,7','0,-1,-5,3,7'], ans: 0, expl: 'Ordem crescente: -5, -1, 0, 3, 7.' },
+        { q: 'Temperatura era -3°C e subiu 8°C. Qual é agora?', opts: ['5°C','3°C','-5°C','11°C'], ans: 0, expl: '-3 + 8 = 5°C.' },
+        { q: 'Quanto é (-4) × (-3)?', opts: ['-12','-7','7','12'], ans: 3, expl: '(-4) × (-3) = +12. Negativo × negativo = positivo.' }
+      ]
+    },
+    { title: 'Potências e Raízes', intro: 'A potência é uma multiplicação repetida: 3² = 3×3 = 9. A raiz quadrada é a operação inversa: √9 = 3 porque 3² = 9.',
+      questions: [
+        { q: 'Quanto é 4²?', opts: ['8','12','16','20'], ans: 2, expl: '4² = 4 × 4 = 16.' },
+        { q: 'Quanto é √25?', opts: ['4','5','6','7'], ans: 1, expl: '√25 = 5 porque 5 × 5 = 25.' },
+        { q: 'Quanto é 2³?', opts: ['6','8','9','12'], ans: 1, expl: '2³ = 2×2×2 = 8.' },
+        { q: 'Um quadrado tem área de 49 cm². Qual é o lado?', opts: ['6 cm','7 cm','8 cm','9 cm'], ans: 1, expl: 'Lado = √49 = 7 cm. Verificação: 7² = 49 ✓' },
+        { q: 'Quanto é 10³?', opts: ['30','100','1000','10000'], ans: 2, expl: '10³ = 10×10×10 = 1000.' }
+      ]
+    },
+    { title: 'Equações Simples', intro: 'Uma equação tem um valor desconhecido (x). Para resolver, isolamos o x. Exemplo: x + 5 = 12. Subtraímos 5: x = 12 - 5 = 7.',
+      questions: [
+        { q: 'Resolve: x + 8 = 15', opts: ['x=5','x=6','x=7','x=8'], ans: 2, expl: 'x = 15 - 8 = 7. Verificação: 7+8=15 ✓' },
+        { q: 'Resolve: 3x = 21', opts: ['x=5','x=6','x=7','x=8'], ans: 2, expl: 'x = 21÷3 = 7. Verificação: 3×7=21 ✓' },
+        { q: 'Resolve: x - 4 = 9', opts: ['x=5','x=11','x=13','x=14'], ans: 2, expl: 'x = 9+4 = 13. Verificação: 13-4=9 ✓' },
+        { q: 'O pai tem o dobro da idade do filho. Pai=36. Que idade tem o filho?', opts: ['15','16','18','20'], ans: 2, expl: '2x = 36. x = 36÷2 = 18 anos.' },
+        { q: 'Resolve: x/5 = 4', opts: ['x=9','x=15','x=20','x=25'], ans: 2, expl: 'x = 4×5 = 20. Verificação: 20/5=4 ✓' }
+      ]
+    },
+    { title: 'Razões e Proporções', intro: 'A razão compara duas quantidades. Proporção é quando duas razões são iguais. Usamos em receitas, mapas e escalas.',
+      questions: [
+        { q: 'Se 2 kg de tomate custam 80 Mt, quanto custam 5 kg?', opts: ['150 Mt','180 Mt','200 Mt','220 Mt'], ans: 2, expl: 'x = (80×5)÷2 = 400÷2 = 200 Mt.' },
+        { q: 'Numa turma razão rapazes:raparigas é 3:2. Se há 15 rapazes, quantas raparigas?', opts: ['8','9','10','12'], ans: 2, expl: '3 partes = 15 rapazes. 1 parte = 5. Raparigas = 2×5 = 10.' },
+        { q: 'Um carro percorre 120 km em 2 horas. Em 5 horas, quantos km?', opts: ['240 km','280 km','300 km','360 km'], ans: 2, expl: 'Velocidade = 60 km/h. Em 5h: 60×5 = 300 km.' },
+        { q: 'No mapa 1 cm = 50 km. Duas cidades a 3,5 cm. Qual a distância real?', opts: ['125 km','150 km','175 km','200 km'], ans: 2, expl: '3,5 × 50 = 175 km.' },
+        { q: '6 operários fazem um trabalho em 4 dias. Em quantos dias o fazem 3 operários?', opts: ['4 dias','6 dias','8 dias','12 dias'], ans: 2, expl: 'Proporção inversa: 6×4 = 3×x. x = 24÷3 = 8 dias.' }
+      ]
+    },
+    { title: 'Área e Perímetro', intro: 'O perímetro é o contorno de uma figura. A área é o espaço dentro. Para rectângulo: Perímetro=2(c+l), Área=c×l.',
+      questions: [
+        { q: 'Um terreno 20 m × 12 m. Qual é a área?', opts: ['200 m²','220 m²','240 m²','260 m²'], ans: 2, expl: 'Área = 20 × 12 = 240 m².' },
+        { q: 'Triângulo com lados 5, 8 e 6 cm. Qual é o perímetro?', opts: ['17 cm','18 cm','19 cm','20 cm'], ans: 2, expl: 'Perímetro = 5+8+6 = 19 cm.' },
+        { q: 'Campo 100 m × 60 m. Qual a área em hectares? (1 ha = 10 000 m²)', opts: ['0,5 ha','0,6 ha','0,7 ha','0,8 ha'], ans: 1, expl: 'Área = 100×60 = 6000 m². Em hectares: 6000÷10000 = 0,6 ha.' },
+        { q: 'Jardim circular com raio 7 m. Quantos metros de rede? (π≈3,14)', opts: ['21,98 m','33,98 m','43,96 m','51,96 m'], ans: 2, expl: 'Perímetro = 2×π×r = 2×3,14×7 = 43,96 m.' },
+        { q: 'Área de um triângulo com base 10 cm e altura 6 cm:', opts: ['30 cm²','40 cm²','50 cm²','60 cm²'], ans: 0, expl: 'Área = (base×altura)÷2 = (10×6)÷2 = 30 cm².' }
+      ]
+    },
+    { title: 'Probabilidade', intro: 'A probabilidade mede a chance de um evento acontecer. Varia entre 0 (impossível) e 1 (certo). Num dado de 6 faces, a probabilidade de sair o 3 é 1/6.',
+      questions: [
+        { q: 'Atirar uma moeda: probabilidade de sair cara?', opts: ['1/4','1/3','1/2','2/3'], ans: 2, expl: 'P(cara) = 1/2. A moeda tem 2 faces.' },
+        { q: 'Saco com 3 bolas vermelhas e 7 azuis. P(vermelha)?', opts: ['3/7','3/10','7/10','1/3'], ans: 1, expl: 'P(vermelha) = 3/10. Total=10 bolas, vermelhas=3.' },
+        { q: 'P(número par) num dado de 6 faces?', opts: ['1/6','1/3','1/2','2/3'], ans: 2, expl: 'Pares no dado: 2,4,6 (são 3). P(par) = 3/6 = 1/2.' },
+        { q: 'Qual evento tem probabilidade 0?', opts: ['Chover em Dezembro','Tirar 7 num dado de 6 faces','Sol nascer amanhã','Moeda cair cara'], ans: 1, expl: 'Tirar 7 num dado de 6 faces é impossível. O dado só tem 1 a 6.' },
+        { q: 'Turma de 20 alunos, 12 são raparigas. P(escolher rapariga)?', opts: ['2/5','3/5','1/2','4/5'], ans: 1, expl: 'P(rapariga) = 12/20 = 3/5 = 60%.' }
+      ]
+    },
+    { title: 'Ângulos e Triângulos', intro: 'Um ângulo mede a abertura entre dois raios. A soma dos ângulos internos de um triângulo é sempre 180°.',
+      questions: [
+        { q: 'Soma dos ângulos internos de qualquer triângulo?', opts: ['90°','120°','180°','360°'], ans: 2, expl: 'A soma é sempre 180°.' },
+        { q: 'Triângulo com ângulos de 60° e 80°. Qual o terceiro?', opts: ['30°','40°','50°','60°'], ans: 1, expl: '180° - 60° - 80° = 40°.' },
+        { q: 'Um ângulo de 135° é:', opts: ['Recto','Agudo','Obtuso','Nulo'], ans: 2, expl: '135° é obtuso: maior que 90° e menor que 180°.' },
+        { q: 'Triângulo equilátero: qual é cada ângulo?', opts: ['45°','60°','72°','90°'], ans: 1, expl: '180° ÷ 3 = 60° cada.' },
+        { q: 'Triângulo rectângulo com catetos 3 e 4. Qual a hipotenusa?', opts: ['4','5','6','7'], ans: 1, expl: 'c² = 3²+4² = 9+16 = 25. c = √25 = 5. O famoso triângulo 3-4-5!' }
+      ]
+    }
+  ]
+};
+
+// NAVEGAÇÃO
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if (id === 'screen-student-select') loadAlunoList();
+}
+
+function switchTab(tab) {
+  document.getElementById('tab-login').style.display = tab==='login' ? 'block' : 'none';
+  document.getElementById('tab-register').style.display = tab==='register' ? 'block' : 'none';
+  document.getElementById('tab-btn-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-btn-register').classList.toggle('active', tab==='register');
+  document.getElementById('gl-error').style.display = 'none';
+}
+
+function showErr(id, msg) { const e=document.getElementById(id); e.textContent=msg; e.style.display='block'; }
+function hideErr(id) { document.getElementById(id).style.display='none'; }
+
+// ENCARREGADO
+async function registerGuardian() {
+  const nome=document.getElementById('gr-nome').value.trim();
+  const telefone=document.getElementById('gr-telefone').value.trim();
+  const pin=document.getElementById('gr-pin').value.trim();
+  hideErr('gl-error');
+  if (!nome||!telefone||!pin||pin.length!==4) { showErr('gl-error','Preenche todos os campos. O PIN deve ter 4 dígitos.'); return; }
+  const { data, error } = await db.from('encarregados').insert([{nome,telefone,pin}]).select().single();
+  if (error) { showErr('gl-error', error.code==='23505' ? 'Este telefone já está registado.' : 'Erro ao criar conta.'); return; }
+  currentGuardian = data;
+  loadGuardianDash();
+}
+
+async function loginGuardian() {
+  const telefone=document.getElementById('gl-telefone').value.trim();
+  const pin=document.getElementById('gl-pin').value.trim();
+  hideErr('gl-error');
+  if (!telefone||!pin) { showErr('gl-error','Preenche o telefone e o PIN.'); return; }
+  const { data, error } = await db.from('encarregados').select('*').eq('telefone',telefone).eq('pin',pin).single();
+  if (error||!data) { showErr('gl-error','Telefone ou PIN incorrectos.'); return; }
+  currentGuardian = data;
+  loadGuardianDash();
+}
+
+function logoutGuardian() { currentGuardian=null; goTo('screen-home'); }
+
+async function loadGuardianDash() {
+  document.getElementById('gd-nome').textContent = '👋 ' + currentGuardian.nome.split(' ')[0];
+  const { data: alunos } = await db.from('alunos').select('*').eq('encarregado_id', currentGuardian.id);
+  const c = document.getElementById('gd-alunos');
+  if (!alunos||!alunos.length) {
+    c.innerHTML = '<div class="card"><p style="color:#64748b;text-align:center">Ainda não adicionaste nenhum aluno.</p></div>';
+  } else {
+    c.innerHTML = alunos.map(a => {
+      const prec = a.total>0 ? Math.round((a.certas/a.total)*100) : 0;
+      return `<div class="card aluno-card" onclick="openAlunoDetail('${a.id}')">
+        <div class="aluno-info"><h3>🎒 ${a.nome}</h3><p>Classes: ${(a.classes||[]).join(', ')||'Nenhuma'}</p><p>Sessões: ${a.sessoes} | Precisão: ${prec}%</p></div>
+        <span>›</span></div>`;
+    }).join('');
+  }
+  goTo('screen-guardian-dash');
+}
+
+async function addAluno() {
+  const nome=document.getElementById('na-nome').value.trim();
+  const pin=document.getElementById('na-pin').value.trim();
+  hideErr('gd-error');
+  if (!nome||!pin||pin.length!==4) { showErr('gd-error','Nome e PIN de 4 dígitos são obrigatórios.'); return; }
+  const { error } = await db.from('alunos').insert([{encarregado_id:currentGuardian.id,nome,pin,classes:[],sessoes:0,certas:0,total:0}]);
+  if (error) { showErr('gd-error','Erro ao adicionar aluno.'); return; }
+  document.getElementById('na-nome').value='';
+  document.getElementById('na-pin').value='';
+  loadGuardianDash();
+}
+
+async function openAlunoDetail(id) {
+  const { data: a } = await db.from('alunos').select('*').eq('id',id).single();
+  if (!a) return;
+  currentAluno = a;
+  document.getElementById('ad-nome').textContent = a.nome;
+  const prec = a.total>0 ? Math.round((a.certas/a.total)*100) : 0;
+  document.getElementById('ad-sessoes').textContent = a.sessoes;
+  document.getElementById('ad-certas').textContent = a.certas;
+  document.getElementById('ad-precisao').textContent = prec+'%';
+  const classes=['4ª Classe','5ª Classe','6ª Classe'];
+  document.getElementById('ad-classes').innerHTML = classes.map(cl => {
+    const active=(a.classes||[]).includes(cl);
+    return `<div class="classe-toggle">
+      <span>${cl} <small style="color:#64748b">(150 Mt/mês)</small></span>
+      <label class="toggle"><input type="checkbox" ${active?'checked':''} onchange="toggleClass('${a.id}','${cl}',this.checked)"><span class="slider"></span></label>
+    </div>`;
+  }).join('');
+  goTo('screen-aluno-detail');
+}
+
+async function toggleClass(alunoId, classe, active) {
+  const { data: a } = await db.from('alunos').select('classes').eq('id',alunoId).single();
+  let cls = a.classes||[];
+  if (active) { if(!cls.includes(classe)) cls.push(classe); }
+  else { cls = cls.filter(c=>c!==classe); }
+  await db.from('alunos').update({classes:cls}).eq('id',alunoId);
+}
+
+// ALUNO
+async function loadAlunoList() {
+  const { data: alunos } = await db.from('alunos').select('id,nome');
+  const c = document.getElementById('ss-alunos');
+  if (!alunos||!alunos.length) { c.innerHTML='<p style="color:#64748b;text-align:center">Nenhum aluno registado ainda.</p>'; return; }
+  c.innerHTML = alunos.map(a=>`<button class="btn btn-secondary" onclick="selectAluno('${a.id}','${a.nome}')">${a.nome}</button>`).join('');
+}
+
+function selectAluno(id, nome) {
+  selectedAlunoId = id;
+  document.getElementById('ss-pin-title').textContent = 'PIN de '+nome;
+  document.getElementById('ss-pin-box').style.display = 'block';
+  document.getElementById('ss-pin').value = '';
+  document.getElementById('ss-pin').focus();
+}
+
+async function loginAluno() {
+  const pin = document.getElementById('ss-pin').value.trim();
+  hideErr('ss-error');
+  if (!pin) { showErr('ss-error','Insere o PIN.'); return; }
+  const { data, error } = await db.from('alunos').select('*').eq('id',selectedAlunoId).eq('pin',pin).single();
+  if (error||!data) { showErr('ss-error','PIN incorrecto.'); return; }
+  currentAluno = data;
+  loadStudentDash();
+}
+
+function logoutAluno() { currentAluno=null; chatHistory=[]; document.getElementById('chat-box').innerHTML=''; goTo('screen-home'); }
+
+function loadStudentDash() {
+  document.getElementById('sd-nome').textContent = '👋 '+currentAluno.nome.split(' ')[0]+'!';
+  const classes = currentAluno.classes||[];
+  const c = document.getElementById('sd-classes');
+  if (!classes.length) {
+    c.innerHTML='<div class="card"><p style="color:#64748b">O teu encarregado ainda não activou nenhuma classe. Pede-lhe para activar!</p></div>';
+  } else {
+    c.innerHTML = classes.map(classe => {
+      const topics = CURRICULUM[classe]||[];
+      return `<div class="card"><h2>📖 ${classe}</h2>${topics.map((t,i)=>
+        `<div class="topic-card" onclick="openTopic('${classe}',${i})"><h3>${t.title}</h3><p>${t.questions.length} exercícios</p></div>`
+      ).join('')}</div>`;
+    }).join('');
+  }
+  showStudentTab('temas');
+  goTo('screen-student-dash');
+}
+
+function showStudentTab(tab) {
+  document.getElementById('sd-temas').style.display = tab==='temas'?'block':'none';
+  document.getElementById('sd-chat').style.display = tab==='chat'?'block':'none';
+  document.getElementById('tab-temas').classList.toggle('active', tab==='temas');
+  document.getElementById('tab-chat').classList.toggle('active', tab==='chat');
+}
+
+// QUIZ
+function openTopic(classe, index) {
+  currentTopic = { classe, index, topic: CURRICULUM[classe][index] };
+  document.getElementById('topic-title').textContent = currentTopic.topic.title;
+  document.getElementById('topic-intro').textContent = currentTopic.topic.intro;
+  goTo('screen-topic');
+}
+
+function startQuiz() {
+  quizData = { questions: currentTopic.topic.questions, current: 0, score: 0 };
+  renderQuestion();
+  goTo('screen-quiz');
+}
+
+function renderQuestion() {
+  const q = quizData.questions[quizData.current];
+  document.getElementById('quiz-title').textContent = currentTopic.topic.title;
+  document.getElementById('quiz-q').textContent = q.q;
+  document.getElementById('quiz-prog').textContent = `Questão ${quizData.current+1} de ${quizData.questions.length}`;
+  document.getElementById('quiz-score').textContent = `✓ ${quizData.score}`;
+  document.getElementById('quiz-bar').style.width = (quizData.current/quizData.questions.length*100)+'%';
+  document.getElementById('quiz-expl').style.display = 'none';
+  document.getElementById('quiz-next').style.display = 'none';
+  document.getElementById('quiz-opts').innerHTML = q.opts.map((o,i)=>
+    `<button class="option-btn" onclick="selectAnswer(${i})">${o}</button>`
+  ).join('');
+}
+
+async function selectAnswer(idx) {
+  const q = quizData.questions[quizData.current];
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b=>b.disabled=true);
+  const correct = idx===q.ans;
+  btns[idx].classList.add(correct?'correct':'wrong');
+  if (!correct) btns[q.ans].classList.add('correct');
+  if (correct) quizData.score++;
+  document.getElementById('quiz-expl').textContent = (correct?'✅ Correcto! ':'❌ Incorreto. ')+q.expl;
+  document.getElementById('quiz-expl').style.display = 'block';
+  document.getElementById('quiz-next').style.display = 'block';
+  const nt=(currentAluno.total||0)+1, nc=(currentAluno.certas||0)+(correct?1:0);
+  await db.from('alunos').update({total:nt,certas:nc}).eq('id',currentAluno.id);
+  currentAluno.total=nt; currentAluno.certas=nc;
+}
+
+function nextQuestion() {
+  quizData.current++;
+  if (quizData.current >= quizData.questions.length) { showResult(); return; }
+  renderQuestion();
+}
+
+async function showResult() {
+  const ns = (currentAluno.sessoes||0)+1;
+  await db.from('alunos').update({sessoes:ns}).eq('id',currentAluno.id);
+  currentAluno.sessoes=ns;
+  const pct = Math.round((quizData.score/quizData.questions.length)*100);
+  document.getElementById('res-title').textContent = currentTopic.topic.title;
+  document.getElementById('res-score').textContent = quizData.score+'/'+quizData.questions.length;
+  document.getElementById('res-total').textContent = pct+'%';
+  document.getElementById('res-circle').style.background = pct>=60?'#10b981':'#f59e0b';
+  document.getElementById('res-msg').textContent = pct>=80?'🌟 Excelente! Continua assim!':pct>=60?'👍 Bom trabalho! Podes melhorar!':'💪 Revê o tema e tenta novamente!';
+  goTo('screen-result');
+}
+
+// CHAT IA
+function addMessage(role, text) {
+  const box = document.getElementById('chat-box');
+  const div = document.createElement('div');
+  div.className = 'msg '+role;
+  div.innerHTML = `<div class="bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value='';
+  addMessage('user', msg);
+  chatHistory.push({role:'user', content:msg});
+  const btn = document.getElementById('chat-send-btn');
+  btn.disabled=true; btn.textContent='...';
+  const thinking = document.createElement('div');
+  thinking.className='msg ai';
+  thinking.innerHTML='<div class="bubble"><span class="spinner"></span> A pensar...</div>';
+  document.getElementById('chat-box').appendChild(thinking);
+  document.getElementById('chat-box').scrollTop = 99999;
+  try {
+    const resp = await fetch(GROQ_URL, {
+      method:'POST',
+      headers:{'Authorization':'Bearer '+GROQ_KEY,'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'llama-3.1-8b-instant',
+        messages:[
+          {role:'system', content:'És o Tutor Moz, um assistente de matemática simpático e paciente para alunos moçambicanos do ensino primário (4ª, 5ª e 6ª classe). Respondes SEMPRE em português. Usas exemplos do dia-a-dia moçambicano: meticais, mercados, xima, machamba, capulanas, chapas, etc. Explicas passo a passo de forma simples e encorajadora. Respondes APENAS a perguntas de matemática. Se perguntarem outra coisa, redireccionas gentilmente para matemática.'},
+          ...chatHistory.slice(-10)
+        ],
+        max_tokens:500,temperature:0.7
+      })
+    });
+    thinking.remove();
+    if (!resp.ok) { const e=await resp.json(); throw new Error(e.error?.message||'Erro API'); }
+    const data = await resp.json();
+    const reply = data.choices?.[0]?.message?.content || 'Não consegui responder. Tenta novamente!';
+    chatHistory.push({role:'assistant', content:reply});
+    addMessage('ai', reply);
+  } catch(e) {
+    thinking.remove();
+    addMessage('ai', '⚠️ Erro: '+e.message+'. Verifica a tua ligação e tenta novamente.');
+    console.error(e);
+  }
+  btn.disabled=false; btn.textContent='Enviar';
+}
+
+function sendSugestao(text) {
+  document.getElementById('chat-input').value=text;
+  sendChat();
+}
+</script>
+</body>
+</html>
