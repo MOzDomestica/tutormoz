@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TutorMoz – Matemática</title>
+<meta name="description" content="Tutor de matemática para alunos moçambicanos do ensino primário e secundário">
+<meta name="theme-color" content="#1d4ed8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="TutorMoz">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue: #1d4ed8; --blue-light: #3b82f6; --blue-pale: #dbeafe; --blue-mid: #eff6ff;
+  --green: #059669; --green-pale: #d1fae5;
+  --yellow: #d97706; --yellow-pale: #fef3c7;
+  --red: #dc2626; --red-pale: #fee2e2;
+  --purple: #7c3aed; --purple-pale: #ede9fe;
+  --gray: #64748b; --gray-light: #f1f5f9; --gray-border: #e2e8f0;
+  --text: #0f172a; --radius: 14px;
+}
+body { font-family: 'Nunito', sans-serif; background: #f0f4ff; min-height: 100vh; color: var(--text); }
+.screen { display: none; max-width: 480px; margin: 0 auto; padding: 16px 16px 80px; }
+.screen.active { display: block; }
+h1 { font-family: 'Baloo 2', cursive; color: var(--blue); font-size: 2rem; }
+h2 { color: #1e40af; font-size: 1.15rem; margin-bottom: 10px; font-weight: 800; }
+.card { background: white; border-radius: var(--radius); padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 12px rgba(29,78,216,0.08); }
+input, select { width: 100%; padding: 12px 14px; border: 2px solid var(--gray-border); border-radius: 10px; font-size: 1rem; margin-bottom: 10px; font-family: 'Nunito', sans-serif; background: #f8faff; }
+input:focus, select:focus { outline: none; border-color: var(--blue-light); background: white; }
+.btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 8px; transition: all 0.18s; font-family: 'Nunito', sans-serif; }
+.btn-primary { background: var(--blue); color: white; }
+.btn-primary:hover { background: #1e40af; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29,78,216,0.3); }
+.btn-secondary { background: var(--blue-pale); color: var(--blue); }
+.btn-secondary:hover { background: #bfdbfe; }
+.btn-danger { background: var(--red-pale); color: var(--red); }
+.btn-danger:hover { background: #fecaca; }
+.btn-sm { width: auto; padding: 8px 16px; font-size: 0.85rem; }
+.btn-icon { width: auto; padding: 8px 10px; background: none; border: none; font-size: 1.3rem; cursor: pointer; }
+.logo { text-align: center; margin: 20px 0 18px; }
+.logo .icon { font-size: 3.5rem; }
+.logo p { color: var(--gray); margin-top: 4px; font-size: 0.95rem; }
+.error { background: var(--red-pale); color: var(--red); padding: 10px 12px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9rem; }
+.success { background: var(--green-pale); color: var(--green); padding: 10px 12px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9rem; }
+.aluno-card { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: #f8faff; border-radius: 12px; margin-bottom: 10px; border: 1.5px solid var(--blue-pale); }
+.aluno-card:hover { border-color: var(--blue-light); background: var(--blue-mid); cursor: pointer; }
+.aluno-info h3 { font-size: 1rem; color: #1e40af; font-weight: 700; }
+.aluno-info p { font-size: 0.78rem; color: var(--gray); margin-top: 2px; }
+.topic-card { padding: 14px 16px; background: #f8faff; border-radius: 12px; margin-bottom: 8px; border: 1.5px solid var(--blue-pale); cursor: pointer; transition: all 0.18s; display: flex; align-items: center; justify-content: space-between; }
+.topic-card:hover { border-color: var(--blue-light); background: var(--blue-mid); transform: translateX(3px); }
+.topic-card h3 { color: #1e40af; font-size: 0.92rem; font-weight: 700; }
+.topic-card p { color: var(--gray); font-size: 0.77rem; margin-top: 2px; }
+.topic-card .topic-right { display: flex; align-items: center; gap: 6px; }
+.topic-done { background: var(--green-pale); color: var(--green); font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+.quiz-question { font-size: 1.05rem; font-weight: 700; color: #1e40af; margin-bottom: 16px; line-height: 1.45; }
+.option-btn { width: 100%; padding: 12px 16px; border: 2px solid var(--gray-border); border-radius: 10px; background: white; text-align: left; cursor: pointer; margin-bottom: 8px; font-size: 0.92rem; font-family: 'Nunito', sans-serif; font-weight: 600; transition: all 0.15s; }
+.option-btn:hover:not(:disabled) { border-color: var(--blue-light); background: var(--blue-mid); }
+.option-btn.correct { border-color: var(--green); background: var(--green-pale); color: #065f46; }
+.option-btn.wrong { border-color: var(--red); background: var(--red-pale); color: var(--red); }
+.explanation { background: #fffbeb; border: 1.5px solid #fcd34d; border-radius: 10px; padding: 12px 14px; margin-top: 10px; font-size: 0.88rem; color: #78350f; line-height: 1.6; }
+.score-circle { width: 110px; height: 110px; border-radius: 50%; background: var(--blue); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 14px auto; font-size: 2.2rem; font-weight: 900; box-shadow: 0 6px 20px rgba(29,78,216,0.3); }
+.score-circle span { font-size: 0.75rem; font-weight: 600; opacity: 0.85; }
+.chat-box { height: 320px; overflow-y: auto; padding: 10px; background: #f8faff; border-radius: 12px; margin-bottom: 10px; }
+.msg { margin-bottom: 12px; display: flex; }
+.msg.user { justify-content: flex-end; }
+.msg.ai { justify-content: flex-start; }
+.msg.user .bubble { background: var(--blue); color: white; max-width: 82%; }
+.msg.ai .bubble { background: white; color: var(--text); border: 1.5px solid var(--blue-pale); max-width: 88%; }
+.bubble { padding: 10px 14px; border-radius: 14px; font-size: 0.88rem; line-height: 1.55; word-break: break-word; }
+.bubble svg { display: block; margin: 8px auto 4px; }
+.chat-input-row { display: flex; gap: 8px; align-items: center; }
+.chat-input-row input { margin-bottom: 0; flex: 1; }
+.tab-bar { display: flex; gap: 6px; margin-bottom: 14px; }
+.tab { flex: 1; padding: 10px 6px; border: none; border-radius: 8px; background: var(--blue-pale); color: #1d4ed8; font-weight: 700; cursor: pointer; font-size: 0.82rem; font-family: 'Nunito', sans-serif; transition: all 0.15s; }
+.tab.active { background: var(--blue); color: white; }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 3px solid #c7d2fe; border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.header h2 { margin-bottom: 0; flex: 1; font-size: 1.1rem; }
+.back-btn { background: var(--blue-pale); border: none; color: var(--blue); cursor: pointer; font-size: 1.1rem; padding: 7px 10px; border-radius: 8px; font-weight: 700; }
+.stat-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.stat-box { flex: 1; background: var(--blue-mid); border-radius: 10px; padding: 10px 8px; text-align: center; }
+.stat-box .num { font-size: 1.5rem; font-weight: 900; color: var(--blue); }
+.stat-box .lbl { font-size: 0.7rem; color: var(--gray); }
+.classe-toggle { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f4ff; }
+.toggle { position: relative; width: 46px; height: 25px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; inset: 0; background: #cbd5e1; border-radius: 25px; cursor: pointer; transition: 0.3s; }
+.slider:before { content: ''; position: absolute; height: 19px; width: 19px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+.toggle input:checked + .slider { background: var(--blue); }
+.toggle input:checked + .slider:before { transform: translateX(21px); }
+.sugestoes { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.sug-btn { padding: 6px 12px; background: var(--blue-pale); color: #1d4ed8; border: none; border-radius: 20px; cursor: pointer; font-size: 0.78rem; font-family: 'Nunito', sans-serif; font-weight: 600; }
+.sug-btn:hover { background: #bfdbfe; }
+.intro-box { background: var(--blue-mid); border-radius: 10px; padding: 14px; margin-bottom: 12px; font-size: 0.88rem; line-height: 1.65; color: #1e40af; }
+.progress-bar { background: var(--blue-pale); border-radius: 10px; height: 8px; overflow: hidden; }
+.progress-fill { background: var(--blue); height: 100%; border-radius: 10px; transition: width 0.4s; }
+/* PROGRESS SCREEN */
+.prog-topic-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f4ff; }
+.prog-topic-row:last-child { border-bottom: none; }
+.prog-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.prog-dot.done { background: var(--green); }
+.prog-dot.partial { background: var(--yellow); }
+.prog-dot.none { background: var(--gray-border); }
+.prog-label { flex: 1; font-size: 0.83rem; color: var(--text); }
+.prog-pct { font-size: 0.8rem; font-weight: 700; color: var(--gray); }
+/* VOICE BUTTON */
+.voice-btn { background: none; border: 2px solid var(--blue-pale); border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 1.1rem; transition: all 0.2s; flex-shrink: 0; }
+.voice-btn.speaking { background: #fef3c7; border-color: var(--yellow); animation: pulse 1s infinite; }
+.voice-btn.listening { background: var(--red-pale); border-color: var(--red); animation: pulse 0.6s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+/* UNDERSTANDING CHECK */
+.understand-box { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 12px; margin-top: 10px; }
+.understand-box p { font-size: 0.88rem; color: #166534; font-weight: 700; margin-bottom: 8px; }
+.understand-btns { display: flex; gap: 8px; }
+.understand-btns button { flex: 1; padding: 9px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 0.85rem; }
+.btn-yes { background: var(--green-pale); color: var(--green); }
+.btn-no { background: var(--red-pale); color: var(--red); }
+/* EXAM PREP */
+.exam-badge { display: inline-block; background: var(--purple-pale); color: var(--purple); font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-left: 6px; }
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: flex-end; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: white; border-radius: 20px 20px 0 0; padding: 22px; width: 100%; max-width: 480px; animation: slideUp 0.3s ease; }
+.modal-title { font-size: 1.1rem; font-weight: 800; color: #1e40af; margin-bottom: 14px; }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+/* INSTALL BANNER */
+#install-banner { display:none; position:fixed; bottom:16px; right:16px; z-index:9998; }
+/* CONFIRM MODAL */
+#confirm-modal .modal-box { border-radius: 20px; max-width: 360px; margin: auto; }
+#confirm-modal { align-items: center; }
+</style>
+</head>
+<body>
+
+<!-- ===== ECRÃ INICIAL ===== -->
+<div id="screen-home" class="screen active">
+  <div class="logo">
+    <div class="icon">📐</div>
+    <h1>TutorMoz</h1>
+    <p>Matemática • Ensino Primário & Secundário</p>
+  </div>
+  <div class="card">
+    <button class="btn btn-primary" onclick="goTo('screen-guardian-login')">👨‍👩‍👧 Sou Encarregado</button>
+    <button class="btn btn-secondary" onclick="goTo('screen-student-select')">🎒 Sou Aluno</button>
+  </div>
+  <div class="card" style="text-align:center;padding:12px">
+    <button onclick="showInstallModal()" style="background:none;border:none;color:var(--blue);font-weight:700;cursor:pointer;font-size:0.9rem;font-family:'Nunito',sans-serif">📲 Instalar App no meu dispositivo</button>
+  </div>
+  <p style="text-align:center;color:#94a3b8;font-size:0.78rem;margin-top:8px">mozdomestica.github.io/tutormoz</p>
+</div>
+
+<!-- ===== LOGIN ENCARREGADO ===== -->
+<div id="screen-guardian-login" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('screen-home')">←</button>
+    <h2>Área do Encarregado</h2>
+  </div>
+  <div class="card">
+    <div id="gl-error" class="error" style="display:none"></div>
+    <div class="tab-bar">
+      <button class="tab active" id="tab-btn-login" onclick="switchTab('login')">Entrar</button>
+      <button class="tab" id="tab-btn-register" onclick="switchTab('register')">Criar Conta</button>
+    </div>
+    <div id="tab-login">
+      <input id="gl-telefone" type="tel" placeholder="Telefone (ex: 84xxxxxxx)">
+      <input id="gl-pin" type="password" maxlength="4" placeholder="PIN (4 dígitos)">
+      <button class="btn btn-primary" onclick="loginGuardian()">Entrar</button>
+    </div>
+    <div id="tab-register" style="display:none">
+      <input id="gr-nome" type="text" placeholder="Nome completo">
+      <input id="gr-telefone" type="tel" placeholder="Telefone (ex: 84xxxxxxx)">
+      <input id="gr-pin" type="password" maxlength="4" placeholder="Criar PIN (4 dígitos)">
+      <button class="btn btn-primary" onclick="registerGuardian()">Criar Conta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ENCARREGADO ===== -->
+<div id="screen-guardian-dash" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="logoutGuardian()">←</button>
+    <h2 id="gd-nome">Dashboard</h2>
+  </div>
+  <div id="gd-error" class="error" style="display:none"></div>
+  <div id="gd-alunos"></div>
+  <div class="card">
+    <h2>➕ Adicionar Aluno</h2>
+    <input id="na-nome" type="text" placeholder="Nome do aluno">
+    <input id="na-pin" type="password" maxlength="4" placeholder="PIN do aluno (4 dígitos)">
+    <button class="btn btn-primary" onclick="addAluno()">Adicionar</button>
+  </div>
+</div>
+
+<!-- ===== DETALHE ALUNO (encarregado) ===== -->
+<div id="screen-aluno-detail" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="loadGuardianDash()">←</button>
+    <h2 id="ad-nome">Aluno</h2>
+    <button class="btn-icon" onclick="confirmDeleteAluno()" title="Remover aluno">🗑️</button>
+  </div>
+  <div class="card">
+    <div class="stat-row">
+      <div class="stat-box"><div class="num" id="ad-sessoes">0</div><div class="lbl">Sessões</div></div>
+      <div class="stat-box"><div class="num" id="ad-certas">0</div><div class="lbl">Certas</div></div>
+      <div class="stat-box"><div class="num" id="ad-precisao">0%</div><div class="lbl">Precisão</div></div>
+      <div class="stat-box"><div class="num" id="ad-temas">0</div><div class="lbl">Temas</div></div>
+    </div>
+    <h2 style="margin-bottom:10px">Classes Activas</h2>
+    <div id="ad-classes"></div>
+  </div>
+  <div class="card" id="ad-prog-card" style="display:none">
+    <h2>📊 Progresso por Tema</h2>
+    <div id="ad-prog-list"></div>
+  </div>
+</div>
+
+<!-- ===== SELECCIONAR ALUNO ===== -->
+<div id="screen-student-select" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('screen-home')">←</button>
+    <h2>Área do Aluno</h2>
+  </div>
+  <div id="ss-error" class="error" style="display:none"></div>
+  <div class="card" id="ss-step1">
+    <h2>📱 Telefone do encarregado</h2>
+    <p style="color:var(--gray);font-size:0.88rem;margin-bottom:12px">Insere o telefone da tua mãe, pai ou encarregado</p>
+    <input id="ss-telefone" type="tel" placeholder="Telefone (ex: 84xxxxxxx)">
+    <button class="btn btn-primary" onclick="loadAlunosByPhone()">Continuar →</button>
+  </div>
+  <div class="card" id="ss-step2" style="display:none">
+    <h2>Qual é o teu nome?</h2>
+    <div id="ss-alunos"></div>
+    <button class="btn btn-secondary" onclick="resetStudentLogin()" style="margin-top:8px">← Voltar</button>
+  </div>
+  <div class="card" id="ss-pin-box" style="display:none">
+    <h2 id="ss-pin-title">Insere o teu PIN</h2>
+    <input id="ss-pin" type="password" maxlength="4" placeholder="PIN (4 dígitos)">
+    <button class="btn btn-primary" onclick="loginAluno()">Entrar</button>
+    <button class="btn btn-secondary" onclick="backToNames()">← Voltar</button>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ALUNO ===== -->
+<div id="screen-student-dash" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="logoutAluno()">←</button>
+    <h2 id="sd-nome">Olá!</h2>
+    <button class="btn-icon" onclick="showStudentTab('progresso')" title="Ver progresso">📊</button>
+  </div>
+  <div class="tab-bar">
+    <button class="tab active" id="tab-temas" onclick="showStudentTab('temas')">📚 Temas</button>
+    <button class="tab" id="tab-chat" onclick="showStudentTab('chat')">🤖 Tutor IA</button>
+    <button class="tab" id="tab-progresso" onclick="showStudentTab('progresso')">📊 Progresso</button>
+    <button class="tab" id="tab-prova" onclick="showStudentTab('prova')">📝 Prova</button>
+  </div>
+  <!-- TEMAS -->
+  <div id="sd-temas"><div id="sd-classes"></div></div>
+  <!-- CHAT IA -->
+  <div id="sd-chat" style="display:none">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:0.82rem;color:var(--gray)">Perguntas rápidas:</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="voice-btn" id="voice-listen-btn" onclick="toggleVoiceInput()" title="Falar">🎤</button>
+          <button class="voice-btn" id="voice-speak-btn" onclick="toggleVoiceOutput()" title="Ouvir respostas">🔊</button>
+          <button class="voice-btn" id="voice-settings-btn" onclick="toggleVoiceSettings()" title="Configurar voz" style="font-size:0.9rem">⚙️</button>
+        </div>
+      </div>
+      <div id="voice-settings-panel" style="display:none;background:#f8faff;border-radius:10px;padding:10px;margin-bottom:8px;border:1.5px solid var(--blue-pale)">
+        <div style="font-size:0.8rem;font-weight:700;color:#1e40af;margin-bottom:6px">🔊 Configurar Voz</div>
+        <select id="voice-select" onchange="changeVoice()" style="margin-bottom:6px;font-size:0.82rem;padding:7px">
+          <option value="">A carregar vozes...</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:0.78rem;color:var(--gray);width:60px">Velocidade:</span>
+          <input type="range" id="voice-rate" min="0.5" max="1.5" step="0.1" value="0.9" oninput="updateVoiceRate(this.value)" style="flex:1;margin:0;padding:0;border:none;background:none">
+          <span id="voice-rate-val" style="font-size:0.78rem;color:var(--blue);width:28px">0.9</span>
+        </div>
+        <button onclick="testVoice()" style="background:var(--blue-pale);color:var(--blue);border:none;border-radius:8px;padding:6px 12px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">▶ Testar voz</button>
+      </div>
+      <div class="sugestoes" id="chat-sugestoes"></div>
+      <div class="chat-box" id="chat-box"></div>
+      <div id="understand-area"></div>
+      <div class="chat-input-row">
+        <input id="chat-input" type="text" placeholder="Escreve a tua dúvida..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn btn-primary btn-sm" onclick="sendChat()" id="chat-send-btn">Enviar</button>
+      </div>
+    </div>
+  </div>
+  <!-- PROGRESSO -->
+  <div id="sd-progresso" style="display:none">
+    <div class="card">
+      <h2>📊 O Meu Progresso</h2>
+      <div class="stat-row" id="prog-stats"></div>
+      <div id="prog-classes"></div>
+    </div>
+  </div>
+  <!-- PROVA -->
+  <div id="sd-prova" style="display:none">
+    <div class="card">
+      <h2>📝 Preparação para Prova</h2>
+      <p style="color:var(--gray);font-size:0.88rem;margin-bottom:12px">Escolhe a classe e o tema para praticar para a prova:</p>
+      <select id="prova-classe" onchange="loadProvaTopics()">
+        <option value="">Selecciona a classe...</option>
+      </select>
+      <select id="prova-tema">
+        <option value="">Selecciona o tema...</option>
+      </select>
+      <button class="btn btn-primary" onclick="startProvaPrep()">🎯 Começar Simulação de Prova</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TEMA (intro) ===== -->
+<div id="screen-topic" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('screen-student-dash')">←</button>
+    <h2 id="topic-title">Tema</h2>
+  </div>
+  <div class="card">
+    <div class="intro-box" id="topic-intro"></div>
+    <div id="topic-shapes"></div>
+    <button class="btn btn-primary" onclick="startQuiz()">Começar Exercícios →</button>
+    <button class="btn btn-secondary" onclick="showStudentTab('chat'); goTo('screen-student-dash')">💬 Tenho dúvidas</button>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div id="screen-quiz" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('screen-topic')">←</button>
+    <h2 id="quiz-title">Exercício</h2>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+      <span id="quiz-prog" style="color:var(--gray);font-size:0.83rem"></span>
+      <span id="quiz-score" style="color:var(--blue);font-weight:700;font-size:0.83rem"></span>
+    </div>
+    <div class="progress-bar" style="margin-bottom:14px"><div class="progress-fill" id="quiz-bar"></div></div>
+    <div class="quiz-question" id="quiz-q"></div>
+    <div id="quiz-visual" style="margin-bottom:10px"></div>
+    <div id="quiz-opts"></div>
+    <div id="quiz-expl" class="explanation" style="display:none"></div>
+    <button class="btn btn-primary" id="quiz-next" style="display:none;margin-top:10px" onclick="nextQuestion()">Próxima →</button>
+  </div>
+</div>
+
+<!-- ===== RESULTADO ===== -->
+<div id="screen-result" class="screen">
+  <div class="card" style="text-align:center">
+    <h2 id="res-title">Resultado</h2>
+    <div class="score-circle" id="res-circle">
+      <div id="res-score"></div>
+      <span id="res-total"></span>
+    </div>
+    <p id="res-msg" style="color:var(--gray);margin-bottom:16px;font-size:0.95rem;font-weight:600"></p>
+    <div id="res-review" style="text-align:left;margin-bottom:14px"></div>
+    <button class="btn btn-primary" onclick="goTo('screen-student-dash')">Voltar aos Temas</button>
+    <button class="btn btn-secondary" onclick="showStudentTab('chat'); goTo('screen-student-dash')">💬 Pedir ajuda ao Tutor IA</button>
+    <button class="btn btn-secondary" onclick="startQuiz()">🔄 Repetir Quiz</button>
+  </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Install Modal -->
+<div class="modal-overlay" id="install-modal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="modal-title">📲 Instalar TutorMoz</div>
+      <button onclick="hideInstallModal()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--gray)">✕</button>
+    </div>
+    <div id="install-steps-android" style="display:none">
+      <p style="background:#fef3c7;border-radius:8px;padding:10px;font-size:0.85rem;color:#78350f;margin-bottom:12px">⚠️ <strong>Usa o Google Chrome</strong> para instalar no Android</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:12px;background:var(--blue-mid);border-radius:10px;padding:12px;align-items:center">
+          <div style="width:28px;height:28px;background:var(--blue);border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0">1</div>
+          <div style="font-size:0.88rem">Toca nos <strong>3 pontos ⋮</strong> no canto superior direito do Chrome</div>
+        </div>
+        <div style="display:flex;gap:12px;background:var(--blue-mid);border-radius:10px;padding:12px;align-items:center">
+          <div style="width:28px;height:28px;background:var(--blue);border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0">2</div>
+          <div style="font-size:0.88rem">Toca em <strong>"Adicionar ao ecrã inicial"</strong> ou <strong>"Instalar app"</strong></div>
+        </div>
+        <div style="display:flex;gap:12px;background:var(--blue-mid);border-radius:10px;padding:12px;align-items:center">
+          <div style="width:28px;height:28px;background:var(--blue);border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0">3</div>
+          <div style="font-size:0.88rem">Toca em <strong>"Instalar"</strong> ou <strong>"Adicionar"</strong> para confirmar</div>
+        </div>
+      </div>
+      <button onclick="doInstall()" id="btn-install-direct" style="width:100%;margin-top:14px;background:var(--blue);color:white;border:none;border-radius:10px;padding:13px;font-weight:700;font-size:1rem;cursor:pointer;font-family:'Nunito',sans-serif">✅ Instalar directamente (Chrome)</button>
+    </div>
+    <div id="install-steps-ios" style="display:none">
+      <p style="background:#fef3c7;border-radius:8px;padding:10px;font-size:0.85rem;color:#78350f;margin-bottom:12px">⚠️ <strong>Usa o Safari</strong> para instalar no iPhone/iPad — não funciona no Chrome</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:12px;background:var(--blue-mid);border-radius:10px;padding:12px;align-items:center">
+          <div style="width:28px;height:28px;background:var(--blue);border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0">1</div>
+          <div style="font-size:0.88rem">Toca no ícone de <strong>partilhar 📤</strong> na barra inferior do Safari</div>
+        </div>
+        <div style="display:flex;gap:12px;background:var(--blue-mid);border-radius:10px;padding:12px;align-items:center">
+          <div style="width:28px;height:28px;background:var(--blue);border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0">2</div>
+          <div style="font-size:0.88rem">Desliza para baixo e toca em <strong>"Adicionar ao ecrã inicial"</strong></div>
+        </div>
+        <div style="display:flex;gap:12px;background:var(--blue-mid);border-radius:10px;padding:12px;align-items:center">
+          <div style="width:28px;height:28px;background:var(--blue);border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0">3</div>
+          <div style="font-size:0.88rem">Toca em <strong>"Adicionar"</strong> no canto superior direito</div>
+        </div>
+      </div>
+    </div>
+    <div id="install-steps-desktop" style="display:none">
+      <p style="background:#fef3c7;border-radius:8px;padding:10px;font-size:0.85rem;color:#78350f;margin-bottom:12px">⚠️ <strong>Usa o Google Chrome</strong> para instalar no computador</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:12px;background:var(--blue-mid);border-radius:10px;padding:12px;align-items:center">
+          <div style="font-size:1.5rem">💻</div>
+          <div style="font-size:0.88rem"><strong>Opção 1:</strong> Toca no ícone <strong>⊕</strong> na barra de endereço do Chrome (lado direito)</div>
+        </div>
+        <div style="display:flex;gap:12px;background:var(--blue-mid);border-radius:10px;padding:12px;align-items:center">
+          <div style="font-size:1.5rem">⋮</div>
+          <div style="font-size:0.88rem"><strong>Opção 2:</strong> Clica nos 3 pontos → <strong>"Instalar TutorMoz..."</strong></div>
+        </div>
+      </div>
+      <button onclick="doInstall()" style="width:100%;margin-top:14px;background:var(--blue);color:white;border:none;border-radius:10px;padding:13px;font-weight:700;font-size:1rem;cursor:pointer;font-family:'Nunito',sans-serif">✅ Instalar agora</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-box" style="border-radius:16px;max-width:360px;margin:auto">
+    <div class="modal-title">🗑️ Remover Aluno</div>
+    <p style="color:var(--gray);font-size:0.9rem;margin-bottom:16px">Tens a certeza que queres remover <strong id="confirm-name"></strong>? Esta acção não pode ser desfeita.</p>
+    <button class="btn btn-danger" onclick="deleteAluno()">Sim, remover</button>
+    <button class="btn btn-secondary" onclick="closeConfirmModal()">Cancelar</button>
+  </div>
+</div>
+
+<!-- Install Banner -->
+<div id="install-banner">
+  <button onclick="showInstallModal()" style="background:var(--blue);color:white;border:none;border-radius:50px;padding:11px 18px;font-weight:700;font-size:0.88rem;box-shadow:0 4px 16px rgba(29,78,216,0.4);cursor:pointer;display:flex;align-items:center;gap:8px;font-family:'Nunito',sans-serif">
+    📲 Instalar App
+  </button>
+</div>
+
+<style>@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}</style>
+
+<script>
+const SUPABASE_URL = 'https://sacgiyeekwzxcgyceocz.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_GyP1cwoTRovYiqOrmy28wA_MEnOhZq1';
+const GROQ_KEY = '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';
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentGuardian = null;
+let currentAluno = null;
+let currentTopic = null;
+let quizData = { questions: [], current: 0, score: 0, wrongAnswers: [] };
+let chatHistory = [];
+let selectedAlunoId = null;
+let voiceOutputEnabled = false;
+let speechSynth = window.speechSynthesis;
+let recognition = null;
+let awaitingUnderstanding = false;
+let compressionCount = 0;
+let verifyCount = 0;
+let alunoToDelete = null;
+
+// ===== CURRÍCULO COMPLETO MINED =====
+const CURRICULUM = {
+  '1ª Classe': [
+    { title: 'Números de 1 a 10', intro: 'Vamos aprender a contar até 10! Os números estão em todo o lado: 1 dedo, 2 olhos, 3 laranjas, 4 patas de um gato... Vamos contar juntos! Usa os teus dedos para ajudar.',
+      questions: [
+        { q: 'Quantos dedos tens numa mão?', opts: ['3','4','5','6'], ans: 2, expl: 'Numa mão temos 5 dedos. Conta: polegar, indicador, médio, anelar, mindinho = 5!' },
+        { q: 'Qual número vem depois do 6?', opts: ['5','7','8','9'], ans: 1, expl: 'Depois do 6 vem o 7. A ordem é: 1,2,3,4,5,6,7,8,9,10.' },
+        { q: 'Tens 3 laranjas e comes 1. Quantas ficam?', opts: ['1','2','3','4'], ans: 1, expl: '3 - 1 = 2 laranjas. Tinhas 3, comeste 1, ficaram 2.' },
+        { q: 'Qual é o maior número? 4, 7, 2, 9', opts: ['4','7','2','9'], ans: 3, expl: '9 é o maior. Na ordem 1,2,...,9,10 — o 9 está mais à frente.' },
+        { q: 'Quanto é 2 + 3?', opts: ['4','5','6','7'], ans: 1, expl: '2 + 3 = 5. Conta nos dedos: começa em 2 e conta mais 3: 3,4,5!' },
+        { q: 'Qual número vem antes do 5?', opts: ['3','4','6','7'], ans: 1, expl: 'Antes do 5 vem o 4. A ordem: 1,2,3,4,5.' },
+        { q: 'Quantos olhos tem uma pessoa?', opts: ['1','2','3','4'], ans: 1, expl: 'Uma pessoa tem 2 olhos.' },
+        { q: 'Quanto é 4 + 4?', opts: ['6','7','8','9'], ans: 2, expl: '4 + 4 = 8.' },
+        { q: 'Tens 7 rebuçados e comes 3. Quantos ficam?', opts: ['3','4','5','6'], ans: 1, expl: '7 - 3 = 4 rebuçados.' },
+        { q: 'Qual é o menor número? 8, 3, 6, 1', opts: ['8','3','6','1'], ans: 3, expl: '1 é o menor. É o primeiro número a contar.' }
+      ]
+    },
+    { title: 'Formas e Cores', intro: 'As formas estão em todo o lado! Uma janela é um quadrado ou rectângulo, uma moeda é um círculo, um pedaço de pizza é um triângulo!', shapes: 'formas_basicas',
+      questions: [
+        { q: 'Quantos lados tem um triângulo?', opts: ['2','3','4','5'], ans: 1, expl: 'Um triângulo tem 3 lados. Tri = três!' },
+        { q: 'Qual a forma de uma moeda de 1 Mt?', opts: ['Quadrado','Triângulo','Círculo','Rectângulo'], ans: 2, expl: 'Uma moeda é redonda — tem forma de círculo.' },
+        { q: 'Que forma tem 4 lados iguais?', opts: ['Triângulo','Círculo','Quadrado','Rectângulo'], ans: 2, expl: 'O quadrado tem 4 lados iguais.' },
+        { q: 'Que forma não tem lados?', opts: ['Quadrado','Triângulo','Círculo','Rectângulo'], ans: 2, expl: 'O círculo é redondo e não tem lados.' },
+        { q: 'Uma janela rectangular tem quantos lados?', opts: ['2','3','4','5'], ans: 2, expl: 'Um rectângulo tem 4 lados: 2 compridos e 2 curtos.' }
+      ]
+    },
+    { title: 'Números de 10 a 20', intro: 'Já sabes contar até 10. Agora vamos até 20! Depois do 10 vem 11, 12, 13... até 20. É como contar os dedos das duas mãos e mais alguns!',
+      questions: [
+        { q: 'Qual número vem depois do 10?', opts: ['9','11','12','20'], ans: 1, expl: 'Depois do 10 vem o 11.' },
+        { q: 'Quanto é 10 + 5?', opts: ['14','15','16','17'], ans: 1, expl: '10 + 5 = 15.' },
+        { q: 'Qual é o maior número? 12, 18, 15, 11', opts: ['12','18','15','11'], ans: 1, expl: '18 é o maior.' },
+        { q: 'Tens 20 Mt e gastas 7 Mt. Quanto fica?', opts: ['11 Mt','12 Mt','13 Mt','14 Mt'], ans: 2, expl: '20 - 7 = 13 Mt.' },
+        { q: 'Quanto é 8 + 9?', opts: ['15','16','17','18'], ans: 2, expl: '8 + 9 = 17.' }
+      ]
+    }
+  ],
+  '2ª Classe': [
+    { title: 'Adição até 100', intro: 'Vamos aprender a somar números maiores! Na machamba, se tens 23 canas e cortas mais 15, ao todo tens 23 + 15 = 38 canas.',
+      questions: [
+        { q: 'Quanto é 25 + 14?', opts: ['37','38','39','40'], ans: 2, expl: '25 + 14 = 39. Somamos as unidades: 5+4=9. Dezenas: 2+1=3. Resultado: 39.' },
+        { q: 'Tens 40 Mt e ganhas mais 35 Mt. Quanto tens?', opts: ['65 Mt','70 Mt','75 Mt','80 Mt'], ans: 2, expl: '40 + 35 = 75 Mt.' },
+        { q: 'Quanto é 57 + 23?', opts: ['70','78','80','82'], ans: 2, expl: '57 + 23 = 80.' },
+        { q: 'Uma vendedeira tem 32 mangas e recebe mais 48. Quantas tem?', opts: ['70','78','80','82'], ans: 2, expl: '32 + 48 = 80 mangas.' },
+        { q: 'Quanto é 45 + 45?', opts: ['80','85','90','95'], ans: 2, expl: '45 + 45 = 90.' }
+      ]
+    },
+    { title: 'Subtracção até 100', intro: 'Subtrair é tirar uma quantidade de outra. Se tens 50 Mt e pagas 20 Mt pelo chapa, ficam 50 - 20 = 30 Mt.',
+      questions: [
+        { q: 'Quanto é 60 - 25?', opts: ['25','30','35','40'], ans: 2, expl: '60 - 25 = 35. Verifica: 35 + 25 = 60 ✓' },
+        { q: 'Tens 80 Mt e gastas 37 Mt. Quanto sobra?', opts: ['33 Mt','43 Mt','53 Mt','63 Mt'], ans: 1, expl: '80 - 37 = 43 Mt.' },
+        { q: 'Quanto é 100 - 42?', opts: ['48','52','58','62'], ans: 2, expl: '100 - 42 = 58.' },
+        { q: 'Havia 75 laranjas, venderam-se 38. Quantas ficam?', opts: ['27','37','47','57'], ans: 1, expl: '75 - 38 = 37 laranjas.' },
+        { q: 'Quanto é 90 - 55?', opts: ['25','30','35','40'], ans: 2, expl: '90 - 55 = 35.' }
+      ]
+    },
+    { title: 'Tabuada (×2, ×3, ×4, ×5)', intro: 'A tabuada é a base de toda a matemática! A tabuada do 2 é como ter pares de coisas. 2 sapatos = 1 par. 3 pares = 6 sapatos.',
+      questions: [
+        { q: 'Quanto é 3 × 4?', opts: ['10','11','12','13'], ans: 2, expl: '3 × 4 = 12. São 3 grupos de 4: 4+4+4=12.' },
+        { q: 'Quanto é 5 × 5?', opts: ['20','22','25','30'], ans: 2, expl: '5 × 5 = 25. A tabuada do 5 termina em 0 ou 5.' },
+        { q: 'Há 4 pratos com 3 laranjas cada. Quantas laranjas no total?', opts: ['10','11','12','14'], ans: 2, expl: '4 × 3 = 12 laranjas.' },
+        { q: 'Quanto é 2 × 8?', opts: ['14','15','16','18'], ans: 2, expl: '2 × 8 = 16.' },
+        { q: 'Quanto é 5 × 4?', opts: ['16','18','20','22'], ans: 2, expl: '5 × 4 = 20.' }
+      ]
+    }
+  ],
+  '3ª Classe': [
+    { title: 'Números até 1000', intro: 'Os números até 1000 têm três grupos: centenas, dezenas e unidades. O 743 tem 7 centenas, 4 dezenas e 3 unidades. Como 7 sacos de 100 Mt, 4 notas de 10 Mt e 3 moedas de 1 Mt!',
+      questions: [
+        { q: 'Qual o valor do algarismo 5 em 523?', opts: ['5','50','500','5000'], ans: 2, expl: 'O 5 está na posição das centenas. Valor = 5 × 100 = 500.' },
+        { q: 'Quanto é 600 + 275?', opts: ['825','835','845','875'], ans: 3, expl: '600 + 275 = 875.' },
+        { q: 'Quanto é 800 - 325?', opts: ['465','475','485','495'], ans: 1, expl: '800 - 325 = 475.' },
+        { q: 'Qual número tem 7 centenas, 4 dezenas e 3 unidades?', opts: ['347','437','734','743'], ans: 3, expl: '7 centenas + 4 dezenas + 3 unidades = 743.' },
+        { q: 'Uma escola tem 348 alunos. Inscrevem-se mais 152. Quantos?', opts: ['490','500','510','520'], ans: 1, expl: '348 + 152 = 500 alunos.' }
+      ]
+    },
+    { title: 'Multiplicação e Divisão', intro: 'A multiplicação é somar grupos iguais. Se tens 6 pacotes de 8 bolachas, no total tens 6×8=48 bolachas! A divisão é repartir em partes iguais.',
+      questions: [
+        { q: 'Quanto é 7 × 8?', opts: ['54','56','58','52'], ans: 1, expl: '7 × 8 = 56.' },
+        { q: 'Quanto é 48 ÷ 6?', opts: ['6','7','8','9'], ans: 2, expl: '48 ÷ 6 = 8. Verifica: 6 × 8 = 48 ✓' },
+        { q: 'Tens 35 Mt para dividir por 5 pessoas. Quanto fica cada um?', opts: ['5 Mt','6 Mt','7 Mt','8 Mt'], ans: 2, expl: '35 ÷ 5 = 7 Mt.' },
+        { q: 'Uma caixa tem 6 laranjas. Quantas há em 9 caixas?', opts: ['48','54','56','45'], ans: 1, expl: '6 × 9 = 54 laranjas.' },
+        { q: 'Quanto é 72 ÷ 9?', opts: ['6','7','8','9'], ans: 2, expl: '72 ÷ 9 = 8.' }
+      ]
+    },
+    { title: 'Fracções Simples', intro: 'Uma fracção representa uma parte de um todo. Se cortas uma laranja ao meio, cada parte é 1/2. O número de baixo (denominador) diz em quantas partes dividiste. O de cima (numerador) diz quantas partes tens.',
+      questions: [
+        { q: 'Uma pizza tem 4 partes. Comes 1 parte. Que fracção comeste?', opts: ['1/2','1/3','1/4','2/4'], ans: 2, expl: '1/4 (um quarto). A pizza tem 4 partes e comeste 1.' },
+        { q: 'Qual fracção é maior: 1/2 ou 1/4?', opts: ['1/4','São iguais','1/2','Não se compara'], ans: 2, expl: '1/2 é maior. Metade de uma laranja é maior que um quarto.' },
+        { q: 'Quanto é 1/2 de 20 Mt?', opts: ['5 Mt','8 Mt','10 Mt','15 Mt'], ans: 2, expl: '1/2 de 20 = 20 ÷ 2 = 10 Mt.' },
+        { q: 'Um bolo tem 8 fatias. Comes 3. Que fracção comeste?', opts: ['3/5','3/8','5/8','8/3'], ans: 1, expl: '3/8 (três oitavos).' },
+        { q: 'Qual fracção representa metade?', opts: ['1/4','1/2','2/3','3/4'], ans: 1, expl: '1/2 representa metade.' }
+      ]
+    },
+    { title: 'Medidas de Comprimento', intro: 'Usamos cm, m e km para medir comprimentos. 100 cm = 1 m. 1000 m = 1 km. Da tua casa à escola pode ser 2 km!',
+      questions: [
+        { q: 'Quantos cm tem 2 metros?', opts: ['20 cm','100 cm','200 cm','2000 cm'], ans: 2, expl: '2 m = 200 cm. 1 m = 100 cm, então 2 × 100 = 200 cm.' },
+        { q: 'Uma corda tem 350 cm. Quantos metros?', opts: ['3 m','3,5 m','35 m','0,35 m'], ans: 1, expl: '350 cm = 3,5 m. Dividimos por 100: 350 ÷ 100 = 3,5 m.' },
+        { q: 'João tem 1,50 m e Maria 1,35 m. Qual a diferença?', opts: ['10 cm','15 cm','20 cm','25 cm'], ans: 1, expl: '1,50 - 1,35 = 0,15 m = 15 cm.' },
+        { q: 'Uma sala mede 5 m × 4 m. Qual é o perímetro?', opts: ['9 m','16 m','18 m','20 m'], ans: 2, expl: 'Perímetro = 2 × (5+4) = 2 × 9 = 18 m.' },
+        { q: 'Três réguas de 30 cm em fila têm quantos metros?', opts: ['0,3 m','0,9 m','9 m','90 m'], ans: 1, expl: '3 × 30 = 90 cm = 0,9 m.' }
+      ]
+    },
+    { title: 'Geometria Básica', intro: 'As formas geométricas estão em todo o lado! Vamos aprender o quadrado, o rectângulo, o triângulo e o círculo, e calcular os seus perímetros e áreas.', shapes: 'geometria_basica',
+      questions: [
+        { q: 'Quantos lados tem um triângulo?', opts: ['2','3','4','5'], ans: 1, expl: 'Um triângulo tem 3 lados. "Tri" significa três.' },
+        { q: 'Um quadrado tem lado de 5 cm. Qual é o perímetro?', opts: ['10 cm','15 cm','20 cm','25 cm'], ans: 2, expl: 'Perímetro = 4 × lado = 4 × 5 = 20 cm.' },
+        { q: 'Qual forma tem 4 lados iguais e 4 ângulos rectos?', opts: ['Triângulo','Rectângulo','Círculo','Quadrado'], ans: 3, expl: 'O quadrado tem 4 lados iguais e 4 ângulos de 90°.' },
+        { q: 'Um rectângulo tem 8 cm × 3 cm. Qual é a área?', opts: ['11 cm²','22 cm²','24 cm²','32 cm²'], ans: 2, expl: 'Área = 8 × 3 = 24 cm².' },
+        { q: 'Qual a forma de uma moeda de 1 Mt?', opts: ['Quadrado','Triângulo','Círculo','Rectângulo'], ans: 2, expl: 'Uma moeda tem forma de círculo.' }
+      ]
+    },
+    { title: 'Linhas e Ângulos', intro: 'As linhas paralelas nunca se encontram, como os carris do comboio! As linhas perpendiculares cruzam-se formando um ângulo recto (90°), como o canto de uma janela.', shapes: 'linhas_angulos',
+      questions: [
+        { q: 'Duas linhas que nunca se encontram chamam-se:', opts: ['Paralelas','Perpendiculares','Cruzadas','Oblíquas'], ans: 0, expl: 'Linhas paralelas nunca se encontram, como os carris do comboio.' },
+        { q: 'Duas linhas que se cruzam em 90° chamam-se:', opts: ['Paralelas','Perpendiculares','Curvas','Diagonais'], ans: 1, expl: 'Linhas perpendiculares formam um ângulo de 90° (ângulo recto).' },
+        { q: 'O ângulo do canto de um quaderno é:', opts: ['Agudo','Recto','Obtuso','Nulo'], ans: 1, expl: 'O canto do quaderno tem 90° — é um ângulo recto.' },
+        { q: 'Um ângulo menor que 90° chama-se:', opts: ['Recto','Obtuso','Agudo','Plano'], ans: 2, expl: 'Ângulo agudo é menor que 90°.' },
+        { q: 'Os lados opostos de um rectângulo são:', opts: ['Perpendiculares','Paralelos','Iguais e paralelos','Diferentes'], ans: 2, expl: 'Os lados opostos de um rectângulo são iguais e paralelos.' }
+      ]
+    }
+  ],
+  '4ª Classe': [
+    { title: 'Números até 1 000 000', intro: 'Agora vamos aprender números muito grandes! 1 000 000 = um milhão. Maputo tem mais de 1 000 000 de habitantes!',
+      questions: [
+        { q: 'Como se escreve por extenso 350 000?', opts: ['Trezentos e cinco mil','Trinta e cinco mil','Trezentos e cinquenta mil','Três mil e quinhentos'], ans: 2, expl: '350 000 = Trezentos e cinquenta mil.' },
+        { q: 'Qual o valor do algarismo 7 em 574 320?', opts: ['7','700','7000','70 000'], ans: 3, expl: 'O 7 está nas dezenas de milhar. Valor = 7 × 10 000 = 70 000.' },
+        { q: 'Quanto é 500 000 + 250 000?', opts: ['650 000','700 000','750 000','800 000'], ans: 2, expl: '500 000 + 250 000 = 750 000.' },
+        { q: 'Quanto é 1 000 000 - 375 000?', opts: ['615 000','625 000','635 000','645 000'], ans: 1, expl: '1 000 000 - 375 000 = 625 000.' },
+        { q: 'Ordena: 432 000, 243 000, 342 000', opts: ['432<342<243','243<342<432','342<243<432','243<432<342'], ans: 1, expl: '243 000 < 342 000 < 432 000.' }
+      ]
+    },
+    { title: 'Fracções Equivalentes', intro: 'Fracções equivalentes representam a mesma quantidade. 1/2 = 2/4 = 3/6. É como dizer "meio pão" de formas diferentes!',
+      questions: [
+        { q: 'Qual fracção é equivalente a 1/2?', opts: ['1/3','2/3','2/4','3/4'], ans: 2, expl: '2/4 = 1/2. Multiplicamos por 2: (1×2)/(2×2) = 2/4.' },
+        { q: 'Simplifica a fracção 6/8:', opts: ['2/3','3/4','4/6','1/2'], ans: 1, expl: '6/8 = 3/4. Dividimos por MDC(6,8)=2.' },
+        { q: 'Qual é maior: 3/4 ou 2/3?', opts: ['2/3','São iguais','3/4','Não se compara'], ans: 2, expl: '3/4 > 2/3. 3/4 = 9/12 e 2/3 = 8/12. Como 9>8, então 3/4 > 2/3.' },
+        { q: 'Quanto é 1/4 + 1/4?', opts: ['1/8','2/4','1/2','2/8'], ans: 1, expl: '1/4 + 1/4 = 2/4 = 1/2.' },
+        { q: 'Quanto é 3/4 de 40 Mt?', opts: ['10 Mt','20 Mt','30 Mt','35 Mt'], ans: 2, expl: '3/4 de 40 = (40÷4)×3 = 10×3 = 30 Mt.' }
+      ]
+    },
+    { title: 'Números Decimais', intro: 'Os números decimais têm uma vírgula que separa a parte inteira da parte decimal. 2,5 lê-se "dois vírgula cinco". Usamos no dinheiro: 15,50 Mt.',
+      questions: [
+        { q: 'Como se lê 3,7?', opts: ['Três e sete','Trinta e sete','Três vírgula sete','Três sétimos'], ans: 2, expl: '3,7 = "três vírgula sete". Parte inteira=3, decimal=7 décimas.' },
+        { q: 'Quanto é 2,5 + 1,3?', opts: ['3,5','3,8','4,0','3,2'], ans: 1, expl: '2,5 + 1,3 = 3,8. Alinhamos as vírgulas.' },
+        { q: 'Uma laranja pesa 0,250 kg. Quanto pesam 4 laranjas?', opts: ['0,750 kg','1,000 kg','1,250 kg','0,500 kg'], ans: 1, expl: '4 × 0,250 = 1,000 kg.' },
+        { q: 'Quanto é 5,60 - 2,35?', opts: ['3,25','3,15','3,35','2,25'], ans: 0, expl: '5,60 - 2,35 = 3,25.' },
+        { q: 'Ordena do menor: 1,5; 1,05; 1,50', opts: ['1,50<1,5<1,05','1,05<1,50<1,5','1,05<1,5=1,50','1,5<1,05<1,50'], ans: 2, expl: '1,05 < 1,5 = 1,50. Nota: 1,5 e 1,50 são iguais.' }
+      ]
+    },
+    { title: 'Percentagem', intro: 'A percentagem (%) significa "por cada 100". 50% quer dizer 50 em cada 100. Usamos em descontos: 20% de desconto numa camisa de 500 Mt = poupar 100 Mt.',
+      questions: [
+        { q: 'Quanto é 50% de 80 Mt?', opts: ['20 Mt','30 Mt','40 Mt','50 Mt'], ans: 2, expl: '50% de 80 = 80÷2 = 40 Mt.' },
+        { q: 'Uma camisa de 400 Mt tem 25% de desconto. Qual o desconto?', opts: ['75 Mt','100 Mt','125 Mt','150 Mt'], ans: 1, expl: '25% de 400 = (400×25)÷100 = 100 Mt.' },
+        { q: 'Em 100 alunos, 60% são raparigas. Quantas raparigas?', opts: ['40','50','60','65'], ans: 2, expl: '60% de 100 = 60 raparigas.' },
+        { q: 'Um sapato de 600 Mt tem 20% de desconto. Qual o preço final?', opts: ['420 Mt','460 Mt','480 Mt','500 Mt'], ans: 2, expl: 'Desconto = 20% de 600 = 120 Mt. Final = 600-120 = 480 Mt.' },
+        { q: 'Se 50 Mt é 10% do preço, qual é o preço total?', opts: ['100 Mt','200 Mt','500 Mt','1000 Mt'], ans: 2, expl: 'Se 10% = 50 Mt, então 100% = 50×10 = 500 Mt.' }
+      ]
+    },
+    { title: 'Geometria e Linhas', intro: 'Vamos aprender mais sobre as formas geométricas, as linhas paralelas e perpendiculares, e calcular áreas e perímetros!', shapes: 'geometria_avancada',
+      questions: [
+        { q: 'Um terreno 20 m × 12 m. Qual é a área?', opts: ['200 m²','220 m²','240 m²','260 m²'], ans: 2, expl: 'Área = 20 × 12 = 240 m².' },
+        { q: 'Triângulo com lados 5, 8 e 6 cm. Qual é o perímetro?', opts: ['17 cm','18 cm','19 cm','20 cm'], ans: 2, expl: 'Perímetro = 5+8+6 = 19 cm.' },
+        { q: 'Os carris do comboio são exemplos de linhas:', opts: ['Perpendiculares','Curvas','Paralelas','Cruzadas'], ans: 2, expl: 'Os carris nunca se encontram — são linhas paralelas.' },
+        { q: 'O símbolo ⊥ significa linhas:', opts: ['Paralelas','Perpendiculares','Curvas','Diagonais'], ans: 1, expl: '⊥ é o símbolo de perpendicular (90°).' },
+        { q: 'Quadrado com lado de 7 cm. Qual é a área?', opts: ['14 cm²','28 cm²','42 cm²','49 cm²'], ans: 3, expl: 'Área = lado² = 7 × 7 = 49 cm².' }
+      ]
+    }
+  ],
+  '5ª Classe': [
+    { title: 'Múltiplos e Divisores', intro: 'Os múltiplos de um número são os resultados da sua tabuada. Os divisores dividem o número exactamente. Útil para dividir 12 mangas igualmente entre amigos!',
+      questions: [
+        { q: 'Qual dos seguintes é múltiplo de 4?', opts: ['14','18','24','30'], ans: 2, expl: '24 é múltiplo de 4 porque 4 × 6 = 24.' },
+        { q: 'Quais são os divisores de 12?', opts: ['1,2,3,4,6,12','1,2,4,6,12','1,3,4,6,12','2,3,4,6,12'], ans: 0, expl: 'Divisores de 12: 1,2,3,4,6,12.' },
+        { q: 'Qual é o MMC de 4 e 6?', opts: ['8','12','18','24'], ans: 1, expl: 'MMC(4,6) = 12. Múltiplos de 4: 4,8,12. Múltiplos de 6: 6,12. Primeiro comum: 12.' },
+        { q: 'Qual é o MDC de 18 e 24?', opts: ['3','4','6','9'], ans: 2, expl: 'MDC(18,24) = 6.' },
+        { q: 'O número 15 é múltiplo de:', opts: ['4','6','5','8'], ans: 2, expl: '15 é múltiplo de 5 porque 5 × 3 = 15.' }
+      ]
+    },
+    { title: 'Medidas de Massa e Capacidade', intro: 'A massa mede o peso (kg, g). A capacidade mede líquidos (litros, ml). 1 kg = 1000 g. 1 litro = 1000 ml.',
+      questions: [
+        { q: 'Quantos gramas tem 2,5 kg?', opts: ['250 g','2500 g','25 g','2050 g'], ans: 1, expl: '2,5 kg = 2500 g.' },
+        { q: 'Uma garrafa tem 1,5 litros. Quantos ml?', opts: ['150 ml','1050 ml','1500 ml','15000 ml'], ans: 2, expl: '1,5 litros = 1500 ml.' },
+        { q: 'Compras 3 embalagens de 500 g de açúcar. Quantos kg?', opts: ['1 kg','1,5 kg','2 kg','2,5 kg'], ans: 1, expl: '3 × 500g = 1500g = 1,5 kg.' },
+        { q: 'Uma receita precisa de 250 ml de óleo. Tens 1 litro. Quantas vezes usas?', opts: ['2 vezes','3 vezes','4 vezes','5 vezes'], ans: 2, expl: '1000 ml ÷ 250 ml = 4 vezes.' },
+        { q: 'Que unidade usas para medir o leite?', opts: ['kg','cm','litros','km'], ans: 2, expl: 'Usamos litros (ou ml) para medir líquidos.' }
+      ]
+    },
+    { title: 'Gráficos e Tabelas', intro: 'Os gráficos e tabelas mostram informação de forma visual. São usados em jornais e televisão para mostrar resultados, preços, estatísticas!',
+      questions: [
+        { q: 'Tabela: Manga=30, Laranja=45, Banana=25. Mais vendida?', opts: ['Manga','Laranja','Banana','Todas iguais'], ans: 1, expl: 'Laranja com 45 é a mais vendida.' },
+        { q: 'Num gráfico de barras, a barra mais alta representa:', opts: ['O menor valor','O maior valor','A média','O total'], ans: 1, expl: 'Barra mais alta = maior valor.' },
+        { q: 'Temperaturas: 28°, 30°, 27°, 32°, 29°. Qual a média?', opts: ['28°','29°','29,2°','30°'], ans: 2, expl: 'Média = (28+30+27+32+29)÷5 = 146÷5 = 29,2°C.' },
+        { q: 'Num gráfico circular, 50% é representado por qual ângulo?', opts: ['90°','120°','150°','180°'], ans: 3, expl: '50% de 360° = 180°. Metade do círculo.' },
+        { q: 'Para que serve uma tabela de frequência?', opts: ['Calcular áreas','Contar quantas vezes algo acontece','Medir comprimentos','Somar fracções'], ans: 1, expl: 'A tabela de frequência conta repetições.' }
+      ]
+    },
+    { title: 'Ângulos e Triângulos', intro: 'Um ângulo mede a abertura entre dois raios. A soma dos ângulos de qualquer triângulo é sempre 180°!', shapes: 'angulos_triangulos',
+      questions: [
+        { q: 'Soma dos ângulos internos de qualquer triângulo?', opts: ['90°','120°','180°','360°'], ans: 2, expl: 'A soma é sempre 180°.' },
+        { q: 'Triângulo com ângulos 60° e 80°. Qual o terceiro?', opts: ['30°','40°','50°','60°'], ans: 1, expl: '180° - 60° - 80° = 40°.' },
+        { q: 'Um ângulo de 135° é:', opts: ['Recto','Agudo','Obtuso','Nulo'], ans: 2, expl: '135° é obtuso: maior que 90° e menor que 180°.' },
+        { q: 'Triângulo equilátero: qual é cada ângulo?', opts: ['45°','60°','72°','90°'], ans: 1, expl: '180° ÷ 3 = 60° cada.' },
+        { q: 'Triângulo rectângulo com catetos 3 e 4. Qual a hipotenusa?', opts: ['4','5','6','7'], ans: 1, expl: 'c² = 3²+4² = 9+16=25. c = √25 = 5. Triângulo 3-4-5!' }
+      ]
+    }
+  ],
+  '6ª Classe': [
+    { title: 'Números Inteiros', intro: 'Os números inteiros incluem positivos, zero e negativos. Usamos negativos para temperaturas abaixo de zero, dívidas ou altitudes abaixo do nível do mar.',
+      questions: [
+        { q: 'Qual é o oposto de -8?', opts: ['-8','0','+8','1/8'], ans: 2, expl: 'O oposto de -8 é +8.' },
+        { q: 'Quanto é -5 + 3?', opts: ['-8','-2','2','8'], ans: 1, expl: '-5 + 3 = -2.' },
+        { q: 'Ordena: 3, -5, 0, -1, 7', opts: ['-5,-1,0,3,7','7,3,0,-1,-5','-5,0,-1,3,7','0,-1,-5,3,7'], ans: 0, expl: 'Ordem crescente: -5, -1, 0, 3, 7.' },
+        { q: 'Temperatura era -3°C e subiu 8°C. Qual é agora?', opts: ['5°C','3°C','-5°C','11°C'], ans: 0, expl: '-3 + 8 = 5°C.' },
+        { q: 'Quanto é (-4) × (-3)?', opts: ['-12','-7','7','12'], ans: 3, expl: '(-4) × (-3) = +12. Negativo × negativo = positivo.' }
+      ]
+    },
+    { title: 'Potências e Raízes', intro: 'A potência é uma multiplicação repetida: 3² = 3×3 = 9. A raiz quadrada é a operação inversa: √9 = 3 porque 3² = 9.',
+      questions: [
+        { q: 'Quanto é 4²?', opts: ['8','12','16','20'], ans: 2, expl: '4² = 4 × 4 = 16.' },
+        { q: 'Quanto é √25?', opts: ['4','5','6','7'], ans: 1, expl: '√25 = 5 porque 5 × 5 = 25.' },
+        { q: 'Quanto é 2³?', opts: ['6','8','9','12'], ans: 1, expl: '2³ = 2×2×2 = 8.' },
+        { q: 'Um quadrado tem área de 49 cm². Qual é o lado?', opts: ['6 cm','7 cm','8 cm','9 cm'], ans: 1, expl: 'Lado = √49 = 7 cm.' },
+        { q: 'Quanto é 10³?', opts: ['30','100','1000','10000'], ans: 2, expl: '10³ = 10×10×10 = 1000.' }
+      ]
+    },
+    { title: 'Equações Simples', intro: 'Uma equação tem um valor desconhecido (x). Para resolver, isolamos o x. Ex: x + 5 = 12. Subtraímos 5 dos dois lados: x = 7.',
+      questions: [
+        { q: 'Resolve: x + 8 = 15', opts: ['x=5','x=6','x=7','x=8'], ans: 2, expl: 'x = 15-8 = 7.' },
+        { q: 'Resolve: 3x = 21', opts: ['x=5','x=6','x=7','x=8'], ans: 2, expl: 'x = 21÷3 = 7.' },
+        { q: 'Resolve: x - 4 = 9', opts: ['x=5','x=11','x=13','x=14'], ans: 2, expl: 'x = 9+4 = 13.' },
+        { q: 'O pai tem o dobro da idade do filho. Pai=36. Filho?', opts: ['15','16','18','20'], ans: 2, expl: '2x = 36. x = 18 anos.' },
+        { q: 'Resolve: 2x + 3 = 11', opts: ['x=3','x=4','x=5','x=6'], ans: 1, expl: '2x = 8. x = 4.' }
+      ]
+    },
+    { title: 'Razões e Proporções', intro: 'A razão compara duas quantidades. A proporção é quando duas razões são iguais. Usamos em receitas, mapas e escalas.',
+      questions: [
+        { q: 'Se 2 kg de tomate custam 80 Mt, quanto custam 5 kg?', opts: ['150 Mt','180 Mt','200 Mt','220 Mt'], ans: 2, expl: 'x = (80×5)÷2 = 200 Mt.' },
+        { q: 'Razão rapazes:raparigas é 3:2. Com 15 rapazes, quantas raparigas?', opts: ['8','9','10','12'], ans: 2, expl: '3 partes = 15. 1 parte = 5. Raparigas = 2×5 = 10.' },
+        { q: 'Carro: 120 km em 2 horas. Em 5 horas, quantos km?', opts: ['240 km','280 km','300 km','360 km'], ans: 2, expl: '60 km/h × 5h = 300 km.' },
+        { q: 'Mapa: 1 cm = 50 km. Cidades a 3,5 cm. Distância real?', opts: ['125 km','150 km','175 km','200 km'], ans: 2, expl: '3,5 × 50 = 175 km.' },
+        { q: '6 operários: 4 dias. 3 operários: quantos dias?', opts: ['4 dias','6 dias','8 dias','12 dias'], ans: 2, expl: '6×4 = 3×x. x = 24÷3 = 8 dias (proporção inversa).' }
+      ]
+    },
+    { title: 'Área e Perímetro', intro: 'O perímetro é o contorno de uma figura. A área é o espaço dentro. Para rectângulo: P=2(c+l), A=c×l. Para triângulo: A=(base×altura)÷2.', shapes: 'area_perimetro',
+      questions: [
+        { q: 'Terreno 20 m × 12 m. Qual é a área?', opts: ['200 m²','220 m²','240 m²','260 m²'], ans: 2, expl: 'Área = 20 × 12 = 240 m².' },
+        { q: 'Triângulo com lados 5, 8 e 6 cm. Qual o perímetro?', opts: ['17 cm','18 cm','19 cm','20 cm'], ans: 2, expl: 'P = 5+8+6 = 19 cm.' },
+        { q: 'Campo 100 m × 60 m. Área em hectares? (1 ha = 10 000 m²)', opts: ['0,5 ha','0,6 ha','0,7 ha','0,8 ha'], ans: 1, expl: '100×60=6000 m². 6000÷10000 = 0,6 ha.' },
+        { q: 'Jardim circular raio 7 m. Perímetro? (π≈3,14)', opts: ['21,98 m','33,98 m','43,96 m','51,96 m'], ans: 2, expl: 'P = 2×π×r = 2×3,14×7 = 43,96 m.' },
+        { q: 'Área triângulo: base 10 cm, altura 6 cm:', opts: ['30 cm²','40 cm²','50 cm²','60 cm²'], ans: 0, expl: 'A = (b×h)÷2 = (10×6)÷2 = 30 cm².' }
+      ]
+    },
+    { title: 'Probabilidade', intro: 'A probabilidade mede a chance de um evento acontecer. Varia entre 0 (impossível) e 1 (certo). Num dado de 6 faces, a probabilidade de sair o 3 é 1/6.',
+      questions: [
+        { q: 'Probabilidade de sair cara ao lançar uma moeda?', opts: ['1/4','1/3','1/2','2/3'], ans: 2, expl: 'P(cara) = 1/2. A moeda tem 2 faces.' },
+        { q: 'Saco: 3 bolas vermelhas e 7 azuis. P(vermelha)?', opts: ['3/7','3/10','7/10','1/3'], ans: 1, expl: 'P(vermelha) = 3/10.' },
+        { q: 'P(número par) num dado de 6 faces?', opts: ['1/6','1/3','1/2','2/3'], ans: 2, expl: 'Pares: 2,4,6. P(par) = 3/6 = 1/2.' },
+        { q: 'Qual evento tem probabilidade 0?', opts: ['Chover em Dezembro','Tirar 7 num dado de 6 faces','Sol nascer amanhã','Cara numa moeda'], ans: 1, expl: 'Tirar 7 num dado de 6 faces é impossível.' },
+        { q: 'Turma de 20, 12 são raparigas. P(escolher rapariga)?', opts: ['2/5','3/5','1/2','4/5'], ans: 1, expl: 'P = 12/20 = 3/5 = 60%.' }
+      ]
+    }
+  ]
+};
+
+// ===== SVG DE FORMAS GEOMÉTRICAS =====
+const SHAPE_SVGS = {
+  'formas_basicas': `
+    <div style="margin:12px 0">
+      <div style="font-weight:700;color:#1e40af;font-size:0.88rem;margin-bottom:10px">🔷 Formas Geométricas:</div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <div style="text-align:center">
+          <svg width="65" height="65" viewBox="0 0 65 65"><rect x="5" y="5" width="55" height="55" fill="#dbeafe" stroke="#2563eb" stroke-width="2.5"/></svg>
+          <div style="font-size:0.75rem;color:#1e40af;margin-top:3px"><b>Quadrado</b><br>4 lados iguais</div>
+        </div>
+        <div style="text-align:center">
+          <svg width="65" height="65" viewBox="0 0 65 65"><polygon points="32,4 60,60 4,60" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/></svg>
+          <div style="font-size:0.75rem;color:#166534;margin-top:3px"><b>Triângulo</b><br>3 lados</div>
+        </div>
+        <div style="text-align:center">
+          <svg width="65" height="65" viewBox="0 0 65 65"><circle cx="32" cy="32" r="28" fill="#fef9c3" stroke="#ca8a04" stroke-width="2.5"/></svg>
+          <div style="font-size:0.75rem;color:#92400e;margin-top:3px"><b>Círculo</b><br>Sem lados</div>
+        </div>
+        <div style="text-align:center">
+          <svg width="85" height="55" viewBox="0 0 85 55"><rect x="4" y="4" width="77" height="47" fill="#fce7f3" stroke="#db2777" stroke-width="2.5"/></svg>
+          <div style="font-size:0.75rem;color:#9d174d;margin-top:3px"><b>Rectângulo</b><br>2 pares</div>
+        </div>
+      </div>
+    </div>`,
+  'geometria_basica': `
+    <div style="margin:12px 0">
+      <div style="font-weight:700;color:#1e40af;font-size:0.88rem;margin-bottom:10px">📐 Fórmulas:</div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <div style="text-align:center">
+          <svg width="65" height="65" viewBox="0 0 65 65">
+            <rect x="5" y="5" width="55" height="55" fill="#dbeafe" stroke="#2563eb" stroke-width="2.5"/>
+            <text x="32" y="35" text-anchor="middle" font-size="9" fill="#1e40af">P=4×lado</text>
+            <text x="32" y="47" text-anchor="middle" font-size="9" fill="#1e40af">A=l²</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#1e40af;margin-top:3px"><b>Quadrado</b></div>
+        </div>
+        <div style="text-align:center">
+          <svg width="65" height="65" viewBox="0 0 65 65">
+            <polygon points="32,4 60,60 4,60" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/>
+            <text x="32" y="48" text-anchor="middle" font-size="9" fill="#166534">A=b×h÷2</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#166534;margin-top:3px"><b>Triângulo</b></div>
+        </div>
+        <div style="text-align:center">
+          <svg width="80" height="55" viewBox="0 0 80 55">
+            <rect x="4" y="4" width="72" height="47" fill="#fce7f3" stroke="#db2777" stroke-width="2.5"/>
+            <text x="40" y="29" text-anchor="middle" font-size="9" fill="#9d174d">P=2(c+l)</text>
+            <text x="40" y="41" text-anchor="middle" font-size="9" fill="#9d174d">A=c×l</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#9d174d;margin-top:3px"><b>Rectângulo</b></div>
+        </div>
+        <div style="text-align:center">
+          <svg width="65" height="65" viewBox="0 0 65 65">
+            <circle cx="32" cy="32" r="28" fill="#fef9c3" stroke="#ca8a04" stroke-width="2.5"/>
+            <line x1="32" y1="32" x2="60" y2="32" stroke="#ca8a04" stroke-width="2"/>
+            <text x="32" y="25" text-anchor="middle" font-size="9" fill="#92400e">A=π×r²</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#92400e;margin-top:3px"><b>Círculo</b></div>
+        </div>
+      </div>
+    </div>`,
+  'linhas_angulos': `
+    <div style="margin:12px 0">
+      <div style="font-weight:700;color:#1e40af;font-size:0.88rem;margin-bottom:10px">📏 Tipos de Linhas e Ângulos:</div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <div style="text-align:center">
+          <svg width="85" height="55" viewBox="0 0 85 55">
+            <line x1="5" y1="18" x2="80" y2="18" stroke="#2563eb" stroke-width="2.5"/>
+            <line x1="5" y1="38" x2="80" y2="38" stroke="#2563eb" stroke-width="2.5"/>
+            <text x="42" y="52" text-anchor="middle" font-size="9" fill="#1e40af">Paralelas ∥</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#1e40af;margin-top:3px">Nunca se encontram<br><i>ex: carris do comboio</i></div>
+        </div>
+        <div style="text-align:center">
+          <svg width="75" height="75" viewBox="0 0 75 75">
+            <line x1="37" y1="5" x2="37" y2="70" stroke="#16a34a" stroke-width="2.5"/>
+            <line x1="5" y1="37" x2="70" y2="37" stroke="#16a34a" stroke-width="2.5"/>
+            <rect x="37" y="37" width="10" height="10" fill="none" stroke="#16a34a" stroke-width="1.5"/>
+            <text x="37" y="82" text-anchor="middle" font-size="9" fill="#166534">Perp. ⊥ (90°)</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#166534;margin-top:3px">Cruzam em 90°<br><i>ex: canto da janela</i></div>
+        </div>
+        <div style="text-align:center">
+          <svg width="75" height="70" viewBox="0 0 75 70">
+            <line x1="5" y1="60" x2="70" y2="60" stroke="#db2777" stroke-width="2.5"/>
+            <line x1="10" y1="60" x2="10" y2="15" stroke="#db2777" stroke-width="2.5"/>
+            <path d="M10,45 L22,45 L22,60" fill="none" stroke="#db2777" stroke-width="1.8"/>
+            <text x="37" y="76" text-anchor="middle" font-size="9" fill="#9d174d">Ângulo Recto 90°</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#9d174d;margin-top:3px"><b>Recto = 90°</b></div>
+        </div>
+        <div style="text-align:center">
+          <svg width="75" height="70" viewBox="0 0 75 70">
+            <line x1="5" y1="60" x2="70" y2="60" stroke="#7c3aed" stroke-width="2.5"/>
+            <line x1="10" y1="60" x2="50" y2="15" stroke="#7c3aed" stroke-width="2.5"/>
+            <path d="M10,45 Q22,48 24,60" fill="none" stroke="#7c3aed" stroke-width="1.8"/>
+            <text x="37" y="76" text-anchor="middle" font-size="9" fill="#7c3aed">Agudo &lt;90°</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#7c3aed;margin-top:3px"><b>Agudo &lt;90°</b></div>
+        </div>
+        <div style="text-align:center">
+          <svg width="75" height="70" viewBox="0 0 75 70">
+            <line x1="5" y1="60" x2="70" y2="60" stroke="#d97706" stroke-width="2.5"/>
+            <line x1="10" y1="60" x2="60" y2="20" stroke="#d97706" stroke-width="2.5"/>
+            <path d="M10,45 Q28,42 32,60" fill="none" stroke="#d97706" stroke-width="1.8"/>
+            <text x="37" y="76" text-anchor="middle" font-size="9" fill="#d97706">Obtuso &gt;90°</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#d97706;margin-top:3px"><b>Obtuso &gt;90°</b></div>
+        </div>
+      </div>
+    </div>`,
+  'geometria_avancada': `
+    <div style="margin:12px 0">
+      <div style="font-weight:700;color:#1e40af;font-size:0.88rem;margin-bottom:10px">📐 Formas e Linhas:</div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <div style="text-align:center">
+          <svg width="85" height="55" viewBox="0 0 85 55">
+            <line x1="5" y1="18" x2="80" y2="18" stroke="#2563eb" stroke-width="2.5"/>
+            <line x1="5" y1="38" x2="80" y2="38" stroke="#2563eb" stroke-width="2.5"/>
+            <text x="42" y="52" text-anchor="middle" font-size="9" fill="#1e40af">Paralelas ∥</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#1e40af;margin-top:3px">Paralelas</div>
+        </div>
+        <div style="text-align:center">
+          <svg width="65" height="65" viewBox="0 0 65 65">
+            <line x1="32" y1="3" x2="32" y2="62" stroke="#16a34a" stroke-width="2.5"/>
+            <line x1="3" y1="32" x2="62" y2="32" stroke="#16a34a" stroke-width="2.5"/>
+            <rect x="32" y="32" width="9" height="9" fill="none" stroke="#16a34a" stroke-width="1.5"/>
+          </svg>
+          <div style="font-size:0.75rem;color:#166534;margin-top:3px">Perpendiculares ⊥</div>
+        </div>
+        <div style="text-align:center">
+          <svg width="65" height="65" viewBox="0 0 65 65">
+            <rect x="5" y="5" width="55" height="55" fill="#dbeafe" stroke="#2563eb" stroke-width="2.5"/>
+            <text x="32" y="36" text-anchor="middle" font-size="9" fill="#1e40af">A=l²</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#1e40af;margin-top:3px"><b>Quadrado</b></div>
+        </div>
+        <div style="text-align:center">
+          <svg width="80" height="55" viewBox="0 0 80 55">
+            <rect x="4" y="4" width="72" height="47" fill="#fce7f3" stroke="#db2777" stroke-width="2.5"/>
+            <text x="40" y="32" text-anchor="middle" font-size="9" fill="#9d174d">A=c×l</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#9d174d;margin-top:3px"><b>Rectângulo</b></div>
+        </div>
+      </div>
+    </div>`,
+  'angulos_triangulos': `
+    <div style="margin:12px 0">
+      <div style="font-weight:700;color:#1e40af;font-size:0.88rem;margin-bottom:10px">📐 Tipos de Ângulos e Triângulos:</div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <div style="text-align:center">
+          <svg width="70" height="70" viewBox="0 0 70 70">
+            <line x1="8" y1="58" x2="62" y2="58" stroke="#2563eb" stroke-width="2.5"/>
+            <line x1="8" y1="58" x2="8" y2="12" stroke="#2563eb" stroke-width="2.5"/>
+            <path d="M8,45 L20,45 L20,58" fill="none" stroke="#2563eb" stroke-width="1.8"/>
+            <text x="35" y="68" text-anchor="middle" font-size="9" fill="#1e40af">Recto 90°</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#1e40af;margin-top:3px">Recto = 90°</div>
+        </div>
+        <div style="text-align:center">
+          <svg width="70" height="70" viewBox="0 0 70 70">
+            <line x1="8" y1="58" x2="62" y2="58" stroke="#16a34a" stroke-width="2.5"/>
+            <line x1="8" y1="58" x2="35" y2="15" stroke="#16a34a" stroke-width="2.5"/>
+            <path d="M8,44 Q20,47 22,58" fill="none" stroke="#16a34a" stroke-width="1.8"/>
+            <text x="35" y="68" text-anchor="middle" font-size="9" fill="#166534">Agudo &lt;90°</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#166534;margin-top:3px">Agudo &lt;90°</div>
+        </div>
+        <div style="text-align:center">
+          <svg width="70" height="70" viewBox="0 0 70 70">
+            <line x1="8" y1="58" x2="62" y2="58" stroke="#db2777" stroke-width="2.5"/>
+            <line x1="8" y1="58" x2="55" y2="22" stroke="#db2777" stroke-width="2.5"/>
+            <path d="M8,44 Q24,40 28,58" fill="none" stroke="#db2777" stroke-width="1.8"/>
+            <text x="35" y="68" text-anchor="middle" font-size="9" fill="#9d174d">Obtuso &gt;90°</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#9d174d;margin-top:3px">Obtuso &gt;90°</div>
+        </div>
+        <div style="text-align:center">
+          <svg width="65" height="65" viewBox="0 0 65 65">
+            <polygon points="32,5 60,58 4,58" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/>
+            <text x="32" y="42" text-anchor="middle" font-size="8" fill="#7c3aed">60°+60°+60°</text>
+            <text x="32" y="54" text-anchor="middle" font-size="8" fill="#7c3aed">=180°</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#7c3aed;margin-top:3px"><b>Equilátero</b></div>
+        </div>
+      </div>
+      <div style="background:#eff6ff;border-radius:8px;padding:8px;text-align:center;margin-top:8px;font-size:0.83rem;color:#1e40af;font-weight:700">∠A + ∠B + ∠C = 180° em qualquer triângulo</div>
+    </div>`,
+  'area_perimetro': `
+    <div style="margin:12px 0">
+      <div style="font-weight:700;color:#1e40af;font-size:0.88rem;margin-bottom:10px">📐 Áreas e Perímetros:</div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <div style="text-align:center">
+          <svg width="75" height="65" viewBox="0 0 75 65">
+            <rect x="5" y="5" width="65" height="42" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+            <text x="37" y="22" text-anchor="middle" font-size="8.5" fill="#1e40af">c = 6,5 cm</text>
+            <text x="8" y="32" font-size="7" fill="#1e40af">l=4</text>
+            <text x="37" y="58" text-anchor="middle" font-size="8" fill="#1e40af">A=c×l | P=2(c+l)</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#1e40af;margin-top:3px"><b>Rectângulo</b></div>
+        </div>
+        <div style="text-align:center">
+          <svg width="65" height="65" viewBox="0 0 65 65">
+            <polygon points="32,5 60,58 4,58" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+            <line x1="32" y1="5" x2="32" y2="58" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="3,2"/>
+            <text x="38" y="35" font-size="7.5" fill="#166534">h</text>
+            <text x="32" y="63" text-anchor="middle" font-size="8" fill="#166534">A=(b×h)÷2</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#166534;margin-top:3px"><b>Triângulo</b></div>
+        </div>
+        <div style="text-align:center">
+          <svg width="65" height="65" viewBox="0 0 65 65">
+            <circle cx="32" cy="30" r="26" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+            <line x1="32" y1="30" x2="58" y2="30" stroke="#ca8a04" stroke-width="1.8"/>
+            <text x="46" y="26" font-size="8" fill="#92400e">r</text>
+            <text x="32" y="62" text-anchor="middle" font-size="7.5" fill="#92400e">A=πr² | P=2πr</text>
+          </svg>
+          <div style="font-size:0.75rem;color:#92400e;margin-top:3px"><b>Círculo</b></div>
+        </div>
+      </div>
+    </div>`
+};
+
+// ===== SUGESTÕES POR CLASSE =====
+function getSugestoes(classes) {
+  const all = {
+    '1ª Classe': ['Quanto é 5+3?','O que é um triângulo?','Conta até 10','Qual é maior: 7 ou 4?'],
+    '2ª Classe': ['Como faço 25+14?','O que são dezenas?','Tabuada do 3','Quanto é 8×4?'],
+    '3ª Classe': ['Quanto é 350+250?','O que é uma fracção?','Como faço 72÷9?','O que são linhas paralelas?'],
+    '4ª Classe': ['O que é percentagem?','Quanto é 3/4 de 80 Mt?','O que são decimais?','Como calcular área?'],
+    '5ª Classe': ['O que é o MMC?','Como calcular a média?','O que são ângulos?','Como calcular probabilidade?'],
+    '6ª Classe': ['O que é equação?','Como resuelvo 3x=21?','O que são números inteiros?','Como calcular raiz quadrada?'],
+  };
+  const suggestions = new Set();
+  (classes||[]).forEach(c => (all[c]||[]).forEach(s => suggestions.add(s)));
+  if (!suggestions.size) {
+    ['O que são fracções?','Como somar números grandes?','O que é perímetro?','Como faço divisão?'].forEach(s=>suggestions.add(s));
+  }
+  return [...suggestions].slice(0, 6);
+}
+
+// ===== NAVEGAÇÃO =====
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function switchTab(tab) {
+  document.getElementById('tab-login').style.display = tab==='login'?'block':'none';
+  document.getElementById('tab-register').style.display = tab==='register'?'block':'none';
+  document.getElementById('tab-btn-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-btn-register').classList.toggle('active', tab==='register');
+  document.getElementById('gl-error').style.display = 'none';
+}
+
+function showErr(id, msg) { const e=document.getElementById(id); e.textContent=msg; e.style.display='block'; }
+function hideErr(id) { document.getElementById(id).style.display='none'; }
+
+// ===== ENCARREGADO =====
+async function registerGuardian() {
+  const nome=document.getElementById('gr-nome').value.trim();
+  const telefone=document.getElementById('gr-telefone').value.trim();
+  const pin=document.getElementById('gr-pin').value.trim();
+  hideErr('gl-error');
+  if (!nome||!telefone||!pin||pin.length!==4) { showErr('gl-error','Preenche todos os campos. PIN com 4 dígitos.'); return; }
+  const { data, error } = await db.from('encarregados').insert([{nome,telefone,pin}]).select().single();
+  if (error) { showErr('gl-error', error.code==='23505'?'Este telefone já está registado.':'Erro ao criar conta.'); return; }
+  currentGuardian = data;
+  loadGuardianDash();
+}
+
+async function loginGuardian() {
+  const telefone=document.getElementById('gl-telefone').value.trim();
+  const pin=document.getElementById('gl-pin').value.trim();
+  hideErr('gl-error');
+  if (!telefone||!pin) { showErr('gl-error','Preenche o telefone e o PIN.'); return; }
+  const { data, error } = await db.from('encarregados').select('*').eq('telefone',telefone).eq('pin',pin).single();
+  if (error||!data) { showErr('gl-error','Telefone ou PIN incorrectos.'); return; }
+  currentGuardian = data;
+  loadGuardianDash();
+}
+
+function logoutGuardian() { currentGuardian=null; goTo('screen-home'); }
+
+async function loadGuardianDash() {
+  document.getElementById('gd-nome').textContent = '👋 '+currentGuardian.nome.split(' ')[0];
+  const { data: alunos } = await db.from('alunos').select('*').eq('encarregado_id', currentGuardian.id);
+  const c = document.getElementById('gd-alunos');
+  if (!alunos||!alunos.length) {
+    c.innerHTML = '<div class="card"><p style="color:var(--gray);text-align:center;padding:8px 0">Ainda não adicionaste nenhum aluno.</p></div>';
+  } else {
+    c.innerHTML = alunos.map(a => {
+      const prec = a.total>0 ? Math.round((a.certas/a.total)*100) : 0;
+      return `<div class="card aluno-card" onclick="openAlunoDetail('${a.id}')">
+        <div class="aluno-info"><h3>🎒 ${a.nome}</h3><p>Classes: ${(a.classes||[]).join(', ')||'Nenhuma'}</p><p>Sessões: ${a.sessoes||0} | Precisão: ${prec}%</p></div>
+        <span style="color:var(--blue);font-size:1.2rem">›</span></div>`;
+    }).join('');
+  }
+  goTo('screen-guardian-dash');
+}
+
+async function addAluno() {
+  const nome=document.getElementById('na-nome').value.trim();
+  const pin=document.getElementById('na-pin').value.trim();
+  hideErr('gd-error');
+  if (!nome||!pin||pin.length!==4) { showErr('gd-error','Nome e PIN de 4 dígitos são obrigatórios.'); return; }
+  const { error } = await db.from('alunos').insert([{encarregado_id:currentGuardian.id,nome,pin,classes:[],sessoes:0,certas:0,total:0,progresso:{}}]);
+  if (error) { showErr('gd-error','Erro ao adicionar aluno.'); return; }
+  document.getElementById('na-nome').value='';
+  document.getElementById('na-pin').value='';
+  loadGuardianDash();
+}
+
+async function openAlunoDetail(id) {
+  const { data: a } = await db.from('alunos').select('*').eq('id',id).single();
+  if (!a) return;
+  currentAluno = a;
+  alunoToDelete = a;
+  document.getElementById('ad-nome').textContent = a.nome;
+  const prec = a.total>0 ? Math.round((a.certas/a.total)*100) : 0;
+  document.getElementById('ad-sessoes').textContent = a.sessoes||0;
+  document.getElementById('ad-certas').textContent = a.certas||0;
+  document.getElementById('ad-precisao').textContent = prec+'%';
+  // Count completed topics
+  const prog = a.progresso||{};
+  let temasDone = 0;
+  Object.values(prog).forEach(v => { if(v >= 60) temasDone++; });
+  document.getElementById('ad-temas').textContent = temasDone;
+  const classes=['1ª Classe','2ª Classe','3ª Classe','4ª Classe','5ª Classe','6ª Classe'];
+  document.getElementById('ad-classes').innerHTML = classes.map(cl => {
+    const active=(a.classes||[]).includes(cl);
+    return `<div class="classe-toggle">
+      <span>${cl} <small style="color:var(--gray)">(150 Mt/mês)</small></span>
+      <label class="toggle"><input type="checkbox" ${active?'checked':''} onchange="toggleClass('${a.id}','${cl}',this.checked)"><span class="slider"></span></label>
+    </div>`;
+  }).join('');
+  // Progress per topic
+  if (Object.keys(prog).length > 0) {
+    document.getElementById('ad-prog-card').style.display = 'block';
+    document.getElementById('ad-prog-list').innerHTML = Object.entries(prog).map(([key,pct]) => {
+      const dotClass = pct>=80?'done':pct>=40?'partial':'none';
+      return `<div class="prog-topic-row"><div class="prog-dot ${dotClass}"></div><div class="prog-label">${key}</div><div class="prog-pct">${pct}%</div></div>`;
+    }).join('');
+  }
+  goTo('screen-aluno-detail');
+}
+
+async function toggleClass(alunoId, classe, active) {
+  const { data: a } = await db.from('alunos').select('classes').eq('id',alunoId).single();
+  let cls = a.classes||[];
+  if (active) { if(!cls.includes(classe)) cls.push(classe); }
+  else { cls = cls.filter(c=>c!==classe); }
+  await db.from('alunos').update({classes:cls}).eq('id',alunoId);
+}
+
+function confirmDeleteAluno() {
+  if (!alunoToDelete) return;
+  document.getElementById('confirm-name').textContent = alunoToDelete.nome;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+function closeConfirmModal() {
+  document.getElementById('confirm-modal').classList.remove('open');
+}
+
+async function deleteAluno() {
+  if (!alunoToDelete) return;
+  closeConfirmModal();
+  await db.from('alunos').delete().eq('id', alunoToDelete.id);
+  alunoToDelete = null;
+  currentAluno = null;
+  loadGuardianDash();
+}
+
+// ===== ALUNO =====
+async function loadAlunosByPhone() {
+  const telefone = document.getElementById('ss-telefone').value.trim();
+  const errEl = document.getElementById('ss-error');
+  errEl.style.display = 'none';
+  if (!telefone) { errEl.textContent='Insere o telefone do encarregado.'; errEl.style.display='block'; return; }
+  const { data: enc, error } = await db.from('encarregados').select('id,nome').eq('telefone',telefone).single();
+  if (error||!enc) { errEl.textContent='Telefone não encontrado. Pede ao teu encarregado para verificar.'; errEl.style.display='block'; return; }
+  const { data: alunos } = await db.from('alunos').select('id,nome').eq('encarregado_id',enc.id);
+  const c = document.getElementById('ss-alunos');
+  if (!alunos||!alunos.length) {
+    c.innerHTML='<p style="color:var(--gray);text-align:center">Nenhum aluno registado nesta conta.</p>';
+  } else {
+    c.innerHTML = alunos.map(a=>`<button class="btn btn-secondary" onclick="selectAluno('${a.id}','${a.nome}')">${a.nome}</button>`).join('');
+  }
+  document.getElementById('ss-step1').style.display='none';
+  document.getElementById('ss-step2').style.display='block';
+}
+
+function resetStudentLogin() {
+  document.getElementById('ss-step1').style.display='block';
+  document.getElementById('ss-step2').style.display='none';
+  document.getElementById('ss-pin-box').style.display='none';
+  document.getElementById('ss-telefone').value='';
+  document.getElementById('ss-error').style.display='none';
+}
+
+function backToNames() {
+  document.getElementById('ss-pin-box').style.display='none';
+  document.getElementById('ss-step2').style.display='block';
+}
+
+function selectAluno(id, nome) {
+  selectedAlunoId = id;
+  document.getElementById('ss-pin-title').textContent = 'PIN de '+nome;
+  document.getElementById('ss-step2').style.display='none';
+  document.getElementById('ss-pin-box').style.display='block';
+  document.getElementById('ss-pin').value='';
+  document.getElementById('ss-pin').focus();
+}
+
+async function loginAluno() {
+  const pin = document.getElementById('ss-pin').value.trim();
+  hideErr('ss-error');
+  if (!pin) { showErr('ss-error','Insere o PIN.'); return; }
+  const { data, error } = await db.from('alunos').select('*').eq('id',selectedAlunoId).eq('pin',pin).single();
+  if (error||!data) { showErr('ss-error','PIN incorrecto.'); return; }
+  currentAluno = data;
+  loadStudentDash();
+}
+
+function logoutAluno() {
+  currentAluno=null; chatHistory=[];
+  document.getElementById('chat-box').innerHTML='';
+  stopSpeech();
+  goTo('screen-home');
+}
+
+function loadStudentDash() {
+  document.getElementById('sd-nome').textContent = '👋 '+currentAluno.nome.split(' ')[0]+'!';
+  const classes = currentAluno.classes||[];
+  const c = document.getElementById('sd-classes');
+  const prog = currentAluno.progresso||{};
+  if (!classes.length) {
+    c.innerHTML='<div class="card"><p style="color:var(--gray)">O teu encarregado ainda não activou nenhuma classe. Pede-lhe para activar!</p></div>';
+  } else {
+    c.innerHTML = classes.map(classe => {
+      const topics = CURRICULUM[classe]||[];
+      return `<div class="card"><h2>📖 ${classe}</h2>${topics.map((t,i) => {
+        const key = classe+'|'+t.title;
+        const pct = prog[key]||0;
+        const doneLabel = pct>=80 ? `<span class="topic-done">✓ ${pct}%</span>` : pct>0 ? `<span class="topic-done" style="background:#fef3c7;color:#d97706">${pct}%</span>` : '';
+        return `<div class="topic-card" onclick="openTopic('${classe}',${i})">
+          <div><h3>${t.title}</h3><p>${t.questions.length} exercícios</p></div>
+          <div class="topic-right">${doneLabel}<span style="color:var(--blue)">›</span></div>
+        </div>`;
+      }).join('')}</div>`;
+    }).join('');
+  }
+  // Sugestões chat
+  const sugs = getSugestoes(classes);
+  document.getElementById('chat-sugestoes').innerHTML = sugs.map(s=>`<button class="sug-btn" onclick="sendSugestao('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+  // Prova: populate classe select
+  const provaSel = document.getElementById('prova-classe');
+  provaSel.innerHTML = '<option value="">Selecciona a classe...</option>';
+  classes.forEach(cl => {
+    const opt = document.createElement('option');
+    opt.value = cl; opt.textContent = cl;
+    provaSel.appendChild(opt);
+  });
+  loadProgressDash();
+  showStudentTab('temas');
+  goTo('screen-student-dash');
+}
+
+function loadProgressDash() {
+  const prog = currentAluno.progresso||{};
+  const total = currentAluno.total||0;
+  const certas = currentAluno.certas||0;
+  const prec = total>0 ? Math.round((certas/total)*100) : 0;
+  const temasDone = Object.values(prog).filter(v=>v>=80).length;
+  document.getElementById('prog-stats').innerHTML = `
+    <div class="stat-box"><div class="num">${currentAluno.sessoes||0}</div><div class="lbl">Sessões</div></div>
+    <div class="stat-box"><div class="num">${prec}%</div><div class="lbl">Precisão</div></div>
+    <div class="stat-box"><div class="num">${temasDone}</div><div class="lbl">Temas ≥80%</div></div>`;
+  const classes = currentAluno.classes||[];
+  if (!classes.length) { document.getElementById('prog-classes').innerHTML='<p style="color:var(--gray);font-size:0.88rem">Sem classes activas.</p>'; return; }
+  let html = '';
+  classes.forEach(classe => {
+    const topics = CURRICULUM[classe]||[];
+    html += `<div style="margin-bottom:14px"><div style="font-weight:700;color:#1e40af;font-size:0.88rem;margin-bottom:8px">📖 ${classe}</div>`;
+    topics.forEach(t => {
+      const key = classe+'|'+t.title;
+      const pct = prog[key]||0;
+      const dotClass = pct>=80?'done':pct>0?'partial':'none';
+      html += `<div class="prog-topic-row"><div class="prog-dot ${dotClass}"></div><div class="prog-label">${t.title}</div>
+        <div style="flex:1;margin:0 10px"><div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct>=80?'var(--green)':pct>0?'var(--yellow)':'var(--gray-border)'}"></div></div></div>
+        <div class="prog-pct">${pct}%</div></div>`;
+    });
+    html += '</div>';
+  });
+  document.getElementById('prog-classes').innerHTML = html;
+}
+
+function showStudentTab(tab) {
+  ['temas','chat','progresso','prova'].forEach(t => {
+    document.getElementById('sd-'+t).style.display = t===tab?'block':'none';
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+  });
+  if (tab==='progresso') loadProgressDash();
+}
+
+function loadProvaTopics() {
+  const classe = document.getElementById('prova-classe').value;
+  const sel = document.getElementById('prova-tema');
+  sel.innerHTML = '<option value="">Selecciona o tema...</option>';
+  if (!classe) return;
+  (CURRICULUM[classe]||[]).forEach((t,i) => {
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = t.title;
+    sel.appendChild(opt);
+  });
+}
+
+function startProvaPrep() {
+  const classe = document.getElementById('prova-classe').value;
+  const idx = document.getElementById('prova-tema').value;
+  if (!classe||idx==='') { alert('Selecciona a classe e o tema!'); return; }
+  currentTopic = { classe, index: parseInt(idx), topic: CURRICULUM[classe][parseInt(idx)] };
+  startQuiz(true);
+}
+
+// ===== QUIZ =====
+function openTopic(classe, index) {
+  currentTopic = { classe, index, topic: CURRICULUM[classe][index] };
+  document.getElementById('topic-title').textContent = currentTopic.topic.title;
+  document.getElementById('topic-intro').textContent = currentTopic.topic.intro;
+  const shapeKey = currentTopic.topic.shapes;
+  document.getElementById('topic-shapes').innerHTML = shapeKey && SHAPE_SVGS[shapeKey] ? SHAPE_SVGS[shapeKey] : '';
+  goTo('screen-topic');
+}
+
+function startQuiz(isProva=false) {
+  const all = currentTopic.topic.questions;
+  const shuffled = [...all].sort(()=>Math.random()-0.5);
+  const picked = isProva ? shuffled.slice(0, Math.min(10, shuffled.length)) : shuffled.slice(0, Math.min(5, shuffled.length));
+  quizData = { questions: picked, current: 0, score: 0, wrongAnswers: [], isProva };
+  document.getElementById('quiz-title').textContent = (isProva?'📝 Prova: ':'')+currentTopic.topic.title;
+  renderQuestion();
+  goTo('screen-quiz');
+}
+
+function renderQuestion() {
+  const q = quizData.questions[quizData.current];
+  document.getElementById('quiz-q').textContent = q.q;
+  document.getElementById('quiz-prog').textContent = `Questão ${quizData.current+1} de ${quizData.questions.length}`;
+  document.getElementById('quiz-score').textContent = `✓ ${quizData.score}`;
+  document.getElementById('quiz-bar').style.width = (quizData.current/quizData.questions.length*100)+'%';
+  document.getElementById('quiz-expl').style.display='none';
+  document.getElementById('quiz-next').style.display='none';
+  document.getElementById('quiz-visual').innerHTML='';
+  // Show shape visual if topic has shapes
+  if (currentTopic.topic.shapes && SHAPE_SVGS[currentTopic.topic.shapes]) {
+    document.getElementById('quiz-visual').innerHTML = SHAPE_SVGS[currentTopic.topic.shapes];
+  }
+  document.getElementById('quiz-opts').innerHTML = q.opts.map((o,i)=>
+    `<button class="option-btn" onclick="selectAnswer(${i})">${o}</button>`
+  ).join('');
+}
+
+async function selectAnswer(idx) {
+  const q = quizData.questions[quizData.current];
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b=>b.disabled=true);
+  const correct = idx===q.ans;
+  btns[idx].classList.add(correct?'correct':'wrong');
+  if (!correct) { btns[q.ans].classList.add('correct'); quizData.wrongAnswers.push(q); }
+  if (correct) quizData.score++;
+  const explText = (correct?'✅ Correcto! ':'❌ Incorreto. ')+q.expl;
+  document.getElementById('quiz-expl').textContent = explText;
+  document.getElementById('quiz-expl').style.display='block';
+  document.getElementById('quiz-next').style.display='block';
+  if (voiceOutputEnabled) speak(explText);
+  // Update stats
+  const nt=(currentAluno.total||0)+1, nc=(currentAluno.certas||0)+(correct?1:0);
+  await db.from('alunos').update({total:nt,certas:nc}).eq('id',currentAluno.id);
+  currentAluno.total=nt; currentAluno.certas=nc;
+}
+
+function nextQuestion() {
+  quizData.current++;
+  if (quizData.current>=quizData.questions.length) { showResult(); return; }
+  renderQuestion();
+}
+
+async function showResult() {
+  const ns=(currentAluno.sessoes||0)+1;
+  const pct = Math.round((quizData.score/quizData.questions.length)*100);
+  // Save progress per topic
+  const prog = currentAluno.progresso||{};
+  const key = currentTopic.classe+'|'+currentTopic.topic.title;
+  const prevPct = prog[key]||0;
+  prog[key] = Math.max(prevPct, pct); // Keep best score
+  await db.from('alunos').update({sessoes:ns, progresso:prog}).eq('id',currentAluno.id);
+  currentAluno.sessoes=ns; currentAluno.progresso=prog;
+  document.getElementById('res-title').textContent = currentTopic.topic.title;
+  document.getElementById('res-score').textContent = quizData.score+'/'+quizData.questions.length;
+  document.getElementById('res-total').textContent = pct+'%';
+  document.getElementById('res-circle').style.background = pct>=80?'var(--green)':pct>=60?'var(--blue)':'var(--yellow)';
+  const msgs = pct>=80?'🌟 Excelente! Estás a aprender muito!':pct>=60?'👍 Bom trabalho! Podes melhorar!':'💪 Revê o tema e tenta novamente!';
+  document.getElementById('res-msg').textContent = msgs;
+  // Review wrong answers
+  let reviewHtml = '';
+  if (quizData.wrongAnswers.length>0) {
+    reviewHtml = `<div style="background:var(--red-pale);border-radius:10px;padding:12px;font-size:0.85rem">
+      <div style="font-weight:700;color:var(--red);margin-bottom:8px">❌ Perguntas para rever (${quizData.wrongAnswers.length}):</div>
+      ${quizData.wrongAnswers.map(q=>`<div style="margin-bottom:6px;color:#7f1d1d">• ${q.q}<br><span style="color:var(--green)">${q.expl}</span></div>`).join('')}
+    </div>`;
+  }
+  document.getElementById('res-review').innerHTML = reviewHtml;
+  if (voiceOutputEnabled) speak(msgs);
+  goTo('screen-result');
+}
+
+// ===== CHAT IA com verificação de compreensão =====
+function addMessage(role, html) {
+  const box = document.getElementById('chat-box');
+  const div = document.createElement('div');
+  div.className = 'msg '+role;
+  div.innerHTML = `<div class="bubble">${html}</div>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function showUnderstandBox() {
+  document.getElementById('understand-area').innerHTML = `
+    <div class="understand-box">
+      <p>🤔 Percebeste a explicação?</p>
+      <div class="understand-btns">
+        <button class="btn-yes" onclick="handleUnderstand(true)">✅ Sim, percebi!</button>
+        <button class="btn-no" onclick="handleUnderstand(false)">❌ Não percebi</button>
+      </div>
+    </div>`;
+  awaitingUnderstanding = true;
+}
+
+function clearUnderstandBox() {
+  document.getElementById('understand-area').innerHTML='';
+  awaitingUnderstanding = false;
+}
+
+async function handleUnderstand(understood) {
+  clearUnderstandBox();
+  if (!understood) {
+    compressionCount++;
+    const msg = compressionCount<=1 ? 'Não percebeste — vou dar um exemplo mais simples! Diz-me qual parte não ficou clara.' : 'Vamos tentar de uma forma diferente. Podes descrever o que já percebeste?';
+    addMessage('ai', msg);
+    chatHistory.push({role:'assistant', content:msg});
+    if (voiceOutputEnabled) speak(msg);
+  } else {
+    verifyCount = 0;
+    compressionCount = 0;
+    await doVerifyQuestions();
+  }
+}
+
+async function doVerifyQuestions() {
+  if (verifyCount >= 2) return;
+  verifyCount++;
+  const lastTopic = currentTopic ? currentTopic.topic.title : 'matemática';
+  const classe = currentAluno ? (currentAluno.classes||[]).join(', ')||'ensino primário' : 'ensino primário';
+  const nomeAluno = currentAluno ? currentAluno.nome.split(' ')[0] : 'aluno';
+  const btn = document.getElementById('chat-send-btn');
+  btn.disabled=true; btn.textContent='...';
+  const thinking = document.createElement('div');
+  thinking.className='msg ai';
+  thinking.innerHTML='<div class="bubble"><span class="spinner"></span> A preparar pergunta...</div>';
+  document.getElementById('chat-box').appendChild(thinking);
+  document.getElementById('chat-box').scrollTop=99999;
+  try {
+    const resp = await fetch(GROQ_URL, {
+      method:'POST',
+      headers:{'Authorization':'Bearer '+GROQ_KEY,'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'llama-3.1-8b-instant',
+        messages:[
+          {role:'system',content:`És o Tutor Moz para alunos moçambicanos da ${classe}. O aluno chama-se ${nomeAluno}. Faz UMA pergunta curta e simples dirigida a ${nomeAluno} para verificar se percebeu o tema "${lastTopic}". Usa o nome do aluno na pergunta. A pergunta deve ser diferente das anteriores. Não expliques — apenas faz a pergunta. Responde em português.`},
+          {role:'user',content:`Faz a pergunta de verificação número ${verifyCount} sobre "${lastTopic}" para ${nomeAluno} da ${classe}.`}
+        ],
+        max_tokens:120,temperature:0.7
+      })
+    });
+    thinking.remove();
+    const data = await resp.json();
+    const q = data.choices?.[0]?.message?.content||'Podes resolver um exercício simples sobre este tema?';
+    chatHistory.push({role:'assistant',content:q});
+    addMessage('ai', q);
+    if (voiceOutputEnabled) speak(q);
+  } catch(e) {
+    thinking.remove();
+  }
+  btn.disabled=false; btn.textContent='Enviar';
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  clearUnderstandBox();
+  input.value='';
+  addMessage('user', msg);
+  chatHistory.push({role:'user',content:msg});
+  const btn = document.getElementById('chat-send-btn');
+  btn.disabled=true; btn.textContent='...';
+  const thinking = document.createElement('div');
+  thinking.className='msg ai';
+  thinking.innerHTML='<div class="bubble"><span class="spinner"></span> A pensar...</div>';
+  document.getElementById('chat-box').appendChild(thinking);
+  document.getElementById('chat-box').scrollTop=99999;
+  const classe = currentAluno ? (currentAluno.classes||[]).join(', ')||'ensino primário' : 'ensino primário';
+  const nomeAluno = currentAluno ? currentAluno.nome.split(' ')[0] : 'aluno';
+  try {
+    const resp = await fetch(GROQ_URL, {
+      method:'POST',
+      headers:{'Authorization':'Bearer '+GROQ_KEY,'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'llama-3.1-8b-instant',
+        messages:[
+          {role:'system',content:`És o Tutor Moz, assistente de matemática simpático e paciente para alunos moçambicanos. Respondes SEMPRE em português de Moçambique. O aluno chama-se ${nomeAluno} e está na ${classe}.
+REGRAS OBRIGATÓRIAS:
+1) Chama SEMPRE o aluno pelo nome "${nomeAluno}" nas tuas respostas — nunca uses "amigo", "aluno" ou outro nome genérico.
+2) Usa exemplos ADEQUADOS para a classe: 1ª/2ª=frutas,dedos,rebuçados; 3ª/4ª=meticais,mercado,machamba; 5ª/6ª=percentagens,distâncias,equações.
+3) Nunca uses conceitos que o aluno ainda não aprendeu na sua classe.
+4) Usa exemplos moçambicanos: meticais, mercados de Maputo/Chimoio/Beira, xima, machamba, capulanas, chapas, matapa, mangas, cajus.
+5) Explica passo a passo de forma simples e encorajadora.
+6) Para formas geométricas: descreve com comparações visuais (janela=rectângulo, moeda=círculo).
+7) Para linhas paralelas diz "como os carris do comboio". Para perpendiculares diz "como o canto da janela, formam 90°".
+8) Responde APENAS a perguntas de matemática.
+9) Mantém respostas curtas e claras (máx 200 palavras).`},
+          ...chatHistory.slice(-12)
+        ],
+        max_tokens:500,temperature:0.7
+      })
+    });
+    thinking.remove();
+    if (!resp.ok) { const e=await resp.json(); throw new Error(e.error?.message||'Erro API'); }
+    const data = await resp.json();
+    const reply = data.choices?.[0]?.message?.content||'Não consegui responder. Tenta novamente!';
+    chatHistory.push({role:'assistant',content:reply});
+    addMessage('ai', reply.replace(/\n/g,'<br>'));
+    if (voiceOutputEnabled) speak(reply);
+    // Show understanding check after every AI response
+    setTimeout(showUnderstandBox, 300);
+  } catch(e) {
+    thinking.remove();
+    addMessage('ai', '⚠️ Erro de ligação. Verifica a internet e tenta novamente.');
+  }
+  btn.disabled=false; btn.textContent='Enviar';
+}
+
+function sendSugestao(text) {
+  document.getElementById('chat-input').value=text;
+  sendChat();
+}
+
+// ===== VOZ MELHORADA =====
+let selectedVoice = null;
+let voiceRate = 0.9;
+let voicesLoaded = false;
+
+function loadVoices() {
+  const voices = speechSynth.getVoices();
+  if (!voices.length) return;
+  voicesLoaded = true;
+  const sel = document.getElementById('voice-select');
+  if (!sel) return;
+  // Priority: Portuguese voices first, then others
+  const ptVoices = voices.filter(v => v.lang.startsWith('pt'));
+  const otherVoices = voices.filter(v => !v.lang.startsWith('pt'));
+  const sorted = [...ptVoices, ...otherVoices];
+  sel.innerHTML = sorted.map((v,i) => {
+    const label = `${v.name} (${v.lang})${v.localService ? ' ★' : ''}`;
+    return `<option value="${i}" ${v.lang.startsWith('pt') && !selectedVoice ? 'selected' : ''}>${label}</option>`;
+  }).join('');
+  // Auto-select best Portuguese voice
+  if (!selectedVoice) {
+    // Prefer local pt-PT or pt-BR voices (★ = built-in, more natural)
+    selectedVoice = ptVoices.find(v => v.localService && v.lang === 'pt-PT')
+      || ptVoices.find(v => v.localService)
+      || ptVoices.find(v => v.lang === 'pt-PT')
+      || ptVoices.find(v => v.lang.startsWith('pt'))
+      || voices[0];
+    // Update select to reflect auto-chosen voice
+    const idx = sorted.indexOf(selectedVoice);
+    if (idx >= 0) sel.value = idx;
+  }
+}
+
+// Load voices when available
+if (speechSynth) {
+  speechSynth.onvoiceschanged = loadVoices;
+  loadVoices(); // try immediately too
+}
+
+function changeVoice() {
+  const sel = document.getElementById('voice-select');
+  const voices = speechSynth.getVoices();
+  const ptVoices = voices.filter(v => v.lang.startsWith('pt'));
+  const otherVoices = voices.filter(v => !v.lang.startsWith('pt'));
+  const sorted = [...ptVoices, ...otherVoices];
+  selectedVoice = sorted[parseInt(sel.value)] || null;
+}
+
+function updateVoiceRate(val) {
+  voiceRate = parseFloat(val);
+  document.getElementById('voice-rate-val').textContent = val;
+}
+
+function testVoice() {
+  const nome = currentAluno ? currentAluno.nome.split(' ')[0] : 'aluno';
+  speak(`Olá ${nome}! Estou pronto para te ajudar com matemática. Vamos aprender juntos!`);
+}
+
+function toggleVoiceSettings() {
+  const panel = document.getElementById('voice-settings-panel');
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen && !voicesLoaded) loadVoices();
+}
+
+function speak(text) {
+  if (!speechSynth || !voiceOutputEnabled) return;
+  speechSynth.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  if (selectedVoice) utt.voice = selectedVoice;
+  utt.lang = selectedVoice ? selectedVoice.lang : 'pt-PT';
+  utt.rate = voiceRate;
+  utt.pitch = 1.05;
+  speechSynth.speak(utt);
+}
+
+function stopSpeech() {
+  if (speechSynth) speechSynth.cancel();
+}
+
+function toggleVoiceOutput() {
+  voiceOutputEnabled = !voiceOutputEnabled;
+  const btn = document.getElementById('voice-speak-btn');
+  btn.classList.toggle('speaking', voiceOutputEnabled);
+  btn.title = voiceOutputEnabled ? 'Voz activada — clica para desligar' : 'Activar voz';
+  if (voiceOutputEnabled) {
+    loadVoices();
+    const nome = currentAluno ? currentAluno.nome.split(' ')[0] : 'aluno';
+    speak(`Olá ${nome}, a voz está activada!`);
+  } else {
+    stopSpeech();
+  }
+}
+
+function toggleVoiceInput() {
+  const btn = document.getElementById('voice-listen-btn');
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('O teu navegador não suporta reconhecimento de voz. Usa o Chrome.');
+    return;
+  }
+  if (recognition && recognition.active) {
+    recognition.stop();
+    btn.classList.remove('listening');
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'pt-PT';
+  recognition.active = true;
+  btn.classList.add('listening');
+  recognition.onresult = (e) => {
+    document.getElementById('chat-input').value = e.results[0][0].transcript;
+    btn.classList.remove('listening');
+    recognition.active = false;
+  };
+  recognition.onerror = () => { btn.classList.remove('listening'); recognition.active=false; };
+  recognition.onend = () => { btn.classList.remove('listening'); recognition.active=false; };
+  recognition.start();
+}
+
+// ===== PWA INSTALL =====
+let deferredPrompt = null;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isAndroid = /android/i.test(navigator.userAgent);
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+function showInstallModal() {
+  document.getElementById('install-modal').classList.add('open');
+  // Show correct steps
+  document.getElementById('install-steps-android').style.display = isAndroid ? 'block' : 'none';
+  document.getElementById('install-steps-ios').style.display = isIOS ? 'block' : 'none';
+  document.getElementById('install-steps-desktop').style.display = (!isAndroid&&!isIOS) ? 'block' : 'none';
+  if (isAndroid && !deferredPrompt) {
+    const btn = document.getElementById('btn-install-direct');
+    if(btn) btn.style.display='none';
+  }
+}
+
+function hideInstallModal() {
+  document.getElementById('install-modal').classList.remove('open');
+}
+
+async function doInstall() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (choice.outcome==='accepted') hideInstallModal();
+  }
+}
+
+window.addEventListener('appinstalled', () => {
+  hideInstallModal();
+  document.getElementById('install-banner').style.display='none';
+});
+
+// Close modals on overlay click
+document.getElementById('install-modal').addEventListener('click', function(e){
+  if(e.target===this) hideInstallModal();
+});
+document.getElementById('confirm-modal').addEventListener('click', function(e){
+  if(e.target===this) closeConfirmModal();
+});
+
+// Show install banner after 4s
+setTimeout(() => {
+  if (!isStandalone) document.getElementById('install-banner').style.display='flex';
+}, 4000);
+
+// Register service worker for offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
