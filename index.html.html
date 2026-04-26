@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TutorMoz v4 — Matemática 1ª–6ª Classe</title>
+<style>
+  :root {
+    --green:#16a34a; --green-light:#dcfce7; --red:#dc2626; --red-light:#fee2e2;
+    --blue:#2563eb; --blue-light:#dbeafe; --orange:#ea580c; --orange-light:#ffedd5;
+    --yellow:#ca8a04; --yellow-light:#fef9c3; --purple:#7c3aed; --purple-light:#ede9fe;
+    --gray:#6b7280; --gray-light:#f3f4f6; --dark:#111827;
+    --radius:12px; --shadow:0 4px 24px rgba(0,0,0,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',sans-serif;background:#f0f9ff;min-height:100vh;color:var(--dark)}
+  .screen{display:none;min-height:100vh;padding:16px}
+  .screen.active{display:block}
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+  .btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:#1d4ed8}
+  .btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#15803d}
+  .btn-red{background:var(--red);color:#fff}
+  .btn-orange{background:var(--orange);color:#fff}
+  .btn-purple{background:var(--purple);color:#fff}
+  .btn-gray{background:#e5e7eb;color:var(--dark)}
+  .btn-full{width:100%}
+  h1{font-size:26px;font-weight:800}
+  h2{font-size:20px;font-weight:700}
+  h3{font-size:16px;font-weight:600}
+  input,select{width:100%;padding:12px;border:2px solid #e5e7eb;border-radius:10px;font-size:15px;outline:none;transition:.2s}
+  input:focus,select:focus{border-color:var(--blue)}
+  label{font-size:14px;font-weight:600;color:var(--gray);margin-bottom:6px;display:block}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+  .badge-green{background:var(--green-light);color:var(--green)}
+  .badge-red{background:var(--red-light);color:var(--red)}
+  .badge-blue{background:var(--blue-light);color:var(--blue)}
+  .badge-orange{background:var(--orange-light);color:var(--orange)}
+  .badge-purple{background:var(--purple-light);color:var(--purple)}
+  .badge-yellow{background:var(--yellow-light);color:var(--yellow)}
+  .flex{display:flex;align-items:center;gap:10px}
+  .flex-between{display:flex;align-items:center;justify-content:space-between}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+  .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+  .text-center{text-align:center}
+  .text-gray{color:var(--gray)}
+  .text-green{color:var(--green)}
+  .text-red{color:var(--red)}
+  .text-blue{color:var(--blue)}
+  .text-sm{font-size:13px}
+  .text-lg{font-size:18px;font-weight:700}
+  /* Tabs */
+  .tabs{display:flex;gap:4px;background:#e5e7eb;border-radius:10px;padding:4px;margin-bottom:16px}
+  .tab{flex:1;padding:10px;border:none;border-radius:8px;background:transparent;font-size:13px;font-weight:600;cursor:pointer;color:var(--gray)}
+  .tab.active{background:#fff;color:var(--blue);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  /* Progress bar */
+  .prog-bar{height:10px;background:#e5e7eb;border-radius:10px;overflow:hidden}
+  .prog-fill{height:100%;border-radius:10px;transition:.5s}
+  /* Answer options */
+  .answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .answer-btn{padding:14px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:16px;font-weight:700;cursor:pointer;transition:.2s;text-align:center}
+  .answer-btn:hover{border-color:var(--blue);background:var(--blue-light)}
+  .answer-btn.correct{background:var(--green-light);border-color:var(--green);color:var(--green)}
+  .answer-btn.wrong{background:var(--red-light);border-color:var(--red);color:var(--red)}
+  /* Feedback */
+  .feedback{padding:12px 16px;border-radius:10px;font-weight:600;margin-top:12px;text-align:center;font-size:15px}
+  .feedback.good{background:var(--green-light);color:var(--green)}
+  .feedback.bad{background:var(--red-light);color:var(--red)}
+  /* XP bar */
+  .xp-bar-wrap{background:#e5e7eb;border-radius:10px;height:12px;overflow:hidden}
+  .xp-bar-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:10px;transition:.6s}
+  /* Medal grid */
+  .medal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .medal-card{border:2px solid #e5e7eb;border-radius:12px;padding:12px;text-align:center;transition:.2s}
+  .medal-card.unlocked{border-color:var(--yellow);background:var(--yellow-light)}
+  .medal-card.locked{opacity:.5;filter:grayscale(1)}
+  /* Toast */
+  #toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:#1f2937;color:#fff;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px;z-index:9999;transition:.4s;pointer-events:none}
+  #toast.show{transform:translateX(-50%) translateY(0)}
+  /* Floating points */
+  .pts-float{position:fixed;font-size:20px;font-weight:900;color:var(--green);z-index:9998;animation:floatUp 1.2s ease-out forwards;pointer-events:none}
+  @keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-80px)}}
+  /* Diff badge */
+  .diff-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+  .diff-easy{background:#dcfce7;color:#16a34a}
+  .diff-medium{background:#fef9c3;color:#ca8a04}
+  .diff-hard{background:#fee2e2;color:#dc2626}
+  /* Review badge */
+  .review-badge{background:#ffedd5;color:#ea580c;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+  /* Stat card */
+  .stat-card{background:#fff;border-radius:12px;padding:14px;text-align:center;border:2px solid #e5e7eb}
+  .stat-num{font-size:28px;font-weight:900;margin-bottom:4px}
+  /* Before/After */
+  .before-after{display:flex;gap:16px;align-items:center;margin-top:12px}
+  .ba-block{flex:1;text-align:center;padding:14px;border-radius:12px}
+  .ba-before{background:var(--red-light);color:var(--red)}
+  .ba-after{background:var(--green-light);color:var(--green)}
+  .ba-num{font-size:32px;font-weight:900}
+  /* Streak */
+  .streak-bar{background:linear-gradient(90deg,#f97316,#ef4444);color:#fff;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px}
+  /* Error banner */
+  .error-banner{background:var(--orange-light);border:2px solid var(--orange);border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+  /* Header */
+  .app-header{background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:#fff;border-radius:14px;padding:16px 20px;margin-bottom:16px}
+  /* Topic cards */
+  .topic-card{background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:14px;cursor:pointer;transition:.2s}
+  .topic-card:hover{border-color:var(--blue);transform:translateY(-2px)}
+  /* Student card in list */
+  .student-item{display:flex;align-items:center;justify-content:space-between;padding:12px;border:2px solid #e5e7eb;border-radius:12px;cursor:pointer;background:#fff;transition:.2s}
+  .student-item:hover{border-color:var(--blue)}
+  /* Avatar */
+  .avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff}
+  /* Class selector */
+  .class-btn{padding:14px;border:2px solid #e5e7eb;border-radius:12px;background:#fff;font-size:16px;font-weight:700;cursor:pointer;text-align:center;transition:.2s}
+  .class-btn:hover{border-color:var(--blue);background:var(--blue-light);color:var(--blue)}
+  /* Chat */
+  .chat-box{background:#f9fafb;border-radius:12px;padding:12px;min-height:200px;max-height:360px;overflow-y:auto;margin-bottom:12px}
+  .msg{margin-bottom:10px}
+  .msg-ai{background:var(--blue-light);color:var(--dark);border-radius:12px 12px 12px 0;padding:10px 14px;max-width:85%;font-size:14px}
+  .msg-user{background:var(--green-light);color:var(--dark);border-radius:12px 12px 0 12px;padding:10px 14px;max-width:85%;margin-left:auto;font-size:14px}
+  .chat-input-row{display:flex;gap:8px}
+  .chat-input-row input{flex:1}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ========== SCREEN: LOGIN ========== -->
+<div id="screen-login" class="screen active">
+  <div style="max-width:420px;margin:40px auto">
+    <div class="text-center mb20">
+      <div style="font-size:56px;margin-bottom:8px">🎓</div>
+      <h1 style="color:var(--blue)">TutorMoz</h1>
+      <p class="text-gray">Matemática para 1ª–6ª Classe</p>
+    </div>
+    <div class="card">
+      <div class="tabs">
+        <button class="tab active" onclick="switchLoginTab('aluno')">👦 Aluno</button>
+        <button class="tab" onclick="switchLoginTab('enc')">👨‍👩‍👧 Encarregado</button>
+      </div>
+      <div id="login-aluno">
+        <label>Nome do Aluno</label>
+        <select id="sel-aluno" class="mb12">
+          <option value="">-- Seleccionar aluno --</option>
+        </select>
+        <div id="no-aluno" class="text-center text-gray text-sm mb12" style="display:none">
+          Nenhum aluno registado. Peça ao encarregado para registar.
+        </div>
+        <button class="btn btn-green btn-full" onclick="loginAluno()">Entrar</button>
+      </div>
+      <div id="login-enc" style="display:none">
+        <!-- Sub-tabs: entrar vs registar -->
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <button id="enc-tab-entrar" onclick="switchEncTab('entrar')"
+            style="flex:1;padding:9px;border:2px solid var(--blue);border-radius:9px;background:var(--blue);color:#fff;font-weight:700;cursor:pointer">
+            🔑 Entrar
+          </button>
+          <button id="enc-tab-registar" onclick="switchEncTab('registar')"
+            style="flex:1;padding:9px;border:2px solid #e5e7eb;border-radius:9px;background:#fff;color:var(--gray);font-weight:700;cursor:pointer">
+            ➕ Registar
+          </button>
+        </div>
+
+        <!-- ENTRAR -->
+        <div id="enc-panel-entrar">
+          <label>O teu Nome</label>
+          <select id="sel-enc" class="mb12">
+            <option value="">-- Seleccionar encarregado --</option>
+          </select>
+          <label>Código secreto</label>
+          <input type="password" id="inp-enc-code" placeholder="O teu código" class="mb12">
+          <button class="btn btn-primary btn-full" onclick="loginEnc()">Entrar</button>
+          <p class="text-sm text-gray mt8 text-center">Não tens conta? Clica em <strong>Registar</strong> acima.</p>
+        </div>
+
+        <!-- REGISTAR -->
+        <div id="enc-panel-registar" style="display:none">
+          <label>O teu Nome</label>
+          <input type="text" id="inp-enc-nome" placeholder="Ex: Maria António" class="mb12">
+          <label>Criar Código Secreto (4 dígitos)</label>
+          <input type="password" id="inp-enc-novo-code" placeholder="Ex: 5827" maxlength="8" class="mb12">
+          <label>Confirmar Código</label>
+          <input type="password" id="inp-enc-confirmar" placeholder="Repete o código" maxlength="8" class="mb12">
+          <button class="btn btn-green btn-full" onclick="registarEnc()">✅ Criar Conta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCREEN: ENCARREGADO ========== -->
+<div id="screen-enc" class="screen">
+  <div style="max-width:480px;margin:0 auto">
+    <div class="app-header flex-between mb16">
+      <div>
+        <h2 id="enc-title" style="color:#fff">👨‍👩‍👧 Encarregado</h2>
+        <p style="color:rgba(255,255,255,.8);font-size:13px">Gestão de alunos</p>
+      </div>
+      <button class="btn btn-gray" onclick="logout()">Sair</button>
+    </div>
+    <div class="card mb16">
+      <h3 class="mb12">➕ Adicionar Novo Aluno</h3>
+      <label>Nome Completo</label>
+      <input type="text" id="inp-nome" placeholder="Ex: António Manuel" class="mb12">
+      <label>Classe</label>
+      <select id="inp-classe" class="mb16">
+        <option value="1">1ª Classe</option>
+        <option value="2">2ª Classe</option>
+        <option value="3">3ª Classe</option>
+        <option value="4">4ª Classe</option>
+        <option value="5">5ª Classe</option>
+        <option value="6">6ª Classe</option>
+      </select>
+      <button class="btn btn-green btn-full" onclick="addAluno()">✅ Registar Aluno</button>
+    </div>
+    <div class="card">
+      <h3 class="mb12">📋 Alunos Registados</h3>
+      <div id="lista-alunos"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCREEN: ENCARREGADO DETAIL ========== -->
+<div id="screen-enc-detail" class="screen">
+  <div style="max-width:480px;margin:0 auto">
+    <div class="flex-between mb16">
+      <button class="btn btn-gray" onclick="goTo('screen-enc')">← Voltar</button>
+      <button class="btn btn-red" onclick="deleteAlunoConfirm()">🗑️ Remover</button>
+    </div>
+    <div id="enc-detail-content"></div>
+  </div>
+</div>
+
+<!-- ========== SCREEN: CLASS SELECT ========== -->
+<div id="screen-class" class="screen">
+  <div style="max-width:480px;margin:0 auto">
+    <div class="app-header mb16" id="class-header">
+      <h2 style="color:#fff" id="class-header-name">Olá!</h2>
+      <p style="color:rgba(255,255,255,.8);font-size:13px">Escolhe o teu nível</p>
+    </div>
+    <div id="level-xp-bar" class="card mb16"></div>
+    <div id="error-banner-class"></div>
+    <div class="card">
+      <h3 class="mb12">📚 Escolhe a tua Classe</h3>
+      <div id="class-grid" class="grid2" style="gap:10px"></div>
+    </div>
+    <div class="mt16 text-center">
+      <button class="btn btn-gray" onclick="logout()">Sair</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCREEN: STUDENT DASHBOARD ========== -->
+<div id="screen-dash" class="screen">
+  <div style="max-width:480px;margin:0 auto">
+    <div class="app-header flex-between mb16" id="dash-header">
+      <div>
+        <h2 style="color:#fff" id="dash-name">Aluno</h2>
+        <p style="color:rgba(255,255,255,.8);font-size:13px" id="dash-class">1ª Classe</p>
+      </div>
+      <button class="btn btn-gray" onclick="goTo('screen-class')">← Voltar</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="showStudentTab('temas')" id="tab-temas">📚 Temas</button>
+      <button class="tab" onclick="showStudentTab('stats')" id="tab-stats">📊 Stats</button>
+      <button class="tab" onclick="showStudentTab('premios')" id="tab-premios">🏅 Prémios</button>
+      <button class="tab" onclick="showStudentTab('chat')" id="tab-chat">💬 Chat</button>
+    </div>
+    <div id="dash-temas"></div>
+    <div id="dash-stats" style="display:none"></div>
+    <div id="dash-premios" style="display:none"></div>
+    <div id="dash-chat" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ========== SCREEN: QUIZ ========== -->
+<div id="screen-quiz" class="screen">
+  <div style="max-width:480px;margin:0 auto">
+    <div class="flex-between mb16">
+      <button class="btn btn-gray" onclick="goTo('screen-dash')">← Sair</button>
+      <div class="flex gap-8">
+        <span id="q-diff-badge" class="diff-badge"></span>
+        <span id="q-review-badge" class="review-badge" style="display:none">🔁 Revisão</span>
+      </div>
+    </div>
+    <div class="card mb12">
+      <div class="flex-between mb8">
+        <span class="text-sm text-gray" id="q-counter">Questão 1/10</span>
+        <span class="badge badge-blue" id="q-score-badge">0 pts</span>
+      </div>
+      <div class="prog-bar mb12">
+        <div class="prog-fill" id="q-prog" style="background:var(--blue);width:10%"></div>
+      </div>
+      <p style="font-size:18px;font-weight:700;line-height:1.5" id="q-text">Carregando…</p>
+    </div>
+    <div class="answer-grid" id="q-answers"></div>
+    <div id="q-feedback" style="display:none" class="feedback"></div>
+    <div class="text-center mt16">
+      <button class="btn btn-primary btn-full" id="btn-next" style="display:none" onclick="nextQuestion()">Próxima ➜</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCREEN: RESULT ========== -->
+<div id="screen-result" class="screen">
+  <div style="max-width:480px;margin:0 auto">
+    <div class="text-center mb20">
+      <div style="font-size:64px" id="result-emoji">🎉</div>
+      <h1 id="result-title">Parabéns!</h1>
+      <p class="text-gray" id="result-sub"></p>
+    </div>
+    <div id="result-content"></div>
+    <div class="mt16 grid2">
+      <button class="btn btn-green btn-full" onclick="startQuiz(currentTopic)">🔄 Repetir</button>
+      <button class="btn btn-primary btn-full" onclick="goTo('screen-dash')">📚 Temas</button>
+    </div>
+    <div class="mt12">
+      <button class="btn btn-orange btn-full" id="btn-review-errors" style="display:none" onclick="startReviewSession()">🔁 Praticar Erros</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =================== DATA ===================
+// multi-enc system loaded below
+let currentAluno = null;
+let currentClass = 1;
+let currentTopic = null;
+let quizQuestions = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizCorrect = 0;
+let sessionPts = 0;
+let wrongInThisQ = 0;
+let streak = 0; // consecutive correct in quiz
+
+// =================== CURRICULUM ===================
+const CURRICULUM = {
+  1: [
+    {
+      id:'c1_count', name:'Contar até 10', icon:'🔢',
+      questions:[
+        {q:'Quantas mangas há? 🥭🥭🥭',opts:['2','3','4','1'],ans:1},
+        {q:'Conta as laranjas: 🍊🍊🍊🍊🍊',opts:['4','5','6','3'],ans:1},
+        {q:'Quantas bolas? ⚽⚽',opts:['1','2','3','4'],ans:1},
+        {q:'Qual número vem depois do 3?',opts:['2','4','5','1'],ans:1},
+        {q:'Qual número vem antes do 7?',opts:['8','5','6','9'],ans:2},
+        {q:'Conta: ✏️✏️✏️✏️✏️✏️',opts:['5','6','7','8'],ans:1},
+        {q:'Quantos dedos tens numa mão?',opts:['4','5','6','10'],ans:1},
+        {q:'Conta: 🐔🐔🐔',opts:['2','3','4','5'],ans:1},
+        {q:'Qual é o número zero?',opts:['Nada','Um','Dois','Três'],ans:0},
+        {q:'Quantas cadeiras? 🪑🪑🪑🪑',opts:['3','4','5','6'],ans:1},
+      ]
+    },
+    {
+      id:'c1_compare', name:'Comparar Números', icon:'⚖️',
+      questions:[
+        {q:'Qual é maior: 5 ou 3?',opts:['3','5','Iguais','Nenhum'],ans:1},
+        {q:'Qual é menor: 7 ou 9?',opts:['9','7','Iguais','10'],ans:1},
+        {q:'3 __ 3 — qual sinal falta?',opts:['>','<','=','+'],ans:2},
+        {q:'5 __ 8 — qual sinal falta?',opts:['>','<','=','+'],ans:1},
+        {q:'9 __ 6 — qual sinal falta?',opts:['>','<','=','–'],ans:0},
+        {q:'Qual é o maior número? 2, 7, 4',opts:['2','4','7','1'],ans:2},
+        {q:'Qual é o menor? 8, 3, 6',opts:['8','6','3','5'],ans:2},
+        {q:'10 é maior que 9?',opts:['Sim','Não','Iguais','Não sei'],ans:0},
+        {q:'Ordena do menor: 5, 1, 8',opts:['1,5,8','5,1,8','8,5,1','1,8,5'],ans:0},
+        {q:'Qual número está entre 4 e 6?',opts:['3','5','7','8'],ans:1},
+      ]
+    },
+    {
+      id:'c1_add', name:'Adição (Somar)', icon:'➕',
+      questions:[
+        {q:'2 + 3 = ?',opts:['4','5','6','7'],ans:1},
+        {q:'1 + 4 = ?',opts:['3','4','5','6'],ans:2},
+        {q:'3 + 3 = ?',opts:['5','6','7','8'],ans:1},
+        {q:'Tens 2 mangas e ganhas mais 5. Quantas tens?',opts:['6','7','8','9'],ans:1},
+        {q:'4 + 4 = ?',opts:['7','8','9','6'],ans:1},
+        {q:'2 + 2 + 2 = ?',opts:['4','5','6','7'],ans:2},
+        {q:'Mãe comprou 3 pãezinhos e pai comprou 4. Total?',opts:['6','7','8','5'],ans:1},
+        {q:'5 + 5 = ?',opts:['9','10','11','8'],ans:1},
+        {q:'1 + 9 = ?',opts:['9','10','11','8'],ans:1},
+        {q:'6 + 3 = ?',opts:['8','9','10','7'],ans:1},
+      ]
+    },
+    {
+      id:'c1_sub', name:'Subtracção (Tirar)', icon:'➖',
+      questions:[
+        {q:'5 – 2 = ?',opts:['2','3','4','1'],ans:1},
+        {q:'7 – 3 = ?',opts:['3','4','5','6'],ans:1},
+        {q:'Tens 8 meticais, gastas 3. Ficam?',opts:['4','5','6','3'],ans:1},
+        {q:'6 – 6 = ?',opts:['0','1','2','6'],ans:0},
+        {q:'9 – 4 = ?',opts:['4','5','6','3'],ans:1},
+        {q:'10 – 7 = ?',opts:['2','3','4','5'],ans:1},
+        {q:'Havia 6 passarinhos, 2 voaram. Ficaram?',opts:['3','4','5','6'],ans:1},
+        {q:'8 – 5 = ?',opts:['2','3','4','1'],ans:1},
+        {q:'4 – 1 = ?',opts:['2','3','4','5'],ans:1},
+        {q:'7 – 0 = ?',opts:['0','7','6','1'],ans:1},
+      ]
+    },
+    {
+      id:'c1_shapes', name:'Formas Geométricas', icon:'🔷',
+      questions:[
+        {q:'Qual forma tem 4 lados iguais?',opts:['Círculo','Quadrado','Triângulo','Rectângulo'],ans:1},
+        {q:'Uma bola tem forma de…',opts:['Quadrado','Triângulo','Círculo','Rectângulo'],ans:2},
+        {q:'Quantos lados tem um triângulo?',opts:['2','3','4','5'],ans:1},
+        {q:'Um caderno tem forma de…',opts:['Círculo','Triângulo','Quadrado','Rectângulo'],ans:3},
+        {q:'Qual forma não tem cantos?',opts:['Quadrado','Triângulo','Círculo','Rectângulo'],ans:2},
+        {q:'Uma janela rectangular tem quantos lados?',opts:['3','4','5','6'],ans:1},
+        {q:'O sol desenhado tem forma de…',opts:['Quadrado','Círculo','Triângulo','Rectângulo'],ans:1},
+        {q:'Quantos cantos tem um quadrado?',opts:['3','4','5','6'],ans:1},
+      ]
+    },
+    {
+      id:'c1_position', name:'Posição e Espaço', icon:'📍',
+      questions:[
+        {q:'A manga está em cima da mesa. Onde está?',opts:['Baixo','Cima','Dentro','Fora'],ans:1},
+        {q:'O gato está dentro da caixa. Onde está?',opts:['Fora','Cima','Dentro','Baixo'],ans:2},
+        {q:'O livro está à esquerda do lápis. Onde?',opts:['Direita','Esquerda','Cima','Baixo'],ans:1},
+        {q:'O pássaro está acima da árvore. Onde?',opts:['Baixo','Cima','Dentro','Perto'],ans:1},
+        {q:'O sapato está fora da mochila. Onde?',opts:['Dentro','Fora','Cima','Baixo'],ans:1},
+      ]
+    },
+    {
+      id:'c1_measure', name:'Medidas Simples', icon:'📏',
+      questions:[
+        {q:'Um elefante é __ que um rato',opts:['menor','maior','igual','mais rápido'],ans:1},
+        {q:'Um copo cheio tem __ água que um copo vazio',opts:['menos','mais','igual','nenhuma'],ans:1},
+        {q:'Uma régua é __ que um lápis',opts:['mais curta','mais comprida','igual','menor'],ans:1},
+        {q:'Uma mochila cheia é __ que uma mochila vazia',opts:['mais leve','mais pesada','igual','menor'],ans:1},
+        {q:'Um edifício é __ que uma casa',opts:['mais baixo','mais alto','igual','menor'],ans:1},
+      ]
+    },
+    {
+      id:'c1_problems', name:'Problemas do Dia a Dia', icon:'🌍',
+      questions:[
+        {q:'Tens 5MT e gastas 2MT. Ficam quantos meticais?',opts:['2MT','3MT','4MT','5MT'],ans:1},
+        {q:'Compras 3 pãezinhos de manhã e 2 à tarde. Total?',opts:['4','5','6','7'],ans:1},
+        {q:'O chapa tem 8 lugares, 3 estão ocupados. Lugares livres?',opts:['4','5','6','3'],ans:1},
+        {q:'Mãe tem 6 laranjas, dá 2 à vizinha. Ficam?',opts:['3','4','5','6'],ans:1},
+        {q:'Na turma há 4 raparigas e 5 rapazes. Total?',opts:['8','9','10','7'],ans:1},
+        {q:'Tens 10 rebuçados e comes 4. Ficam?',opts:['5','6','7','4'],ans:1},
+      ]
+    },
+  ],
+  2: [
+    {
+      id:'c2_count20', name:'Números até 20', icon:'🔢',
+      questions:[
+        {q:'11 + 2 = ?',opts:['12','13','14','15'],ans:1},
+        {q:'Qual vem depois de 15?',opts:['14','16','17','13'],ans:1},
+        {q:'15 – 5 = ?',opts:['8','10','12','9'],ans:1},
+        {q:'12 + 5 = ?',opts:['16','17','18','15'],ans:1},
+        {q:'20 – 8 = ?',opts:['10','12','14','11'],ans:1},
+        {q:'Conta de 2 em 2: 2, 4, 6, __, 10',opts:['7','8','9','11'],ans:1},
+        {q:'Qual é o maior? 13, 17, 11',opts:['13','11','17','15'],ans:2},
+        {q:'18 – 9 = ?',opts:['7','8','9','10'],ans:2},
+        {q:'14 + 3 = ?',opts:['16','17','18','15'],ans:1},
+        {q:'Conta de 5 em 5: 5, 10, __, 20',opts:['12','13','14','15'],ans:3},
+      ]
+    },
+    {
+      id:'c2_add2d', name:'Adição de 2 Dígitos', icon:'➕',
+      questions:[
+        {q:'12 + 13 = ?',opts:['24','25','26','23'],ans:1},
+        {q:'21 + 14 = ?',opts:['34','35','36','33'],ans:1},
+        {q:'30 + 20 = ?',opts:['40','50','60','45'],ans:1},
+        {q:'Tens 15MT e ganhas mais 12MT. Total?',opts:['25MT','27MT','28MT','26MT'],ans:1},
+        {q:'25 + 14 = ?',opts:['37','38','39','36'],ans:2},
+        {q:'41 + 23 = ?',opts:['63','64','65','62'],ans:1},
+        {q:'18 + 11 = ?',opts:['27','28','29','30'],ans:2},
+        {q:'32 + 15 = ?',opts:['46','47','48','45'],ans:1},
+        {q:'50 + 30 = ?',opts:['70','80','90','75'],ans:1},
+        {q:'Compras 24MT de arroz e 15MT de sal. Total?',opts:['37MT','38MT','39MT','40MT'],ans:2},
+      ]
+    },
+    {
+      id:'c2_sub2d', name:'Subtracção de 2 Dígitos', icon:'➖',
+      questions:[
+        {q:'25 – 12 = ?',opts:['11','13','14','12'],ans:1},
+        {q:'30 – 15 = ?',opts:['13','15','16','14'],ans:1},
+        {q:'Tens 40MT e gastas 18MT. Ficam?',opts:['20MT','22MT','24MT','21MT'],ans:1},
+        {q:'50 – 20 = ?',opts:['20','30','40','25'],ans:1},
+        {q:'35 – 13 = ?',opts:['20','22','24','21'],ans:1},
+        {q:'48 – 24 = ?',opts:['22','24','26','20'],ans:1},
+        {q:'60 – 30 = ?',opts:['20','30','40','25'],ans:1},
+        {q:'43 – 21 = ?',opts:['20','22','24','21'],ans:1},
+        {q:'No chapa cabem 30 pessoas, entram 12. Lugares livres?',opts:['16','18','20','17'],ans:1},
+        {q:'Tinhas 55MT, gastas 23MT. Ficam?',opts:['30MT','32MT','34MT','31MT'],ans:1},
+      ]
+    },
+    {
+      id:'c2_mult_intro', name:'Introdução à Multiplicação', icon:'✖️',
+      questions:[
+        {q:'2 × 3 = ? (2 grupos de 3)',opts:['4','6','8','5'],ans:1},
+        {q:'3 × 2 = ?',opts:['4','6','8','5'],ans:1},
+        {q:'4 × 2 = ?',opts:['6','8','10','7'],ans:1},
+        {q:'5 × 2 = ?',opts:['8','10','12','9'],ans:1},
+        {q:'3 grupos de 4 mangas = ?',opts:['10','12','14','11'],ans:1},
+        {q:'2 × 5 = ?',opts:['8','10','12','9'],ans:1},
+        {q:'4 sacos com 3 laranjas cada. Total?',opts:['10','12','14','11'],ans:1},
+        {q:'6 × 2 = ?',opts:['10','12','14','11'],ans:1},
+        {q:'2 × 9 = ?',opts:['16','18','20','17'],ans:1},
+        {q:'3 × 5 = ?',opts:['13','15','17','14'],ans:1},
+      ]
+    },
+    {
+      id:'c2_money', name:'Dinheiro (Meticais)', icon:'💰',
+      questions:[
+        {q:'1 pão custa 5MT. 2 pães custam?',opts:['8MT','10MT','12MT','9MT'],ans:1},
+        {q:'Tens 20MT, gastas 8MT. Ficam?',opts:['10MT','12MT','14MT','11MT'],ans:1},
+        {q:'3 laranjas a 4MT cada. Total?',opts:['10MT','12MT','14MT','11MT'],ans:1},
+        {q:'Mãe dá-te 50MT, pai dá 30MT. Total?',opts:['70MT','80MT','90MT','75MT'],ans:1},
+        {q:'Gastas 25MT de transporte. Tinhas 60MT. Ficam?',opts:['33MT','35MT','37MT','34MT'],ans:1},
+        {q:'Um pacote de leite custa 15MT. 2 pacotes?',opts:['25MT','30MT','35MT','28MT'],ans:1},
+        {q:'Tens 3 notas de 10MT. Total?',opts:['20MT','30MT','40MT','25MT'],ans:1},
+        {q:'Compras 2 itens a 12MT cada. Total?',opts:['22MT','24MT','26MT','23MT'],ans:1},
+      ]
+    },
+    {
+      id:'c2_shapes2', name:'Formas e Medidas', icon:'📐',
+      questions:[
+        {q:'Quantos lados tem um rectângulo?',opts:['3','4','5','6'],ans:1},
+        {q:'O perímetro é a soma dos…',opts:['Lados','Ângulos','Áreas','Volumes'],ans:0},
+        {q:'Um quadrado tem todos os lados…',opts:['Diferentes','Iguais','Paralelos','Perpendiculares'],ans:1},
+        {q:'Qual forma tem 3 lados?',opts:['Quadrado','Círculo','Triângulo','Rectângulo'],ans:2},
+        {q:'Uma moeda tem forma de…',opts:['Quadrado','Círculo','Triângulo','Rectângulo'],ans:1},
+      ]
+    },
+    {
+      id:'c2_time', name:'Tempo (Horas)', icon:'⏰',
+      questions:[
+        {q:'Quantos dias tem uma semana?',opts:['5','6','7','8'],ans:2},
+        {q:'Quantas horas tem um dia?',opts:['12','20','24','18'],ans:2},
+        {q:'Quantos minutos tem uma hora?',opts:['30','60','90','100'],ans:1},
+        {q:'Que dia vem depois de segunda-feira?',opts:['Domingo','Sábado','Terça-feira','Quarta-feira'],ans:2},
+        {q:'Quantos meses tem um ano?',opts:['10','11','12','13'],ans:2},
+        {q:'A escola começa às 7h. Quantas horas até meio-dia?',opts:['3h','4h','5h','6h'],ans:2},
+        {q:'Dormiste 8 horas. Acordaste às 6h. A que horas dormiste?',opts:['20h','21h','22h','23h'],ans:2},
+      ]
+    },
+    {
+      id:'c2_problems2', name:'Problemas Práticos', icon:'🌍',
+      questions:[
+        {q:'Uma machamba tem 3 linhas com 6 plantas. Total?',opts:['16','18','20','17'],ans:1},
+        {q:'O chapa faz 4 viagens por dia a 12MT cada. Total?',opts:['44MT','48MT','52MT','46MT'],ans:1},
+        {q:'Tens 35MT. Compras arroz por 18MT. Ficam?',opts:['15MT','17MT','19MT','16MT'],ans:1},
+        {q:'3 alunos têm 6 lápis cada. Total?',opts:['16','18','20','17'],ans:1},
+        {q:'Mãe fez 24 capulanas. Vendeu 15. Ficaram?',opts:['7','9','11','8'],ans:1},
+      ]
+    },
+  ],
+  3: [
+    {
+      id:'c3_mult', name:'Tabuada (×2 a ×5)', icon:'✖️',
+      questions:[
+        {q:'3 × 4 = ?',opts:['10','12','14','11'],ans:1},
+        {q:'5 × 6 = ?',opts:['28','30','32','27'],ans:1},
+        {q:'4 × 7 = ?',opts:['26','28','30','27'],ans:1},
+        {q:'3 × 9 = ?',opts:['25','27','29','26'],ans:1},
+        {q:'5 × 8 = ?',opts:['38','40','42','39'],ans:1},
+        {q:'4 × 4 = ?',opts:['14','16','18','15'],ans:1},
+        {q:'2 × 7 = ?',opts:['12','14','16','13'],ans:1},
+        {q:'3 × 8 = ?',opts:['22','24','26','23'],ans:1},
+        {q:'5 × 5 = ?',opts:['23','25','27','24'],ans:1},
+        {q:'4 × 9 = ?',opts:['34','36','38','35'],ans:1},
+      ]
+    },
+    {
+      id:'c3_div', name:'Divisão Simples', icon:'➗',
+      questions:[
+        {q:'12 ÷ 3 = ?',opts:['3','4','5','6'],ans:1},
+        {q:'20 ÷ 4 = ?',opts:['4','5','6','7'],ans:1},
+        {q:'15 ÷ 5 = ?',opts:['2','3','4','5'],ans:1},
+        {q:'Divides 18 mangas por 3 crianças. Cada uma leva?',opts:['5','6','7','8'],ans:1},
+        {q:'24 ÷ 6 = ?',opts:['3','4','5','6'],ans:1},
+        {q:'30 ÷ 5 = ?',opts:['5','6','7','8'],ans:1},
+        {q:'Tens 16MT para 4 crianças. Cada uma recebe?',opts:['3MT','4MT','5MT','6MT'],ans:1},
+        {q:'28 ÷ 4 = ?',opts:['5','7','9','6'],ans:1},
+        {q:'45 ÷ 9 = ?',opts:['4','5','6','7'],ans:1},
+        {q:'36 ÷ 6 = ?',opts:['5','6','7','8'],ans:1},
+      ]
+    },
+    {
+      id:'c3_mult2', name:'Tabuada (×6 a ×9)', icon:'🔢',
+      questions:[
+        {q:'6 × 7 = ?',opts:['40','42','44','41'],ans:1},
+        {q:'8 × 8 = ?',opts:['62','64','66','63'],ans:1},
+        {q:'7 × 9 = ?',opts:['61','63','65','62'],ans:1},
+        {q:'9 × 9 = ?',opts:['79','81','83','80'],ans:1},
+        {q:'6 × 8 = ?',opts:['46','48','50','47'],ans:1},
+        {q:'7 × 7 = ?',opts:['47','49','51','48'],ans:1},
+        {q:'8 × 9 = ?',opts:['70','72','74','71'],ans:1},
+        {q:'6 × 9 = ?',opts:['52','54','56','53'],ans:1},
+        {q:'7 × 8 = ?',opts:['54','56','58','55'],ans:1},
+        {q:'9 × 6 = ?',opts:['52','54','56','53'],ans:1},
+      ]
+    },
+    {
+      id:'c3_fractions', name:'Fracções Simples', icon:'🍕',
+      questions:[
+        {q:'Metade de 8 = ?',opts:['3','4','5','6'],ans:1},
+        {q:'1/2 de 10 = ?',opts:['4','5','6','7'],ans:1},
+        {q:'1/4 de 12 = ?',opts:['2','3','4','5'],ans:1},
+        {q:'Uma pizza foi dividida em 4 partes iguais. Cada parte é…',opts:['1/2','1/3','1/4','1/5'],ans:2},
+        {q:'1/3 de 9 = ?',opts:['2','3','4','5'],ans:1},
+        {q:'Qual fracção é maior: 1/2 ou 1/4?',opts:['1/4','1/2','Iguais','Nenhuma'],ans:1},
+        {q:'1/2 de 20 = ?',opts:['8','10','12','9'],ans:1},
+        {q:'1/4 de 8 = ?',opts:['1','2','3','4'],ans:1},
+      ]
+    },
+    {
+      id:'c3_perimeter', name:'Perímetro e Área', icon:'📐',
+      questions:[
+        {q:'Perímetro de um quadrado com lado 4cm?',opts:['12cm','16cm','20cm','14cm'],ans:1},
+        {q:'Área de um rectângulo 3×5?',opts:['13','15','17','14'],ans:1},
+        {q:'Perímetro de um triângulo com lados 3,4,5?',opts:['10','12','14','11'],ans:1},
+        {q:'Área de um quadrado com lado 6?',opts:['24','36','48','30'],ans:1},
+        {q:'Perímetro de rectângulo 4×6?',opts:['18','20','22','19'],ans:1},
+        {q:'Área = comprimento ×…',opts:['Altura','Largura','Perímetro','Diagonal'],ans:1},
+      ]
+    },
+    {
+      id:'c3_money3', name:'Problemas com Dinheiro', icon:'💰',
+      questions:[
+        {q:'Compras 3 kg de arroz a 40MT/kg. Total?',opts:['100MT','120MT','140MT','110MT'],ans:1},
+        {q:'Tens 200MT. Gastas 75MT. Ficam?',opts:['115MT','125MT','135MT','120MT'],ans:1},
+        {q:'5 laranjas a 6MT cada. Total?',opts:['25MT','30MT','35MT','28MT'],ans:1},
+        {q:'Divide 60MT igualmente por 4 pessoas.',opts:['12MT','15MT','18MT','14MT'],ans:1},
+        {q:'2 chapas × 17MT cada. Total?',opts:['32MT','34MT','36MT','33MT'],ans:1},
+        {q:'Lucro: vendeu por 150MT, comprou por 90MT. Lucro?',opts:['50MT','60MT','70MT','55MT'],ans:1},
+      ]
+    },
+    {
+      id:'c3_time3', name:'Tempo e Calendário', icon:'📅',
+      questions:[
+        {q:'Quantas semanas tem um mês?',opts:['3','4','5','6'],ans:1},
+        {q:'Quantos dias tem Fevereiro (ano normal)?',opts:['27','28','29','30'],ans:1},
+        {q:'1 hora e meia = quantos minutos?',opts:['60','90','120','80'],ans:1},
+        {q:'Que horas são: 14:00?',opts:['2h da manhã','2h da tarde','12h','4h'],ans:1},
+        {q:'Escola começa às 7h e termina às 12h30. Duração?',opts:['4h30','5h','5h30','6h'],ans:2},
+      ]
+    },
+    {
+      id:'c3_problems3', name:'Resolução de Problemas', icon:'🧮',
+      questions:[
+        {q:'Numa machamba cabem 6 fileiras com 8 plantas. Total?',opts:['42','48','54','45'],ans:1},
+        {q:'O chapa faz 5 viagens. Em cada viagem entram 15 passageiros. Total?',opts:['65','75','85','70'],ans:1},
+        {q:'Dividem 72 mangas por 8 crianças. Cada uma recebe?',opts:['7','9','11','8'],ans:1},
+        {q:'Turma A tem 32 alunos, turma B tem 28. Diferença?',opts:['2','4','6','3'],ans:1},
+        {q:'Compras 4 cadernos a 25MT. Tens 120MT. Ficam?',opts:['15MT','20MT','25MT','18MT'],ans:1},
+      ]
+    },
+  ],
+  4: [
+    {
+      id:'c4_mult_large', name:'Multiplicação (2 dígitos)', icon:'✖️',
+      questions:[
+        {q:'12 × 4 = ?',opts:['44','48','52','46'],ans:1},
+        {q:'23 × 3 = ?',opts:['67','69','71','68'],ans:1},
+        {q:'15 × 6 = ?',opts:['88','90','92','89'],ans:1},
+        {q:'24 × 5 = ?',opts:['118','120','122','119'],ans:1},
+        {q:'31 × 4 = ?',opts:['122','124','126','123'],ans:1},
+        {q:'42 × 3 = ?',opts:['124','126','128','125'],ans:1},
+        {q:'Uma caixa tem 24 laranjas. 5 caixas têm?',opts:['110','120','130','115'],ans:1},
+        {q:'14 × 7 = ?',opts:['96','98','100','97'],ans:1},
+        {q:'25 × 4 = ?',opts:['98','100','102','99'],ans:1},
+        {q:'33 × 3 = ?',opts:['97','99','101','98'],ans:1},
+      ]
+    },
+    {
+      id:'c4_div2', name:'Divisão com Resto', icon:'➗',
+      questions:[
+        {q:'13 ÷ 4 = ? (com resto)',opts:['3 resto 0','3 resto 1','3 resto 2','2 resto 5'],ans:1},
+        {q:'17 ÷ 5 = ?',opts:['3 r1','3 r2','3 r3','2 r7'],ans:1},
+        {q:'22 ÷ 7 = ?',opts:['3 r1','3 r2','3 r3','2 r8'],ans:0},
+        {q:'Tens 25 mangas para 4 cestos. Cada cesto leva? (resto?)',opts:['6 r1','6 r2','6 r3','5 r5'],ans:0},
+        {q:'19 ÷ 6 = ?',opts:['3 r1','3 r2','3 r3','2 r7'],ans:1},
+        {q:'30 ÷ 7 = ?',opts:['4 r1','4 r2','4 r3','3 r9'],ans:1},
+        {q:'45 ÷ 8 = ?',opts:['5 r4','5 r5','5 r6','4 r13'],ans:1},
+      ]
+    },
+    {
+      id:'c4_fractions2', name:'Fracções Equivalentes', icon:'🍰',
+      questions:[
+        {q:'1/2 = ?/4',opts:['1','2','3','4'],ans:1},
+        {q:'2/4 = ?/2',opts:['1','2','3','4'],ans:0},
+        {q:'1/3 = 2/?',opts:['4','5','6','7'],ans:2},
+        {q:'3/6 é igual a…',opts:['1/2','1/3','2/3','1/4'],ans:0},
+        {q:'Qual fracção é maior: 3/4 ou 2/3?',opts:['2/3','3/4','Iguais','Nenhuma'],ans:1},
+        {q:'2/5 + 1/5 = ?',opts:['1/5','2/5','3/5','4/5'],ans:2},
+        {q:'4/8 simplificado = ?',opts:['1/2','1/3','1/4','2/3'],ans:0},
+      ]
+    },
+    {
+      id:'c4_decimal', name:'Números Decimais', icon:'🔢',
+      questions:[
+        {q:'0,5 = ?/2',opts:['1/4','1/2','1/3','2/3'],ans:1},
+        {q:'1,5 + 0,5 = ?',opts:['1,5','2,0','2,5','1,0'],ans:1},
+        {q:'3,0 – 1,5 = ?',opts:['1,0','1,5','2,0','0,5'],ans:1},
+        {q:'0,25 = ?/100',opts:['15','20','25','30'],ans:2},
+        {q:'Qual é maior: 0,7 ou 0,3?',opts:['0,3','0,7','Iguais','Nenhum'],ans:1},
+        {q:'2,4 + 1,6 = ?',opts:['3,0','4,0','5,0','3,5'],ans:1},
+        {q:'5,0 ÷ 2 = ?',opts:['2,0','2,5','3,0','1,5'],ans:1},
+      ]
+    },
+    {
+      id:'c4_geometry', name:'Geometria', icon:'📐',
+      questions:[
+        {q:'Área de triângulo base 6, altura 4?',opts:['10','12','14','24'],ans:1},
+        {q:'Ângulo recto = ? graus',opts:['45°','90°','180°','360°'],ans:1},
+        {q:'Soma dos ângulos de um triângulo = ?',opts:['90°','180°','270°','360°'],ans:1},
+        {q:'Quadrado de lado 5 cm. Área?',opts:['20 cm²','25 cm²','30 cm²','15 cm²'],ans:1},
+        {q:'Perímetro de hexágono regular (lado 4)?',opts:['20','24','28','22'],ans:1},
+        {q:'Ângulo obtuso é maior que…',opts:['45°','90°','180°','360°'],ans:1},
+      ]
+    },
+    {
+      id:'c4_percent', name:'Percentagens', icon:'%',
+      questions:[
+        {q:'50% de 100 = ?',opts:['25','50','75','60'],ans:1},
+        {q:'25% de 80 = ?',opts:['15','20','25','30'],ans:1},
+        {q:'10% de 200MT = ?',opts:['15MT','20MT','25MT','30MT'],ans:1},
+        {q:'75% de 40 = ?',opts:['25','30','35','28'],ans:1},
+        {q:'100% de 350 = ?',opts:['250','300','350','400'],ans:2},
+        {q:'Preço 200MT com 10% desconto. Pagas?',opts:['170MT','180MT','190MT','160MT'],ans:1},
+      ]
+    },
+    {
+      id:'c4_stats', name:'Organização de Dados', icon:'📊',
+      questions:[
+        {q:'Média de 4, 6, 8 = ?',opts:['5','6','7','8'],ans:1},
+        {q:'Moda de 2,3,3,4,5 = ?',opts:['2','3','4','5'],ans:1},
+        {q:'O gráfico de barras serve para…',opts:['Ligar pontos','Comparar valores','Medir ângulos','Calcular área'],ans:1},
+        {q:'Turma: 10 raparigas, 14 rapazes. Total?',opts:['22','24','26','23'],ans:1},
+        {q:'Qual é a mediana de 1,3,5,7,9?',opts:['3','5','7','1'],ans:1},
+      ]
+    },
+    {
+      id:'c4_problems4', name:'Problemas Complexos', icon:'🧮',
+      questions:[
+        {q:'Machamba 8×12m. Área?',opts:['86m²','96m²','106m²','90m²'],ans:1},
+        {q:'Viagem 240 km a 60 km/h. Horas?',opts:['3h','4h','5h','6h'],ans:1},
+        {q:'Loja ganha 30% em cada item de 100MT. Lucro?',opts:['20MT','30MT','40MT','25MT'],ans:1},
+        {q:'Turma tem 40 alunos. 75% passaram. Quantos passaram?',opts:['25','30','35','28'],ans:1},
+        {q:'Pai ganha 8500MT/mês. 25% vai para renda. Renda?',opts:['1750MT','2125MT','2500MT','2000MT'],ans:1},
+      ]
+    },
+  ],
+  5: [
+    {
+      id:'c5_integers', name:'Números Inteiros', icon:'🔢',
+      questions:[
+        {q:'-5 + 8 = ?',opts:['1','2','3','4'],ans:2},
+        {q:'-3 – (-2) = ?',opts:['-5','-1','1','5'],ans:1},
+        {q:'Qual é maior: -2 ou -7?',opts:['-7','-2','Iguais','Nenhum'],ans:1},
+        {q:'-4 × 3 = ?',opts:['7','-12','12','-7'],ans:1},
+        {q:'-12 ÷ 4 = ?',opts:['3','-3','8','-8'],ans:1},
+        {q:'(-2) × (-5) = ?',opts:['-10','10','-7','7'],ans:1},
+        {q:'Temperatura desce 8 graus de -3°C. Resultado?',opts:['-9°C','-11°C','-5°C','-13°C'],ans:1},
+      ]
+    },
+    {
+      id:'c5_ratio', name:'Razões e Proporções', icon:'⚖️',
+      questions:[
+        {q:'Razão 3:6 simplificada = ?',opts:['1:2','1:3','2:3','3:4'],ans:0},
+        {q:'Se 2 kg de milho custa 40MT, 5 kg custa?',opts:['80MT','100MT','120MT','90MT'],ans:1},
+        {q:'Proporção: 4/6 = ?/9',opts:['5','6','7','8'],ans:1},
+        {q:'Mapa: 1cm = 50 km. 3cm = ? km',opts:['100km','150km','200km','120km'],ans:1},
+        {q:'Receita para 4: usa 200g farinha. Para 8?',opts:['300g','400g','500g','350g'],ans:1},
+        {q:'Turma: rapaz/rapariga = 3:2. Com 30 alunos, raparigas?',opts:['10','12','14','15'],ans:1},
+      ]
+    },
+    {
+      id:'c5_algebra', name:'Álgebra Simples', icon:'🔡',
+      questions:[
+        {q:'x + 5 = 12. x = ?',opts:['6','7','8','9'],ans:1},
+        {q:'2x = 14. x = ?',opts:['5','7','9','11'],ans:1},
+        {q:'x – 4 = 9. x = ?',opts:['11','13','15','12'],ans:1},
+        {q:'3x + 2 = 11. x = ?',opts:['2','3','4','5'],ans:1},
+        {q:'x/4 = 6. x = ?',opts:['18','24','30','20'],ans:1},
+        {q:'2x – 3 = 7. x = ?',opts:['4','5','6','7'],ans:1},
+        {q:'Se n laranjas a 8MT, total 56MT. n = ?',opts:['6','7','8','9'],ans:1},
+      ]
+    },
+    {
+      id:'c5_geometry5', name:'Geometria Avançada', icon:'📐',
+      questions:[
+        {q:'Área de círculo com raio 7 (π≈3). Aprox?',opts:['130','147','154','160'],ans:1},
+        {q:'Circunferência com raio 5 (π≈3). Aprox?',opts:['25','30','35','40'],ans:1},
+        {q:'Volume de cubo lado 4?',opts:['48','64','80','56'],ans:1},
+        {q:'Soma dos ângulos de quadrilátero?',opts:['180°','270°','360°','450°'],ans:2},
+        {q:'Triângulo rectângulo: catetos 3 e 4. Hipotenusa?',opts:['5','6','7','8'],ans:0},
+        {q:'Prisma rectangular 3×4×5. Volume?',opts:['50','60','70','55'],ans:1},
+      ]
+    },
+    {
+      id:'c5_percent5', name:'Percentagens Avançadas', icon:'%',
+      questions:[
+        {q:'Preço 500MT com 20% aumento. Novo preço?',opts:['550MT','600MT','650MT','580MT'],ans:1},
+        {q:'Desconto de 15% em 200MT. Pregas?',opts:['155MT','170MT','185MT','160MT'],ans:1},
+        {q:'Vende a 300MT (comprou a 200MT). Lucro %?',opts:['30%','40%','50%','35%'],ans:2},
+        {q:'40% de 350MT = ?',opts:['120MT','140MT','160MT','130MT'],ans:1},
+        {q:'IVA de 17% em 500MT = ?',opts:['75MT','80MT','85MT','90MT'],ans:2},
+        {q:'Banco aplica 10% de juro em 1000MT. Após 1 ano?',opts:['1050MT','1100MT','1150MT','1200MT'],ans:1},
+      ]
+    },
+    {
+      id:'c5_statistics', name:'Estatística', icon:'📊',
+      questions:[
+        {q:'Média de 10,20,30,40,50 = ?',opts:['25','30','35','40'],ans:1},
+        {q:'Mediana de 7,3,5,1,9 = ?',opts:['3','5','7','9'],ans:1},
+        {q:'Moda de 2,3,3,3,4,5 = ?',opts:['2','3','4','5'],ans:1},
+        {q:'Amplitude de 15 e 3 = ?',opts:['10','12','14','13'],ans:1},
+        {q:'Num gráfico circular, 25% = ?°',opts:['60°','80°','90°','100°'],ans:2},
+        {q:'Probabilidade de tirar par de {1,2,3,4} = ?',opts:['1/2','1/4','3/4','1/3'],ans:0},
+      ]
+    },
+    {
+      id:'c5_money5', name:'Matemática Financeira', icon:'💰',
+      questions:[
+        {q:'Salário 12000MT, gasta 75%. Poupa?',opts:['2000MT','3000MT','4000MT','2500MT'],ans:1},
+        {q:'Lucro = Venda – Custo. Vende 850MT, custo 600MT. Lucro?',opts:['200MT','250MT','300MT','225MT'],ans:1},
+        {q:'Desconto 30% em 1000MT. Preço final?',opts:['600MT','700MT','800MT','650MT'],ans:1},
+        {q:'Compra parcelada: 500MT entrada + 6×200MT. Total?',opts:['1600MT','1700MT','1800MT','1650MT'],ans:1},
+        {q:'Juro simples: 2000MT a 5% por 2 anos. Juro total?',opts:['150MT','200MT','250MT','175MT'],ans:1},
+      ]
+    },
+    {
+      id:'c5_problems5', name:'Problemas Avançados', icon:'🧮',
+      questions:[
+        {q:'Velocidade 90 km/h por 2,5h. Distância?',opts:['200km','225km','250km','210km'],ans:1},
+        {q:'Piscina 8×6×2m. Volume em litros?',opts:['72000L','96000L','48000L','84000L'],ans:1},
+        {q:'Num exame, precisas 60%. Com 50 questões, quantas certas?',opts:['25','30','35','28'],ans:1},
+        {q:'Partilham 840MT em 3:4:5. A parte maior = ?',opts:['280MT','315MT','350MT','300MT'],ans:2},
+        {q:'Compra 12 kg a 45MT/kg, vende a 60MT/kg. Lucro?',opts:['150MT','180MT','210MT','160MT'],ans:1},
+      ]
+    },
+  ],
+  6: [
+    {
+      id:'c6_powers', name:'Potências e Raízes', icon:'🔢',
+      questions:[
+        {q:'2³ = ?',opts:['6','8','10','4'],ans:1},
+        {q:'√25 = ?',opts:['4','5','6','7'],ans:1},
+        {q:'3² = ?',opts:['6','8','9','12'],ans:2},
+        {q:'√64 = ?',opts:['6','7','8','9'],ans:2},
+        {q:'4² + 3² = ?',opts:['20','25','30','22'],ans:1},
+        {q:'10³ = ?',opts:['100','1000','10000','300'],ans:1},
+        {q:'√144 = ?',opts:['10','11','12','13'],ans:2},
+        {q:'2⁴ = ?',opts:['8','12','16','14'],ans:2},
+      ]
+    },
+    {
+      id:'c6_algebra6', name:'Equações e Inequações', icon:'🔡',
+      questions:[
+        {q:'2x + 4 = 14. x = ?',opts:['4','5','6','7'],ans:1},
+        {q:'3x – 7 = 8. x = ?',opts:['4','5','6','7'],ans:1},
+        {q:'x² = 49. x = ?',opts:['6','7','8','9'],ans:1},
+        {q:'5x = 75. x = ?',opts:['12','15','18','14'],ans:1},
+        {q:'2(x+3) = 16. x = ?',opts:['4','5','6','7'],ans:1},
+        {q:'x/3 + 2 = 7. x = ?',opts:['10','12','15','18'],ans:2},
+        {q:'3x – 2x = 8. x = ?',opts:['6','7','8','9'],ans:2},
+      ]
+    },
+    {
+      id:'c6_geometry6', name:'Geometria Espacial', icon:'🔷',
+      questions:[
+        {q:'Área da superfície de cubo com lado 5?',opts:['125','150','175','100'],ans:1},
+        {q:'Volume de cilindro: raio 3, altura 10 (π≈3)?',opts:['200','270','300','240'],ans:1},
+        {q:'Volume de cone: raio 6, altura 9 (π≈3, V=πr²h/3)?',opts:['300','324','350','310'],ans:1},
+        {q:'Área de círculo raio 5 (π≈3)?',opts:['65','70','75','80'],ans:2},
+        {q:'Diagonal de quadrado lado 5 (√2≈1,4)?',opts:['6','7','8','6,5'],ans:1},
+        {q:'Área da superfície de esfera raio 3 (4πr², π≈3)?',opts:['96','108','120','100'],ans:1},
+      ]
+    },
+    {
+      id:'c6_ratio6', name:'Razões, Regra de 3', icon:'⚖️',
+      questions:[
+        {q:'Regra de 3: se 5→35, então 8→?',opts:['48','52','56','60'],ans:2},
+        {q:'Velocidade 80km/h, distância 320km. Tempo?',opts:['3h','4h','5h','6h'],ans:1},
+        {q:'Partilha 900MT em 2:3. A menor parte = ?',opts:['300MT','360MT','400MT','320MT'],ans:1},
+        {q:'Escala 1:500. 2cm no mapa = ? m real?',opts:['500m','1000m','1500m','750m'],ans:1},
+        {q:'Regra de 3: 3 operários → 6 dias; 6 operários → ? dias',opts:['2 dias','3 dias','4 dias','5 dias'],ans:1},
+        {q:'Mix: 2 partes leite : 1 parte água. 600ml total. Leite?',opts:['200ml','300ml','400ml','350ml'],ans:2},
+      ]
+    },
+    {
+      id:'c6_statistics6', name:'Estatística e Probabilidade', icon:'🎲',
+      questions:[
+        {q:'Moeda lançada. P(cara) = ?',opts:['1/4','1/3','1/2','3/4'],ans:2},
+        {q:'Dados de 6 faces. P(número par) = ?',opts:['1/3','1/2','2/3','3/4'],ans:1},
+        {q:'Média ponderada: notas 8(×2) e 6(×1). Média?',opts:['6,7','7,0','7,3','7,5'],ans:2},
+        {q:'Num grupo de 40, 30% são raparigas. Rapazes?',opts:['20','24','28','26'],ans:2},
+        {q:'Desvio padrão mede…',opts:['A média','A dispersão','O máximo','A moda'],ans:1},
+        {q:'Evento impossível tem probabilidade de…',opts:['0','0,5','1','2'],ans:0},
+      ]
+    },
+    {
+      id:'c6_systems', name:'Sistemas de Equações', icon:'🔢',
+      questions:[
+        {q:'x+y=10, x=4. y=?',opts:['4','5','6','7'],ans:2},
+        {q:'2x+y=11, x=3. y=?',opts:['3','4','5','6'],ans:2},
+        {q:'x–y=2, x+y=8. x=?',opts:['3','4','5','6'],ans:2},
+        {q:'3x=15. x=?',opts:['4','5','6','7'],ans:1},
+        {q:'x+2y=12, y=3. x=?',opts:['4','5','6','7'],ans:2},
+        {q:'Dois números cuja soma é 20 e diferença é 4. O maior?',opts:['10','11','12','13'],ans:2},
+      ]
+    },
+    {
+      id:'c6_financial', name:'Matemática Financeira', icon:'💰',
+      questions:[
+        {q:'Capital 5000MT a 12% ao ano. Juro em 1 ano?',opts:['500MT','600MT','700MT','550MT'],ans:1},
+        {q:'Monte final: 2000MT + 10% de juro = ?',opts:['2100MT','2200MT','2300MT','2150MT'],ans:1},
+        {q:'Lucro de 500MT sobre custo de 2000MT. % lucro?',opts:['20%','25%','30%','15%'],ans:1},
+        {q:'Prestação: 12 meses × 500MT + entrada 1000MT. Total?',opts:['6000MT','7000MT','8000MT','6500MT'],ans:1},
+        {q:'Desconto 20% em 1500MT. Pagas?',opts:['1100MT','1200MT','1300MT','1150MT'],ans:1},
+        {q:'IVA 17% em 850MT. Total com IVA?',opts:['970MT','994,50MT','1000MT','985MT'],ans:1},
+      ]
+    },
+    {
+      id:'c6_problems6', name:'Problemas de Síntese', icon:'🧮',
+      questions:[
+        {q:'Avião a 900km/h por 3,5h. Distância?',opts:['2800km','3150km','3500km','3000km'],ans:1},
+        {q:'Machamba 120m × 80m. Área em hectares? (1ha=10000m²)',opts:['0,96ha','0,97ha','0,98ha','1,0ha'],ans:0},
+        {q:'Banco dá 8% ao ano. 5000MT rende em 3 anos (juro simples)?',opts:['1000MT','1200MT','1400MT','1100MT'],ans:1},
+        {q:'Turma: média 14 em Mat. e 12 em Port. Média geral?',opts:['12','13','14','15'],ans:1},
+        {q:'Caixa 40×30×20 cm. Volume em litros? (1L=1000cm³)',opts:['20L','24L','28L','22L'],ans:1},
+        {q:'Trabalhador ganha 12000MT, paga 25% impostos. Líquido?',opts:['8000MT','9000MT','10000MT','8500MT'],ans:1},
+      ]
+    },
+  ]
+};
+
+// =================== STORAGE HELPERS ===================
+function saveData(key, val){ try{localStorage.setItem(key,JSON.stringify(val))}catch(e){} }
+function loadData(key){ try{const v=localStorage.getItem(key);return v?JSON.parse(v):null}catch(e){return null} }
+
+function getAlunos(){ return loadData('moz_alunos') || []; }
+function saveAlunos(a){ saveData('moz_alunos', a); }
+function getAluno(id){ return getAlunos().find(a=>a.id===id)||null; }
+
+function getAlunoData(id){ return loadData('moz_data_'+id) || {
+  pts:0, level:1, xp:0, streak:0, lastDay:'',
+  medals:[], topicStats:{}, errorBank:[], diffLevels:{},
+  sessionCount:0, totalTime:0, beforeAfter:{}, chatHistory:[]
+}; }
+function saveAlunoData(id, d){ saveData('moz_data_'+id, d); }
+
+// =================== LEVELS & GAMIFICATION ===================
+const LEVELS = [
+  {n:1,name:'🌱 Iniciante',xp:0},
+  {n:2,name:'📚 Aprendiz',xp:100},
+  {n:3,name:'🔭 Explorador',xp:250},
+  {n:4,name:'⚡ Avançado',xp:500},
+  {n:5,name:'🏆 Mestre',xp:900},
+];
+const MEDALS = [
+  {id:'add_master',name:'Mestre das Mangas',emoji:'🥭',desc:'10 acertos em adição',cond:d=>getTopicCorrect(d,'add')>=10},
+  {id:'money_king',name:'Rei dos Meticais',emoji:'💰',desc:'10 acertos em dinheiro',cond:d=>getTopicCorrect(d,'money')>=10},
+  {id:'daily3',name:'3 Dias Seguidos',emoji:'🔥',desc:'Usar 3 dias consecutivos',cond:d=>d.streak>=3},
+  {id:'daily7',name:'Semana de Fogo',emoji:'⚡',desc:'Usar 7 dias consecutivos',cond:d=>d.streak>=7},
+  {id:'mult_genius',name:'Génio da Multiplicação',emoji:'✖️',desc:'15 acertos seguidos',cond:d=>getTopicCorrect(d,'mult')>=15},
+  {id:'div_expert',name:'Especialista em Divisão',emoji:'➗',desc:'Dominar divisão',cond:d=>getTopicCorrect(d,'div')>=10},
+  {id:'chapa',name:'Campeão dos Chapas',emoji:'🚌',desc:'10 acertos em problemas',cond:d=>getTopicCorrect(d,'problems')>=10},
+  {id:'pts500',name:'500 Pontos',emoji:'⭐',desc:'Alcançar 500 pontos',cond:d=>d.pts>=500},
+  {id:'pts1000',name:'1000 Pontos',emoji:'🌟',desc:'Alcançar 1000 pontos',cond:d=>d.pts>=1000},
+];
+function getTopicCorrect(d,kw){
+  let total=0;
+  Object.entries(d.topicStats||{}).forEach(([k,v])=>{if(k.includes(kw))total+=(v.correct||0);});
+  return total;
+}
+function getLevelInfo(xp){
+  let lv=LEVELS[0];
+  for(const l of LEVELS){if(xp>=l.xp)lv=l;}
+  return lv;
+}
+function getNextLevel(xp){
+  for(const l of LEVELS){if(xp<l.xp)return l;}
+  return null;
+}
+function checkMedals(d){
+  const newOnes=[];
+  for(const m of MEDALS){
+    if(!d.medals.includes(m.id)&&m.cond(d)){
+      d.medals.push(m.id);
+      newOnes.push(m);
+    }
+  }
+  return newOnes;
+}
+function updateStreak(d){
+  const today=new Date().toDateString();
+  if(d.lastDay===today)return;
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  if(d.lastDay===yesterday){d.streak=(d.streak||0)+1;}
+  else{d.streak=1;}
+  d.lastDay=today;
+}
+function showToast(msg,duration=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),duration);
+}
+function floatPoints(pts){
+  const el=document.createElement('div');
+  el.className='pts-float';
+  el.textContent='+'+pts+' pts!';
+  el.style.cssText=`top:${Math.random()*200+100}px;left:${Math.random()*200+80}px`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1200);
+}
+
+// =================== NAVIGATION ===================
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// =================== LOGIN ===================
+function switchLoginTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('login-aluno').style.display = tab==='aluno'?'':'none';
+  document.getElementById('login-enc').style.display = tab==='enc'?'':'none';
+  event.target.classList.add('active');
+  if(tab==='aluno') populateAlunoSelect();
+  if(tab==='enc'){populateEncSelect();}
+}
+function populateAlunoSelect(){
+  const sel=document.getElementById('sel-aluno');
+  const alunos=getAlunos();
+  sel.innerHTML='<option value="">-- Seleccionar aluno --</option>';
+  alunos.forEach(a=>{
+    sel.innerHTML+=`<option value="${a.id}">${a.nome} (${a.classe}ª Classe)</option>`;
+  });
+  document.getElementById('no-aluno').style.display=alunos.length?'none':'block';
+}
+function loginAluno(){
+  const id=document.getElementById('sel-aluno').value;
+  if(!id){showToast('⚠️ Selecciona um aluno!');return;}
+  currentAluno=getAluno(id);
+  if(!currentAluno){showToast('Erro: aluno não encontrado');return;}
+  currentClass=currentAluno.classe;
+  // Update streak
+  const d=getAlunoData(id);
+  updateStreak(d);
+  d.sessionCount=(d.sessionCount||0)+1;
+  saveAlunoData(id,d);
+  if(d.streak>=3) setTimeout(()=>showToast(`🔥 ${d.streak} dias seguidos! Continua assim!`),500);
+  loadClassScreen();
+  goTo('screen-class');
+}
+// =================== ENCARREGADO AUTH ===================
+function switchEncTab(tab){
+  document.getElementById('enc-panel-entrar').style.display=tab==='entrar'?'block':'none';
+  document.getElementById('enc-panel-registar').style.display=tab==='registar'?'block':'none';
+  const btnE=document.getElementById('enc-tab-entrar');
+  const btnR=document.getElementById('enc-tab-registar');
+  if(tab==='entrar'){
+    btnE.style.background='var(--blue)';btnE.style.color='#fff';btnE.style.borderColor='var(--blue)';
+    btnR.style.background='#fff';btnR.style.color='var(--gray)';btnR.style.borderColor='#e5e7eb';
+    populateEncSelect();
+  } else {
+    btnR.style.background='var(--green)';btnR.style.color='#fff';btnR.style.borderColor='var(--green)';
+    btnE.style.background='#fff';btnE.style.color='var(--gray)';btnE.style.borderColor='#e5e7eb';
+  }
+}
+function populateEncSelect(){
+  const sel=document.getElementById('sel-enc');
+  const encs=getEncs();
+  sel.innerHTML='<option value="">-- Seleccionar --</option>';
+  encs.forEach(e=>{sel.innerHTML+=`<option value="${e.id}">${e.nome}</option>`;});
+}
+function registarEnc(){
+  const nome=document.getElementById('inp-enc-nome').value.trim();
+  const code=document.getElementById('inp-enc-novo-code').value.trim();
+  const conf=document.getElementById('inp-enc-confirmar').value.trim();
+  if(!nome||nome.length<2){showToast('⚠️ Introduz o teu nome!');return;}
+  if(!code||code.length<3){showToast('⚠️ Código deve ter pelo menos 3 caracteres!');return;}
+  if(code!==conf){showToast('❌ Os códigos não coincidem!');return;}
+  const encs=getEncs();
+  if(encs.find(e=>e.nome.toLowerCase()===nome.toLowerCase())){showToast('⚠️ Já existe um encarregado com esse nome!');return;}
+  const novoEnc={id:'enc'+Date.now(), nome, code};
+  encs.push(novoEnc);
+  saveEncs(encs);
+  document.getElementById('inp-enc-nome').value='';
+  document.getElementById('inp-enc-novo-code').value='';
+  document.getElementById('inp-enc-confirmar').value='';
+  showToast('✅ Conta criada! Já podes entrar.');
+  switchEncTab('entrar');
+}
+function loginEnc(){
+  const id=document.getElementById('sel-enc').value;
+  const code=document.getElementById('inp-enc-code').value;
+  if(!id){showToast('⚠️ Selecciona o teu nome!');return;}
+  if(!code){showToast('⚠️ Introduz o teu código!');return;}
+  const encs=getEncs();
+  const enc=encs.find(e=>e.id===id);
+  if(!enc){showToast('❌ Encarregado não encontrado!');return;}
+  if(enc.code!==code){showToast('❌ Código incorrecto!');return;}
+  currentEnc=enc;
+  document.getElementById('inp-enc-code').value='';
+  loadEncDash();
+  goTo('screen-enc');
+}
+function logout(){
+  if(currentAluno){
+    const d=getAlunoData(currentAluno.id);
+    d.totalTime=(d.totalTime||0)+5;
+    saveAlunoData(currentAluno.id,d);
+  }
+  currentAluno=null;
+  currentEnc=null;
+  populateAlunoSelect();
+  goTo('screen-login');
+}
+
+// =================== ENCARREGADO ===================
+function loadEncDash(){
+  const enc=currentEnc;
+  document.getElementById('enc-title').textContent=`👨‍👩‍👧 ${enc.nome}`;
+  // Only show this enc's students
+  const alunos=getAlunos().filter(a=>a.encId===enc.id);
+  const lista=document.getElementById('lista-alunos');
+  if(!alunos.length){lista.innerHTML='<p class="text-gray text-center">Nenhum aluno registado ainda.</p>';return;}
+  lista.innerHTML=alunos.map((a,i)=>{
+    const colors=['#2563eb','#16a34a','#dc2626','#7c3aed','#ea580c'];
+    const d=getAlunoData(a.id);
+    const lv=getLevelInfo(d.xp||0);
+    return `<div class="student-item mb8" onclick="showAlunoDetail('${a.id}')">
+      <div class="flex">
+        <div class="avatar" style="background:${colors[i%colors.length]}">${a.nome[0]}</div>
+        <div>
+          <div style="font-weight:700">${a.nome}</div>
+          <div class="text-sm text-gray">${a.classe}ª Classe · ${lv.name}</div>
+        </div>
+      </div>
+      <span class="badge badge-blue">${d.pts||0} pts</span>
+    </div>`;
+  }).join('');
+}
+function addAluno(){
+  const nome=document.getElementById('inp-nome').value.trim();
+  const classe=parseInt(document.getElementById('inp-classe').value);
+  if(!nome){showToast('⚠️ Introduz o nome do aluno!');return;}
+  if(nome.length<2){showToast('⚠️ Nome muito curto!');return;}
+  if(!currentEnc){showToast('⚠️ Sessão expirada. Entra novamente.');return;}
+  const alunos=getAlunos();
+  const novoAluno={id:'a'+Date.now(), nome, classe, encId:currentEnc.id};
+  alunos.push(novoAluno);
+  saveAlunos(alunos);
+  document.getElementById('inp-nome').value='';
+  showToast('✅ Aluno registado com sucesso!');
+  loadEncDash();
+}
+let _detailAlunoId=null;
+function showAlunoDetail(id){
+  _detailAlunoId=id;
+  const a=getAluno(id);
+  const d=getAlunoData(id);
+  const lv=getLevelInfo(d.xp||0);
+  const stats=d.topicStats||{};
+  const topics=Object.entries(stats);
+  const total=topics.reduce((s,[,v])=>s+(v.correct||0)+(v.wrong||0),0);
+  const correct=topics.reduce((s,[,v])=>s+(v.correct||0),0);
+  const pct=total?Math.round(correct/total*100):0;
+  const el=document.getElementById('enc-detail-content');
+  el.innerHTML=`
+    <div class="card mb12">
+      <div class="flex mb12">
+        <div class="avatar" style="background:var(--blue);width:56px;height:56px;font-size:24px">${a.nome[0]}</div>
+        <div>
+          <h2>${a.nome}</h2>
+          <p class="text-gray">${a.classe}ª Classe · ${lv.name}</p>
+        </div>
+      </div>
+      <div class="grid2 mb12">
+        <div class="stat-card"><div class="stat-num text-green">${pct}%</div><div class="text-sm text-gray">Taxa de acerto</div></div>
+        <div class="stat-card"><div class="stat-num text-blue">${d.pts||0}</div><div class="text-sm text-gray">Pontos</div></div>
+        <div class="stat-card"><div class="stat-num text-orange">${d.streak||0}</div><div class="text-sm text-gray">Dias seguidos</div></div>
+        <div class="stat-card"><div class="stat-num text-purple">${d.medals?.length||0}</div><div class="text-sm text-gray">Medalhas</div></div>
+      </div>
+    </div>
+    ${buildReportCard(a,d)}
+    <button class="btn btn-red btn-full mt12" onclick="deleteAlunoConfirm()">🗑️ Remover Aluno</button>
+  `;
+  goTo('screen-enc-detail');
+}
+function buildReportCard(a,d){
+  const stats=d.topicStats||{};
+  const topics=Object.entries(stats);
+  const weak=topics.filter(([,v])=>(v.correct||0)/((v.correct||0)+(v.wrong||0)+0.01)<0.6).map(([k])=>k.replace(/_/g,' '));
+  const strong=topics.filter(([,v])=>(v.correct||0)/((v.correct||0)+(v.wrong||0)+0.01)>=0.8).map(([k])=>k.replace(/_/g,' '));
+  const rec=weak.length?`Praticar mais: ${weak.slice(0,2).join(', ')}`:'Continuar com todos os temas!';
+  return `<div class="card" style="border:2px solid var(--blue)">
+    <h3 class="mb12">📋 Relatório Semanal</h3>
+    <p><strong>Aluno:</strong> ${a.nome}</p>
+    <p><strong>Classe:</strong> ${a.classe}ª</p>
+    <p><strong>Sessões:</strong> ${d.sessionCount||0}</p>
+    <p class="text-green mt8"><strong>✅ Temas fortes:</strong> ${strong.slice(0,3).join(', ')||'A desenvolver'}</p>
+    <p class="text-red"><strong>⚠️ Temas fracos:</strong> ${weak.slice(0,3).join(', ')||'Nenhum!'}</p>
+    <div style="background:var(--blue-light);border-radius:10px;padding:12px;margin-top:12px">
+      <strong>💡 Recomendação:</strong> ${rec}
+    </div>
+  </div>`;
+}
+function deleteAlunoConfirm(){
+  if(!_detailAlunoId)return;
+  const a=getAluno(_detailAlunoId);
+  if(!confirm(`Remover "${a.nome}"? Esta acção não pode ser desfeita.`))return;
+  const alunos=getAlunos().filter(x=>x.id!==_detailAlunoId);
+  saveAlunos(alunos);
+  showToast('🗑️ Aluno removido');
+  loadEncDash();
+  goTo('screen-enc');
+}
+
+// =================== CLASS SCREEN ===================
+function loadClassScreen(){
+  const a=currentAluno;
+  document.getElementById('class-header-name').textContent=`Olá, ${a.nome}! 👋`;
+  const d=getAlunoData(a.id);
+  const lv=getLevelInfo(d.xp||0);
+  const nx=getNextLevel(d.xp||0);
+  const pct=nx?Math.round(((d.xp||0)-lv.xp)/(nx.xp-lv.xp)*100):100;
+  document.getElementById('level-xp-bar').innerHTML=`
+    <div class="flex-between mb8">
+      <span class="badge badge-purple">${lv.name}</span>
+      <span class="text-sm text-gray">${d.pts||0} pts · 🔥 ${d.streak||0} dias</span>
+    </div>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" style="width:${pct}%"></div></div>
+    <p class="text-sm text-gray mt8 text-center">${nx?`${d.xp||0}/${nx.xp} XP para ${nx.name}`:'Nível máximo atingido! 🏆'}</p>
+  `;
+  // Error banner
+  const errors=(d.errorBank||[]).filter(e=>e.nextReview<=Date.now());
+  document.getElementById('error-banner-class').innerHTML=errors.length?
+    `<div class="error-banner mb16" onclick="startReviewSession()">
+      <span>🔁 <strong>${errors.length}</strong> erros para rever</span>
+      <button class="btn btn-orange" style="padding:6px 14px;font-size:13px">Rever agora</button>
+    </div>`:'';
+  // Class grid
+  const grid=document.getElementById('class-grid');
+  grid.innerHTML=[1,2,3,4,5,6].map(c=>`
+    <button class="class-btn ${c===a.classe?'':'opacity-70'}" onclick="selectClass(${c})">
+      ${c}ª Classe${c===a.classe?' ⭐':''}
+    </button>`).join('');
+}
+function selectClass(c){
+  currentClass=c;
+  loadDash();
+  goTo('screen-dash');
+}
+
+// =================== STUDENT DASHBOARD ===================
+function loadDash(){
+  const a=currentAluno;
+  const d=getAlunoData(a.id);
+  document.getElementById('dash-name').textContent=a.nome;
+  document.getElementById('dash-class').textContent=`${currentClass}ª Classe`;
+  showStudentTab('temas');
+}
+function showStudentTab(tab){
+  ['temas','stats','premios','chat'].forEach(t=>{
+    document.getElementById('dash-'+t).style.display=t===tab?'block':'none';
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+  if(tab==='temas') renderTemas();
+  if(tab==='stats') renderStats();
+  if(tab==='premios') renderPremios();
+  if(tab==='chat') renderChat();
+}
+function renderTemas(){
+  const topics=CURRICULUM[currentClass]||[];
+  const d=getAlunoData(currentAluno.id);
+  const el=document.getElementById('dash-temas');
+  el.innerHTML=topics.map(t=>{
+    const st=d.topicStats[t.id]||{correct:0,wrong:0};
+    const total=(st.correct||0)+(st.wrong||0);
+    const pct=total?Math.round(st.correct/total*100):0;
+    const hasErrors=(d.errorBank||[]).some(e=>e.topicId===t.id&&e.nextReview<=Date.now());
+    const diff=d.diffLevels?.[t.id]||'Médio';
+    return `<div class="topic-card mb12" onclick="startQuiz('${t.id}')">
+      <div class="flex-between mb8">
+        <div class="flex">
+          <span style="font-size:22px">${t.icon}</span>
+          <div>
+            <div style="font-weight:700">${t.name}</div>
+            <div class="text-sm text-gray">${total} tentativas</div>
+          </div>
+        </div>
+        <div>
+          ${hasErrors?'<span class="review-badge mb4">🔁 Rever</span>':''}
+          <span class="badge ${pct>=70?'badge-green':pct>=40?'badge-yellow':'badge-red'}">${pct}%</span>
+        </div>
+      </div>
+      <div class="prog-bar">
+        <div class="prog-fill" style="width:${pct}%;background:${pct>=70?'var(--green)':pct>=40?'#eab308':'var(--red)'}"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderStats(){
+  const d=getAlunoData(currentAluno.id);
+  const stats=d.topicStats||{};
+  const topics=Object.entries(stats);
+  const total=topics.reduce((s,[,v])=>s+(v.correct||0)+(v.wrong||0),0);
+  const correct=topics.reduce((s,[,v])=>s+(v.correct||0),0);
+  const pct=total?Math.round(correct/total*100):0;
+  const todayCorrect=topics.reduce((s,[,v])=>s+(v.todayCorrect||0),0);
+  const weak=topics.filter(([,v])=>((v.correct||0)/((v.correct||0)+(v.wrong||0)+0.01))<0.6);
+  const strong=topics.filter(([,v])=>((v.correct||0)/((v.correct||0)+(v.wrong||0)+0.01))>=0.8);
+  const ba=d.beforeAfter||{};
+  const baKeys=Object.keys(ba);
+  const el=document.getElementById('dash-stats');
+  el.innerHTML=`
+    <div class="grid2 mb16">
+      <div class="stat-card"><div class="stat-num text-green">${pct}%</div><div class="text-sm text-gray">Taxa geral</div></div>
+      <div class="stat-card"><div class="stat-num text-blue">${d.pts||0}</div><div class="text-sm text-gray">Pontos</div></div>
+      <div class="stat-card"><div class="stat-num text-orange">${todayCorrect}</div><div class="text-sm text-gray">Certas hoje</div></div>
+      <div class="stat-card"><div class="stat-num text-purple">${d.sessionCount||0}</div><div class="text-sm text-gray">Sessões</div></div>
+    </div>
+    ${strong.length?`<div class="card mb12" style="border-left:4px solid var(--green)">
+      <h3 class="mb8 text-green">✅ Temas Fortes</h3>
+      ${strong.map(([k,v])=>{
+        const p=Math.round(v.correct/(v.correct+v.wrong)*100);
+        return `<div class="flex-between mb6"><span class="text-sm">${k.replace(/_/g,' ')}</span><span class="badge badge-green">${p}%</span></div>`;
+      }).join('')}
+    </div>`:''}
+    ${weak.length?`<div class="card mb12" style="border-left:4px solid var(--red)">
+      <h3 class="mb8 text-red">⚠️ Temas Fracos</h3>
+      ${weak.map(([k,v])=>{
+        const t=(v.correct||0)+(v.wrong||0);
+        const p=t?Math.round(v.correct/t*100):0;
+        return `<div class="flex-between mb6"><span class="text-sm">${k.replace(/_/g,' ')}</span><span class="badge badge-red">${p}%</span></div>`;
+      }).join('')}
+    </div>`:''}
+    ${baKeys.length?`<div class="card mb12">
+      <h3 class="mb12">📈 Prova de Aprendizagem</h3>
+      ${baKeys.map(k=>{
+        const b=ba[k];
+        const diff=b.latest-b.first;
+        return `<div class="mb12">
+          <div class="flex-between mb6">
+            <span class="text-sm font-bold">${k.replace(/_/g,' ')}</span>
+            <span class="badge ${diff>=0?'badge-green':'badge-red'}">${diff>=0?'+':''}${diff}%</span>
+          </div>
+          <div class="before-after">
+            <div class="ba-block ba-before"><div class="ba-num">${b.first}%</div><div>Início</div></div>
+            <div style="font-size:24px">→</div>
+            <div class="ba-block ba-after"><div class="ba-num">${b.latest}%</div><div>Agora</div></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`:''}
+  `;
+}
+function renderPremios(){
+  const d=getAlunoData(currentAluno.id);
+  const lv=getLevelInfo(d.xp||0);
+  const el=document.getElementById('dash-premios');
+  el.innerHTML=`
+    <div class="card mb12">
+      <h3 class="mb12">🏅 Medalhas</h3>
+      <div class="medal-grid">
+        ${MEDALS.map(m=>{
+          const unlocked=d.medals.includes(m.id);
+          return `<div class="medal-card ${unlocked?'unlocked':'locked'}">
+            <div style="font-size:28px">${m.emoji}</div>
+            <div style="font-size:11px;font-weight:700;margin-top:4px">${m.name}</div>
+            <div style="font-size:10px;color:var(--gray);margin-top:2px">${m.desc}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="card mb12">
+      <h3 class="mb12">⬆️ Níveis</h3>
+      ${LEVELS.map(l=>{
+        const active=l.n===lv.n;
+        return `<div class="flex-between mb8 ${active?'font-bold':'opacity-50'}">
+          <span>${l.name}</span>
+          <span class="badge ${active?'badge-purple':'badge-blue'}">${active?'ACTUAL':l.xp+' XP'}</span>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="streak-bar">
+      <span style="font-size:24px">🔥</span>
+      <div>
+        <div style="font-weight:700;font-size:16px">${d.streak||0} dias seguidos</div>
+        <div style="font-size:12px;opacity:.8">Não percas o teu ritmo!</div>
+      </div>
+    </div>
+  `;
+}
+
+// =================== CHAT ===================
+let chatHistory=[];
+function renderChat(){
+  const d=getAlunoData(currentAluno.id);
+  chatHistory=d.chatHistory||[];
+  const el=document.getElementById('dash-chat');
+  el.innerHTML=`
+    <div class="card">
+      <h3 class="mb12">💬 Perguntar ao Tutor</h3>
+      <div class="chat-box" id="chat-box">
+        ${chatHistory.length?chatHistory.map(m=>`<div class="msg"><div class="${m.role==='assistant'?'msg-ai':'msg-user'}">${m.content}</div></div>`).join('')
+        :'<div class="msg"><div class="msg-ai">Olá! 😊 Sou o teu tutor de matemática. Podes perguntar-me qualquer coisa sobre a matéria!</div></div>'}
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-inp" placeholder="Faz uma pergunta..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn btn-primary" onclick="sendChat()">Enviar</button>
+      </div>
+    </div>
+  `;
+  const box=document.getElementById('chat-box');
+  box.scrollTop=box.scrollHeight;
+}
+async function sendChat(){
+  const inp=document.getElementById('chat-inp');
+  const msg=inp.value.trim();
+  if(!msg)return;
+  inp.value='';
+  const box=document.getElementById('chat-box');
+  box.innerHTML+=`<div class="msg"><div class="msg-user">${msg}</div></div>`;
+  box.innerHTML+=`<div class="msg" id="typing"><div class="msg-ai">A pensar… ⏳</div></div>`;
+  box.scrollTop=box.scrollHeight;
+  chatHistory.push({role:'user',content:msg});
+  const msgs=chatHistory.slice(-8);
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:400,
+        system:`És um tutor de matemática amigável e motivador para crianças moçambicanas da ${currentClass}ª classe. 
+Usa sempre exemplos locais (meticais, mangas, chapas, machambas, mercearia).
+Começa sempre com um elogio ou encorajamento. Explica de forma simples e clara. 
+Nunca uses linguagem técnica difícil. Usa emojis 😊. Fala em Português de Moçambique.
+Termina sempre com incentivo. Máximo 3 parágrafos curtos.`,
+        messages:msgs
+      })
+    });
+    const data=await r.json();
+    const reply=data.content?.[0]?.text||'Desculpa, tenta novamente!';
+    document.getElementById('typing').remove();
+    box.innerHTML+=`<div class="msg"><div class="msg-ai">${reply}</div></div>`;
+    chatHistory.push({role:'assistant',content:reply});
+    const d=getAlunoData(currentAluno.id);
+    d.chatHistory=chatHistory.slice(-20);
+    saveAlunoData(currentAluno.id,d);
+    box.scrollTop=box.scrollHeight;
+  }catch(e){
+    document.getElementById('typing').remove();
+    box.innerHTML+=`<div class="msg"><div class="msg-ai">Sem internet de momento. Tenta mais tarde! 📶</div></div>`;
+  }
+}
+
+// =================== QUIZ ENGINE ===================
+let quizPool=[];
+let isReviewSession=false;
+let difficultyLevel=1; // 1=easy, 2=medium, 3=hard
+let consec=0; // consecutive correct
+
+function getDiffLabel(n){ return ['','Fácil ⭐','Médio ⭐⭐','Difícil ⭐⭐⭐'][n]; }
+function getDiffClass(n){ return ['','diff-easy','diff-medium','diff-hard'][n]; }
+
+function startQuiz(topicId){
+  currentTopic=topicId;
+  isReviewSession=false;
+  const topic=CURRICULUM[currentClass].find(t=>t.id===topicId);
+  if(!topic){showToast('Tema não encontrado!');return;}
+  const d=getAlunoData(currentAluno.id);
+  difficultyLevel=d.diffLevels?.[topicId]||1;
+  consec=0;
+  // Build pool with error bank injection
+  quizPool=buildQuizPool(topic,d);
+  quizIndex=0; quizScore=0; quizCorrect=0; sessionPts=0; streak=0;
+  wrongInThisQ=0;
+  // Save first attempt snapshot
+  const st=d.topicStats[topicId]||{correct:0,wrong:0};
+  const tot=(st.correct||0)+(st.wrong||0);
+  if(!d.beforeAfter[topicId]&&tot>0){
+    d.beforeAfter[topicId]={first:Math.round(st.correct/(tot||1)*100),latest:0};
+    saveAlunoData(currentAluno.id,d);
+  }
+  goTo('screen-quiz');
+  renderQuestion();
+}
+function buildQuizPool(topic,d){
+  let qs=[...topic.questions];
+  // Inject pending errors
+  const errors=(d.errorBank||[]).filter(e=>e.topicId===topic.id&&e.nextReview<=Date.now());
+  const errorQs=errors.map(e=>({...e.q,isReview:true,errorId:e.id}));
+  // Interleave errors every 5 questions
+  const pool=[];
+  let ei=0;
+  qs.forEach((q,i)=>{
+    pool.push(q);
+    if((i+1)%5===0&&ei<errorQs.length){pool.push(errorQs[ei++]);}
+  });
+  return pool.slice(0,10);
+}
+function startReviewSession(){
+  const d=getAlunoData(currentAluno.id);
+  const errors=(d.errorBank||[]).filter(e=>e.nextReview<=Date.now());
+  if(!errors.length){showToast('✅ Sem erros para rever!');return;}
+  isReviewSession=true;
+  quizPool=errors.slice(0,10).map(e=>({...e.q,isReview:true,errorId:e.id}));
+  currentTopic=quizPool[0]?.topicId||'review';
+  quizIndex=0;quizScore=0;quizCorrect=0;sessionPts=0;streak=0;wrongInThisQ=0;
+  goTo('screen-quiz');
+  renderQuestion();
+}
+function renderQuestion(){
+  if(quizIndex>=quizPool.length){showResult();return;}
+  const q=quizPool[quizIndex];
+  wrongInThisQ=0;
+  document.getElementById('q-counter').textContent=`Questão ${quizIndex+1}/${quizPool.length}`;
+  document.getElementById('q-score-badge').textContent=`${quizScore} pts`;
+  document.getElementById('q-prog').style.width=`${((quizIndex)/(quizPool.length))*100}%`;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('q-diff-badge').textContent=getDiffLabel(difficultyLevel);
+  document.getElementById('q-diff-badge').className='diff-badge '+getDiffClass(difficultyLevel);
+  const rb=document.getElementById('q-review-badge');
+  rb.style.display=q.isReview?'inline-block':'none';
+  document.getElementById('q-feedback').style.display='none';
+  document.getElementById('btn-next').style.display='none';
+  const ansGrid=document.getElementById('q-answers');
+  ansGrid.innerHTML=q.opts.map((o,i)=>
+    `<button class="answer-btn" onclick="selectAnswer(${i})">${o}</button>`
+  ).join('');
+}
+const GOOD_MSG=['🎉 Excelente! Estás a arrasar!','👏 Muito bem! Continua assim!','✅ Correcto! És fantástico!','🌟 Incrível! Assim se faz!','🔥 Perfeito! Não pares!'];
+const BAD_MSG=['💪 Quase lá! Vamos tentar juntos.','🤔 Boa tentativa! Vamos melhorar.','😊 Não te preocupes, é assim que se aprende!','💙 Erro corrigível! Vamos a mais.'];
+function selectAnswer(idx){
+  const q=quizPool[quizIndex];
+  const btns=document.querySelectorAll('.answer-btn');
+  btns.forEach(b=>b.disabled=true);
+  btns[q.ans].classList.add('correct');
+  const correct=idx===q.ans;
+  if(!correct){btns[idx].classList.add('wrong');wrongInThisQ++;}
+  const fb=document.getElementById('q-feedback');
+  fb.style.display='block';
+  if(correct){
+    consec++; streak++;
+    const pts=wrongInThisQ===0?10:5;
+    quizScore+=pts; sessionPts+=pts;
+    quizCorrect++;
+    floatPoints(pts);
+    fb.className='feedback good';
+    fb.textContent=GOOD_MSG[Math.floor(Math.random()*GOOD_MSG.length)];
+    // Handle error bank
+    if(q.isReview&&q.errorId){
+      const d=getAlunoData(currentAluno.id);
+      const eb=d.errorBank||[];
+      const ei=eb.findIndex(e=>e.id===q.errorId);
+      if(ei>=0){
+        eb[ei].successCount=(eb[ei].successCount||0)+1;
+        if(eb[ei].successCount>=2){eb.splice(ei,1);}
+        else{eb[ei].nextReview=Date.now()+86400000;}
+      }
+      d.errorBank=eb; saveAlunoData(currentAluno.id,d);
+      fb.textContent='🎉 Conseguiste! Erro corrigido!';
+    }
+    // Adaptive: up
+    if(consec>=4&&difficultyLevel<3){
+      difficultyLevel++;consec=0;
+      const d=getAlunoData(currentAluno.id);
+      if(!d.diffLevels)d.diffLevels={};
+      d.diffLevels[currentTopic]=difficultyLevel;
+      saveAlunoData(currentAluno.id,d);
+      showToast('⬆️ Dificuldade aumentada! Estás a melhorar!');
+    }
+  } else {
+    consec=0; streak=0;
+    fb.className='feedback bad';
+    fb.textContent=BAD_MSG[Math.floor(Math.random()*BAD_MSG.length)];
+    // Record error
+    if(!q.isReview){
+      const d=getAlunoData(currentAluno.id);
+      const eb=d.errorBank||[];
+      const exists=eb.find(e=>e.q.q===q.q&&e.topicId===currentTopic);
+      if(!exists){
+        eb.push({id:'e'+Date.now(),topicId:currentTopic,q:{q:q.q,opts:q.opts,ans:q.ans},nextReview:Date.now()+5*60000,successCount:0,failCount:1});
+      } else {exists.failCount++;exists.nextReview=Date.now()+5*60000;}
+      d.errorBank=eb; saveAlunoData(currentAluno.id,d);
+    }
+    // Adaptive: down
+    if(consec<=-3&&difficultyLevel>1){
+      difficultyLevel--;consec=0;
+      const d=getAlunoData(currentAluno.id);
+      if(!d.diffLevels)d.diffLevels={};
+      d.diffLevels[currentTopic]=difficultyLevel;
+      saveAlunoData(currentAluno.id,d);
+      showToast('💙 A ajustar dificuldade para te ajudar melhor…');
+    }
+    consec--;
+  }
+  document.getElementById('btn-next').style.display='block';
+  // Update topic stats
+  const d=getAlunoData(currentAluno.id);
+  if(!d.topicStats[currentTopic])d.topicStats[currentTopic]={correct:0,wrong:0,todayCorrect:0};
+  if(correct){d.topicStats[currentTopic].correct++;d.topicStats[currentTopic].todayCorrect=(d.topicStats[currentTopic].todayCorrect||0)+1;}
+  else d.topicStats[currentTopic].wrong++;
+  // XP & points
+  if(correct){
+    const pts=wrongInThisQ===0?10:5;
+    d.pts=(d.pts||0)+pts;
+    d.xp=(d.xp||0)+pts;
+    const oldLv=getLevelInfo((d.xp||0)-pts);
+    const newLv=getLevelInfo(d.xp||0);
+    if(newLv.n>oldLv.n) setTimeout(()=>showToast(`🎉 Subiste para ${newLv.name}!`),500);
+  }
+  // Check medals
+  const newMedals=checkMedals(d);
+  newMedals.forEach(m=>setTimeout(()=>showToast(`🏅 Medalha desbloqueada: ${m.emoji} ${m.name}!`),800));
+  saveAlunoData(currentAluno.id,d);
+}
+function nextQuestion(){
+  quizIndex++;
+  renderQuestion();
+}
+function showResult(){
+  const pct=Math.round(quizCorrect/quizPool.length*100);
+  const good=pct>=70;
+  document.getElementById('result-emoji').textContent=pct>=90?'🏆':pct>=70?'🎉':pct>=40?'👍':'💪';
+  document.getElementById('result-title').textContent=pct>=90?'Incrível! Perfeito!':pct>=70?'Muito Bem!':pct>=40?'Boa tentativa!':'Continua a praticar!';
+  document.getElementById('result-sub').textContent=`${quizCorrect}/${quizPool.length} correctas · ${quizScore} pontos`;
+  // Update before/after
+  const d=getAlunoData(currentAluno.id);
+  if(!d.beforeAfter[currentTopic]){d.beforeAfter[currentTopic]={first:pct,latest:pct};}
+  else{d.beforeAfter[currentTopic].latest=pct;}
+  saveAlunoData(currentAluno.id,d);
+  const errors=(d.errorBank||[]).filter(e=>e.nextReview<=Date.now());
+  document.getElementById('btn-review-errors').style.display=errors.length?'block':'none';
+  const ba=d.beforeAfter[currentTopic];
+  document.getElementById('result-content').innerHTML=`
+    <div class="card mb12">
+      <div class="grid2 mb12">
+        <div class="stat-card"><div class="stat-num ${good?'text-green':'text-red'}">${pct}%</div><div class="text-sm text-gray">Acertos</div></div>
+        <div class="stat-card"><div class="stat-num text-blue">${quizScore}</div><div class="text-sm text-gray">Pontos</div></div>
+      </div>
+      ${ba&&ba.first!==ba.latest?`<div class="before-after">
+        <div class="ba-block ba-before"><div class="ba-num">${ba.first}%</div><div>Início</div></div>
+        <div style="font-size:20px">→</div>
+        <div class="ba-block ba-after"><div class="ba-num">${ba.latest}%</div><div>Agora</div></div>
+      </div>`:''}
+    </div>
+    <div class="card" style="border-left:4px solid ${good?'var(--green)':'var(--orange)'}">
+      <p>${pct>=90?'🏆 Fantástico! Estás a dominar este tema!':pct>=70?'🎉 Óptimo resultado! Continua assim!':pct>=40?'💪 Estás a melhorar! Pratica mais um pouco.':'🤗 Não desistas! Cada erro é uma lição!'}</p>
+    </div>
+  `;
+  goTo('screen-result');
+}
+
+// =================== INIT ===================
+window.onload=()=>{
+  populateAlunoSelect();
+  populateEncSelect();
+};
+</script>
+</body>
+</html>
