@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TutorMoz — Matemática do Ensino Primário</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--verde:#00a86b;--verde2:#007a4d;--amarelo:#f5a623;--vermelho:#e74c3c;--azul:#2980b9;--bg:#f0faf5;--card:#fff;--texto:#1a3a2a;--cinza:#6b7c75;--sombra:0 4px 20px rgba(0,168,107,.15)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--texto);min-height:100vh}
+h1,h2,h3,.titulo{font-family:'Baloo 2',cursive}
+#telaLogin{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(135deg,#e8f8f0,#d0f0e0)}
+.logo-emoji{font-size:72px;animation:bounce 2s infinite;display:block;text-align:center}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.logo-titulo{font-size:42px;color:var(--verde2);font-weight:800;text-align:center;line-height:1}
+.logo-sub{font-size:15px;color:var(--cinza);text-align:center;margin:6px 0 24px}
+.card-login{background:#fff;border-radius:24px;padding:28px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,120,70,.15)}
+.tabs-login{display:flex;gap:6px;margin-bottom:20px;background:#f0faf5;border-radius:12px;padding:4px}
+.tab-btn{flex:1;padding:10px;border:none;background:transparent;border-radius:10px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;color:var(--cinza);transition:.2s}
+.tab-btn.ativo{background:#fff;color:var(--verde2);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-weight:700;font-size:12px;color:var(--cinza);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select{width:100%;padding:11px 14px;border:2px solid #e0f0e8;border-radius:12px;font-family:'Nunito',sans-serif;font-size:15px;color:var(--texto);outline:none;transition:.2s;background:#fafffe}
+.form-group input:focus,.form-group select:focus{border-color:var(--verde)}
+.btn{width:100%;padding:13px;border:none;border-radius:14px;font-family:'Baloo 2',cursive;font-size:17px;font-weight:700;cursor:pointer;transition:.2s;margin-bottom:8px}
+.btn-verde{background:linear-gradient(135deg,var(--verde),var(--verde2));color:#fff;box-shadow:0 4px 15px rgba(0,168,107,.35)}
+.btn-verde:hover{transform:translateY(-2px)}
+.btn-cinza{background:#e8f0ec;color:var(--cinza)}
+.msg-erro{background:#fde8e8;color:var(--vermelho);padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:12px;display:none}
+/* PAINEL ENC */
+#painelEnc{display:none;padding:16px;max-width:780px;margin:0 auto}
+.header-enc{background:linear-gradient(135deg,var(--verde),var(--verde2));color:#fff;border-radius:20px;padding:22px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.card{background:#fff;border-radius:20px;padding:22px;margin-bottom:14px;box-shadow:var(--sombra)}
+.card h3{font-size:17px;margin-bottom:14px;color:var(--verde2)}
+.aluno-item{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#f8fffc;border:2px solid #e0f0e8;border-radius:14px;margin-bottom:8px}
+.aluno-nome{font-weight:700;font-size:14px}
+.aluno-classe{background:var(--verde);color:#fff;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.btn-sm{padding:7px 13px;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:12px;margin-left:4px}
+.btn-remove{background:#fde8e8;color:var(--vermelho)}
+.btn-view{background:#e8f0ec;color:var(--cinza)}
+.progresso-bar{height:7px;background:#e0f0e8;border-radius:4px;overflow:hidden;margin-top:5px}
+.progresso-fill{height:100%;background:linear-gradient(90deg,var(--verde),var(--amarelo));border-radius:4px;transition:.5s}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat-box{text-align:center;background:#f8fffc;border-radius:12px;padding:12px}
+.stat-num{font-size:24px;font-weight:800;color:var(--verde2)}
+.stat-label{font-size:11px;color:var(--cinza);margin-top:2px}
+/* TELA ALUNO */
+#telaAluno{display:none;min-height:100vh;background:var(--bg)}
+.header-aluno{background:linear-gradient(135deg,var(--verde),var(--verde2));color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px}
+.aluno-avatar{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.xp-bar-wrap{flex:1;min-width:0}
+.xp-label{font-size:12px;opacity:.85;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xp-bar{height:7px;background:rgba(255,255,255,.3);border-radius:4px;overflow:hidden}
+.xp-fill{height:100%;background:#f5a623;border-radius:4px;transition:.5s}
+.tabs-aluno{display:flex;background:#fff;border-bottom:2px solid #e0f0e8;overflow-x:auto}
+.tab-aluno{flex:1;min-width:70px;padding:11px 6px;text-align:center;border:none;background:transparent;cursor:pointer;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:var(--cinza);border-bottom:3px solid transparent;transition:.2s;white-space:nowrap}
+.tab-aluno.ativo{color:var(--verde2);border-bottom-color:var(--verde)}
+.tab-aluno span{display:block;font-size:19px;margin-bottom:2px}
+.conteudo-aluno{padding:14px;max-width:680px;margin:0 auto}
+/* TEMAS */
+.temas-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tema-card{background:#fff;border-radius:16px;padding:14px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.06);transition:.2s;border:2px solid transparent;position:relative}
+.tema-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,168,107,.15);border-color:var(--verde)}
+.tema-card.completo{border-color:#00a86b;background:#f8fffc}
+.tema-emoji{font-size:26px;margin-bottom:5px}
+.tema-nome{font-size:13px;font-weight:800;color:var(--texto);line-height:1.3}
+.tema-prog{font-size:11px;color:var(--cinza);margin-top:5px}
+.tema-estrelas{position:absolute;top:10px;right:10px;font-size:12px}
+/* QUESTÃO */
+#telaQuestao{display:none;min-height:100vh;background:var(--bg)}
+.quest-header{background:linear-gradient(135deg,var(--verde),var(--verde2));padding:14px 18px;color:#fff;display:flex;align-items:center;gap:10px}
+.quest-header h3{font-size:15px;flex:1}
+.streak-badge{background:rgba(255,165,0,.3);border-radius:20px;padding:3px 11px;font-size:13px;font-weight:700}
+.progress-quest{height:5px;background:rgba(255,255,255,.3);border-radius:3px;margin-top:8px}
+.progress-quest-fill{height:100%;background:#f5a623;border-radius:3px;transition:.5s}
+.quest-body{padding:16px;max-width:580px;margin:0 auto}
+.quest-canvas-wrap{background:#fff;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:var(--sombra);text-align:center;display:none}
+canvas#geoCanvas{border:1px solid #e0ede8;border-radius:8px;max-width:100%}
+.quest-enunciado{background:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:var(--sombra);font-size:16px;font-weight:700;line-height:1.5;text-align:center}
+.dica-box{background:#fff8e6;border:2px solid var(--amarelo);border-radius:12px;padding:11px 14px;margin-bottom:14px;font-size:13px;display:none}
+.opcoes-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+.opcao-btn{padding:14px 10px;border:3px solid #e0f0e8;border-radius:14px;background:#fff;cursor:pointer;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--texto);transition:.2s;text-align:center}
+.opcao-btn:hover:not(:disabled){border-color:var(--verde);background:#f8fffc;transform:scale(1.02)}
+.opcao-btn.certa{border-color:var(--verde);background:#e8f8f0;color:var(--verde2)}
+.opcao-btn.errada{border-color:var(--vermelho);background:#fde8e8;color:var(--vermelho)}
+.opcao-btn:disabled{cursor:default;transform:none}
+.feedback-box{border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;display:none;font-weight:700;font-size:15px}
+.feedback-certo{background:#e8f8f0;border:2px solid var(--verde);color:var(--verde2)}
+.feedback-errado{background:#fde8e8;border:2px solid var(--vermelho);color:var(--vermelho)}
+.btn-prox{width:100%;padding:15px;border:none;border-radius:14px;background:var(--verde);color:#fff;font-family:'Baloo 2',cursive;font-size:17px;font-weight:700;cursor:pointer;display:none;transition:.2s}
+.btn-prox:hover{background:var(--verde2);transform:translateY(-2px)}
+.controles-voz{display:flex;gap:8px;margin-bottom:12px;justify-content:center}
+.btn-voz{padding:7px 14px;border:none;border-radius:20px;cursor:pointer;font-size:13px;font-weight:700;background:#e8f0ec;color:var(--cinza);transition:.2s}
+.btn-voz.ativo,.btn-voz:hover{background:var(--verde);color:#fff}
+/* RESULTADO */
+#telaResultado{display:none;padding:20px;max-width:480px;margin:0 auto;padding-top:40px}
+.resultado-card{background:#fff;border-radius:24px;padding:28px;box-shadow:var(--sombra);text-align:center}
+.resultado-emoji{font-size:72px;margin-bottom:14px;display:block}
+.resultado-titulo{font-size:26px;font-weight:800;color:var(--verde2);margin-bottom:6px}
+.resultado-sub{color:var(--cinza);margin-bottom:20px}
+.result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.result-stat{background:#f8fffc;border-radius:12px;padding:12px}
+.result-stat-num{font-size:26px;font-weight:800;color:var(--verde2)}
+.result-stat-label{font-size:11px;color:var(--cinza);margin-top:2px}
+/* CONQUISTAS */
+.medalhas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.medalha{text-align:center;padding:14px 8px;background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.05);opacity:.3;transition:.3s}
+.medalha.desbloqueada{opacity:1}
+.medalha-icon{font-size:32px;margin-bottom:5px}
+.medalha-nome{font-size:11px;font-weight:700;line-height:1.3}
+.nivel-info{background:linear-gradient(135deg,var(--verde),var(--verde2));color:#fff;border-radius:18px;padding:18px;margin-bottom:16px;text-align:center}
+/* CHAT */
+.chat-container{background:#fff;border-radius:18px;box-shadow:var(--sombra);overflow:hidden;display:flex;flex-direction:column;height:400px}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px}
+.msg{max-width:82%;padding:11px 14px;border-radius:14px;font-size:13px;line-height:1.5}
+.msg-ia{background:#f0faf5;border:1px solid #d0ece0;align-self:flex-start;border-radius:4px 14px 14px 14px}
+.msg-user{background:var(--verde);color:#fff;align-self:flex-end;border-radius:14px 4px 14px 14px}
+.chat-input-wrap{display:flex;gap:8px;padding:10px;border-top:1px solid #e0f0e8;background:#fafffe}
+.chat-input{flex:1;border:2px solid #e0f0e8;border-radius:12px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:13px;outline:none}
+.chat-input:focus{border-color:var(--verde)}
+.btn-enviar{background:var(--verde);color:#fff;border:none;border-radius:12px;padding:9px 14px;cursor:pointer;font-size:17px;transition:.2s}
+.btn-enviar:hover{background:var(--verde2)}
+/* RELATÓRIO */
+.tema-forte{background:#e8f8f0;border:1px solid #b0e0c8;border-radius:10px;padding:9px 13px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.tema-fraco{background:#fde8e8;border:1px solid #f0b0b0;border-radius:10px;padding:9px 13px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(100px);background:#1a3a2a;color:#fff;padding:11px 22px;border-radius:20px;font-weight:700;font-size:13px;transition:.4s;z-index:9999;opacity:0;text-align:center;max-width:280px}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.points-anim{position:fixed;font-size:20px;font-weight:800;color:var(--verde);pointer-events:none;z-index:9999;animation:floatUp .8s ease forwards}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-60px)}}
+@media(max-width:400px){.temas-grid,.opcoes-grid{grid-template-columns:1fr 1fr}.logo-titulo{font-size:34px}}
+</style>
+</head>
+<body>
+<!-- LOGIN -->
+<div id="telaLogin">
+  <span class="logo-emoji">📚</span>
+  <div class="logo-titulo">TutorMoz</div>
+  <div class="logo-sub">Matemática · Ensino Primário · Moçambique</div>
+  <div class="card-login">
+    <div class="tabs-login">
+      <button class="tab-btn ativo" onclick="switchTab('aluno')">👦 Aluno</button>
+      <button class="tab-btn" onclick="switchTab('enc')">👨‍👩‍👧 Encarregado</button>
+    </div>
+    <div id="tabAluno">
+      <div class="msg-erro" id="erroAluno">Nome não encontrado.</div>
+      <div class="form-group"><label>O meu nome</label>
+        <select id="selectAluno"><option value="">— Selecciona o teu nome —</option></select></div>
+      <button class="btn btn-verde" onclick="entrarAluno()">🚀 Entrar e Estudar!</button>
+    </div>
+    <div id="tabEnc" style="display:none">
+      <div class="tabs-login" style="margin-bottom:14px">
+        <button class="tab-btn ativo" id="btnEncEntrar" onclick="switchEncTab('entrar')">Entrar</button>
+        <button class="tab-btn" id="btnEncRegistar" onclick="switchEncTab('registar')">Registar</button>
+      </div>
+      <div id="encEntrar">
+        <div class="msg-erro" id="erroEnc">Nome ou código incorrecto.</div>
+        <div class="form-group"><label>O meu nome</label>
+          <select id="selectEnc"><option value="">— Selecciona o teu nome —</option></select></div>
+        <div class="form-group"><label>Código secreto</label>
+          <input type="password" id="codigoEnc" placeholder="••••" maxlength="6"></div>
+        <button class="btn btn-verde" onclick="entrarEnc()">🔑 Entrar</button>
+      </div>
+      <div id="encRegistar" style="display:none">
+        <div class="msg-erro" id="erroEncReg">Preenche todos os campos.</div>
+        <div class="form-group"><label>Nome completo</label>
+          <input type="text" id="nomeEncNovo" placeholder="Ex: Maria António"></div>
+        <div class="form-group"><label>Cria o teu código (4–6 dígitos)</label>
+          <input type="password" id="codigoEncNovo" placeholder="••••" maxlength="6"></div>
+        <div class="form-group"><label>Confirma o código</label>
+          <input type="password" id="codigoEncConf" placeholder="••••" maxlength="6"></div>
+        <button class="btn btn-verde" onclick="registarEnc()">✅ Criar Conta</button>
+        <button class="btn btn-cinza" onclick="switchEncTab('entrar')">← Já tenho conta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAINEL ENCARREGADO -->
+<div id="painelEnc">
+  <div class="header-enc">
+    <div><div style="font-size:12px;opacity:.8">Bem-vindo(a),</div>
+      <div style="font-size:19px;font-weight:800" id="nomeEncHeader">—</div></div>
+    <button onclick="sair()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:7px 14px;border-radius:20px;cursor:pointer;font-weight:700;font-size:13px">Sair</button>
+  </div>
+  <div class="card">
+    <h3>➕ Registar Novo Aluno</h3>
+    <div class="msg-erro" id="erroAddAluno">Preenche o nome e selecciona a classe.</div>
+    <div class="form-group"><label>Nome completo do aluno</label>
+      <input type="text" id="nomeNovoAluno" placeholder="Ex: João Machava"></div>
+    <div class="form-group"><label>Classe</label>
+      <select id="classeNovoAluno">
+        <option value="">— Selecciona —</option>
+        <option value="1">1ª Classe</option><option value="2">2ª Classe</option>
+        <option value="3">3ª Classe</option><option value="4">4ª Classe</option>
+        <option value="5">5ª Classe</option><option value="6">6ª Classe</option>
+      </select></div>
+    <button class="btn btn-verde" onclick="addAluno()">Registar Aluno</button>
+  </div>
+  <div class="card"><h3>👨‍🎓 Os Meus Alunos</h3><div id="listaAlunos"></div></div>
+  <div class="card" id="cardRelatorio" style="display:none">
+    <h3>📊 Relatório: <span id="nomeRelatorio"></span></h3>
+    <div id="conteudoRelatorio"></div>
+    <button class="btn btn-cinza" style="width:auto;padding:8px 18px;margin-top:10px" onclick="document.getElementById('cardRelatorio').style.display='none'">Fechar</button>
+  </div>
+</div>
+
+<!-- TELA ALUNO -->
+<div id="telaAluno">
+  <div class="header-aluno">
+    <div class="aluno-avatar" id="avatarHeader">🌱</div>
+    <div class="xp-bar-wrap">
+      <div class="xp-label"><span id="nomeAlunoHeader">—</span> · <span id="nivelHeader">Aprendiz</span> · ⭐<span id="pontosHeader">0</span></div>
+      <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+    </div>
+    <button onclick="sair()" style="background:transparent;border:2px solid rgba(255,255,255,.4);color:#fff;padding:5px 11px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0">Sair</button>
+  </div>
+  <div class="tabs-aluno">
+    <button class="tab-aluno ativo" onclick="switchAlunoTab('estudar')" id="tabEstudar"><span>📖</span>Estudar</button>
+    <button class="tab-aluno" onclick="switchAlunoTab('conquistas')" id="tabConquistas"><span>🏆</span>Conquistas</button>
+    <button class="tab-aluno" onclick="switchAlunoTab('chat')" id="tabChat"><span>🤖</span>Tutor IA</button>
+    <button class="tab-aluno" onclick="switchAlunoTab('progresso')" id="tabProgresso"><span>📈</span>Progresso</button>
+  </div>
+  <div class="conteudo-aluno">
+    <div id="secEstudar"><div id="listaTemas"></div></div>
+    <div id="secConquistas" style="display:none">
+      <div class="nivel-info">
+        <div style="font-size:38px" id="nivelEmoji">🌱</div>
+        <div style="font-size:22px;font-weight:800" id="nivelNome">Aprendiz</div>
+        <div style="font-size:13px;opacity:.85;margin-top:4px" id="nivelProx">—</div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-num" id="statPontos">0</div><div class="stat-label">Pontos</div></div>
+          <div class="stat-box"><div class="stat-num" id="statCorretas">0</div><div class="stat-label">Certas</div></div>
+          <div class="stat-box"><div class="stat-num" id="statStreak">0</div><div class="stat-label">🔥 Streak</div></div>
+        </div>
+      </div>
+      <div class="card"><h3>🎖️ Medalhas</h3><div class="medalhas-grid" id="medalhasGrid"></div></div>
+    </div>
+    <div id="secChat" style="display:none">
+      <div class="chat-container">
+        <div class="chat-msgs" id="chatMsgs">
+          <div class="msg msg-ia">👋 Olá! Sou o <strong>Prof. Moz</strong>! Posso ajudar-te com Matemática da tua classe. Pergunta-me qualquer coisa! 😊</div>
+        </div>
+        <div class="chat-input-wrap">
+          <input class="chat-input" id="chatInput" placeholder="Escreve a tua pergunta..." onkeydown="if(event.key==='Enter')enviarChat()">
+          <button class="btn-enviar" onclick="enviarChat()">➤</button>
+        </div>
+      </div>
+    </div>
+    <div id="secProgresso" style="display:none">
+      <div class="card"><h3>📊 Progresso por tema</h3><div id="progressoTemas" style="margin-top:10px"></div></div>
+      <div class="card" style="margin-top:0"><h3>❌ Temas a rever</h3><div id="temasRever" style="margin-top:10px;font-size:13px;color:var(--cinza)">🎉 Sem erros para rever!</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TELA QUESTÃO -->
+<div id="telaQuestao">
+  <div class="quest-header">
+    <button onclick="voltarTemas()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:6px 12px;border-radius:20px;cursor:pointer;font-weight:700;font-size:13px">← Voltar</button>
+    <h3 id="questTemaNome">—</h3>
+    <div class="streak-badge" id="streakBadge">🔥 0</div>
+  </div>
+  <div style="padding:8px 18px;background:rgba(0,100,50,.05)">
+    <div class="progress-quest"><div class="progress-quest-fill" id="progressQuestFill"></div></div>
+    <div style="font-size:11px;color:var(--cinza);margin-top:3px;text-align:right" id="questContador">1/10</div>
+  </div>
+  <div class="quest-body">
+    <div class="controles-voz">
+      <button class="btn-voz" id="btnLer" onclick="lerPergunta()">🔊 Ouvir</button>
+      <button class="btn-voz" id="btnMicrofone" onclick="toggleMic()">🎤 Falar</button>
+    </div>
+    <div class="quest-canvas-wrap" id="canvasWrap">
+      <canvas id="geoCanvas" width="280" height="180"></canvas>
+    </div>
+    <div class="quest-enunciado" id="questEnunciado">—</div>
+    <div class="dica-box" id="dicaBox">💡 <span id="dicaTexto"></span></div>
+    <div class="opcoes-grid" id="opcoesGrid"></div>
+    <div class="feedback-box" id="feedbackBox"></div>
+    <button class="btn-prox" id="btnProx" onclick="proxQuestao()">Próxima →</button>
+    <div style="text-align:center;margin-top:8px">
+      <button onclick="mostrarDica()" style="background:none;border:none;color:var(--cinza);cursor:pointer;font-size:13px">💡 Ver dica</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTADO -->
+<div id="telaResultado">
+  <div class="resultado-card">
+    <span class="resultado-emoji" id="resultEmoji">🎉</span>
+    <div class="resultado-titulo" id="resultTitulo">Excelente!</div>
+    <div class="resultado-sub" id="resultSub">—</div>
+    <div class="result-stats">
+      <div class="result-stat"><div class="result-stat-num" id="rsCertas">0</div><div class="result-stat-label">Certas</div></div>
+      <div class="result-stat"><div class="result-stat-num" id="rsPontos">0</div><div class="result-stat-label">Pontos</div></div>
+      <div class="result-stat"><div class="result-stat-num" id="rsStreak">0</div><div class="result-stat-label">🔥 Max Streak</div></div>
+    </div>
+    <button class="btn btn-verde" onclick="repetirTema()">🔄 Repetir tema</button>
+    <button class="btn" style="background:#e8f0ec;color:var(--cinza)" onclick="voltarTemas()">📚 Outros temas</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+// ===== CURRÍCULO baseado nos livros Aprender Matemática MEC Moçambique =====
+const CURRICULO = {
+1:[
+  {id:"1_1",nome:"Vocabulário Básico",emoji:"🗣️",desc:"Noções de quantidade, tamanho e posição",questoes:[
+    {q:"Qual cesto tem MAIS frutas: um com 3 mangas ou um com 7 mangas?",ops:["Cesto com 3","Cesto com 7","São iguais","Não sei"],resp:1,dica:"Mais = número maior.",visual:null},
+    {q:"O oposto de MUITO é:",ops:["Grande","Pouco","Alto","Cheio"],resp:1,dica:"Se tens muitas laranjas, o oposto é ter quase nenhuma.",visual:null},
+    {q:"Uma garrafa completamente cheia de água está:",ops:["Vazia","Meio cheia","Cheia","Pequena"],resp:2,dica:"Cheia = completamente com líquido.",visual:null},
+    {q:"AUMENTAR significa:",ops:["Ficar igual","Ficar menor","Ficar maior","Desaparecer"],resp:2,dica:"Se aumentas a água, tens mais.",visual:null},
+    {q:"A palavra ENTRE significa:",ops:["Acima","No meio de dois","Depois","Antes"],resp:1,dica:"O Tito está ENTRE a mãe e o pai.",visual:null},
+    {q:"MAIS do que significa:",ops:["Menor quantidade","Maior quantidade","Mesma quantidade","Sem quantidade"],resp:1,dica:"3 é mais do que 1.",visual:null},
+    {q:"PÔR e TIRAR são opostos. Tirar é como:",ops:["Adicionar","Subtrair","Multiplicar","Dividir"],resp:1,dica:"Tirar = retirar = subtrair.",visual:null},
+    {q:"CHEIO é o oposto de:",ops:["Grande","Pequeno","Vazio","Alto"],resp:2,dica:"Cheio ↔ Vazio.",visual:null},
+    {q:"À ESQUERDA é o oposto de:",ops:["Em cima","Em baixo","À direita","Atrás"],resp:2,dica:"Esquerda ↔ Direita.",visual:null},
+    {q:"PARA CIMA é o oposto de:",ops:["Para a frente","Para trás","Para o lado","Para baixo"],resp:3,dica:"Cima ↔ Baixo.",visual:null},
+  ]},
+  {id:"1_2",nome:"Números Naturais 1–5",emoji:"1️⃣",desc:"Contar, ler e escrever números de 1 a 5",questoes:[
+    {q:"🐐🐐🐐 Quantos cabritos?",ops:["2","3","4","5"],resp:1,dica:"Conta um a um.",visual:null},
+    {q:"O número natural DOIS em algarismo é:",ops:["1","2","3","4"],resp:1,dica:"Um=1, Dois=2...",visual:null},
+    {q:"Qual número vem DEPOIS do 3?",ops:["2","3","4","5"],resp:2,dica:"1,2,3,4...",visual:null},
+    {q:"🥭🥭🥭🥭🥭 Quantas mangas?",ops:["3","4","5","6"],resp:2,dica:"Conta cada manga.",visual:null},
+    {q:"O número 4 em palavras é:",ops:["Três","Quatro","Cinco","Dois"],resp:1,dica:"1=um,2=dois,3=três,4=quatro",visual:null},
+    {q:"Qual é o MAIOR? 1, 3, 5, 2",ops:["1","3","5","2"],resp:2,dica:"O maior vale mais.",visual:null},
+    {q:"Qual é o MENOR? 4, 2, 5, 1",ops:["4","2","5","1"],resp:3,dica:"O menor vale menos.",visual:null},
+    {q:"Completa: 1, 2, __, 4, 5",ops:["1","6","3","0"],resp:2,dica:"Entre 2 e 4.",visual:null},
+    {q:"TRÊS crianças mais DUAS crianças são:",ops:["4","5","6","7"],resp:1,dica:"3+2=5.",visual:null},
+    {q:"Ordena do menor ao maior: 3,1,4,2",ops:["3,1,4,2","1,2,3,4","4,3,2,1","2,1,3,4"],resp:1,dica:"Começa pelo 1.",visual:null},
+  ]},
+  {id:"1_3",nome:"Números Naturais 6–9",emoji:"6️⃣",desc:"Contar, ler e escrever números de 6 a 9",questoes:[
+    {q:"🌟🌟🌟🌟🌟🌟 Quantas estrelas?",ops:["5","6","7","8"],resp:1,dica:"Conta todas.",visual:null},
+    {q:"O número OITO em algarismo:",ops:["6","7","8","9"],resp:2,dica:"Seis,sete,oito...",visual:null},
+    {q:"Qual vem DEPOIS do 7?",ops:["6","7","8","9"],resp:2,dica:"7,8...",visual:null},
+    {q:"Qual é o MAIOR? 6,9,7,8",ops:["6","9","7","8"],resp:1,dica:"9 é o maior de 1 a 9.",visual:null},
+    {q:"5 + 3 = ?",ops:["7","8","9","6"],resp:1,dica:"Conta 3 depois do 5.",visual:null},
+    {q:"9 - 2 = ?",ops:["5","6","7","8"],resp:2,dica:"9,8,7 — tira 2.",visual:null},
+    {q:"Completa: 6, 7, __, 9",ops:["5","6","8","10"],resp:2,dica:"Entre 7 e 9.",visual:null},
+    {q:"3 + 6 = ?",ops:["7","8","9","10"],resp:2,dica:"Conta 6 depois do 3.",visual:null},
+    {q:"7 - 3 = ?",ops:["3","4","5","6"],resp:1,dica:"7,6,5,4 — tira 3.",visual:null},
+    {q:"Ordena: 9,6,8,7 do menor ao maior",ops:["6,7,8,9","9,8,7,6","6,8,7,9","7,6,9,8"],resp:0,dica:"Começa pelo menor.",visual:null},
+  ]},
+  {id:"1_4",nome:"Adição até 9",emoji:"➕",desc:"Adição de números naturais até 9",questoes:[
+    {q:"2 + 3 = ?",ops:["4","5","6","7"],resp:1,dica:"Conta: 2, depois mais 3.",visual:null},
+    {q:"4 + 4 = ?",ops:["7","8","9","6"],resp:1,dica:"Quatro mais quatro.",visual:null},
+    {q:"1 + 7 = ?",ops:["7","8","9","6"],resp:1,dica:"Começa em 1, conta 7.",visual:null},
+    {q:"5 + 4 = ?",ops:["8","9","10","7"],resp:1,dica:"5+4=9.",visual:null},
+    {q:"A Fátima tem 3 laranjas e o João tem 5. Total:",ops:["7","8","9","6"],resp:1,dica:"3+5=8.",visual:null},
+    {q:"6 + 3 = ?",ops:["8","9","10","7"],resp:1,dica:"6,7,8,9.",visual:null},
+    {q:"0 + 9 = ?",ops:["0","9","8","10"],resp:1,dica:"Zero mais qualquer número = esse número.",visual:null},
+    {q:"Na escola há 4 meninos e 5 meninas. Total:",ops:["8","9","10","7"],resp:1,dica:"4+5=9.",visual:null},
+    {q:"7 + 2 = ?",ops:["8","9","10","7"],resp:1,dica:"7,8,9.",visual:null},
+    {q:"2 + 2 + 2 = ?",ops:["4","6","8","5"],resp:1,dica:"2+2=4, +2=6.",visual:null},
+  ]},
+  {id:"1_5",nome:"Subtracção até 9",emoji:"➖",desc:"Subtracção de números naturais até 9",questoes:[
+    {q:"5 - 2 = ?",ops:["2","3","4","5"],resp:1,dica:"Tira 2 do 5.",visual:null},
+    {q:"8 - 3 = ?",ops:["4","5","6","7"],resp:1,dica:"8 menos 3.",visual:null},
+    {q:"9 - 4 = ?",ops:["4","5","6","7"],resp:1,dica:"9-4=5.",visual:null},
+    {q:"Tinha 7 mangas. Comi 3. Quantas ficaram?",ops:["3","4","5","6"],resp:1,dica:"7-3=4.",visual:null},
+    {q:"6 - 6 = ?",ops:["0","1","2","6"],resp:0,dica:"Qualquer número menos ele mesmo = 0.",visual:null},
+    {q:"9 - 1 = ?",ops:["7","8","9","10"],resp:1,dica:"9 menos 1.",visual:null},
+    {q:"4 - 0 = ?",ops:["0","4","3","5"],resp:1,dica:"Menos zero = fica igual.",visual:null},
+    {q:"7 - 5 = ?",ops:["1","2","3","4"],resp:1,dica:"7,6,5 — tira 2.",visual:null},
+    {q:"Tinha 6 lápis. Dei 4. Quantos tenho?",ops:["1","2","3","4"],resp:1,dica:"6-4=2.",visual:null},
+    {q:"8 - 8 = ?",ops:["0","1","8","4"],resp:0,dica:"Oito menos oito = zero.",visual:null},
+  ]},
+  {id:"1_6",nome:"Números até 20",emoji:"🔢",desc:"Números naturais de 10 a 20, composição e cálculo mental",questoes:[
+    {q:"10 + 1 = ?",ops:["10","11","12","13"],resp:1,dica:"Dez mais um.",visual:null},
+    {q:"Como se lê 15?",ops:["Cinquenta","Quinze","Doze","Treze"],resp:1,dica:"10+5=15=quinze.",visual:null},
+    {q:"Qual é o maior? 14, 17, 11, 20",ops:["14","17","11","20"],resp:3,dica:"O maior é 20.",visual:null},
+    {q:"12 - 2 = ?",ops:["8","9","10","11"],resp:2,dica:"12 menos 2 = 10.",visual:null},
+    {q:"Como se escreve dezassete?",ops:["7","17","70","71"],resp:1,dica:"Dez+sete=17.",visual:null},
+    {q:"Completa: 16, 17, __, 19",ops:["16","17","18","20"],resp:2,dica:"Entre 17 e 19.",visual:null},
+    {q:"13 + 5 = ?",ops:["17","18","19","20"],resp:1,dica:"13+5=18.",visual:null},
+    {q:"20 - 10 = ?",ops:["10","11","12","9"],resp:0,dica:"Vinte menos dez.",visual:null},
+    {q:"A Catija tem 10 MT. Ganhou mais 8 MT. Total:",ops:["17","18","19","20"],resp:1,dica:"10+8=18.",visual:null},
+    {q:"Ordena: 20,15,11,18 (menor ao maior)",ops:["11,15,18,20","20,18,15,11","15,11,20,18","18,11,15,20"],resp:0,dica:"Começa pelo menor.",visual:null},
+  ]},
+  {id:"1_7",nome:"Espaço e Forma",emoji:"🔷",desc:"Quadrado, triângulo, círculo, rectângulo — figuras planas",questoes:[
+    {q:"Que forma geométrica tem 4 lados IGUAIS?",ops:["Triângulo","Quadrado","Círculo","Rectângulo"],resp:1,dica:"Todos os 4 lados do quadrado são iguais.",visual:"quadrado"},
+    {q:"O círculo tem quantos lados?",ops:["0","1","2","3"],resp:0,dica:"O círculo é redondo, não tem lados.",visual:"circulo"},
+    {q:"Que forma tem 3 lados?",ops:["Quadrado","Círculo","Triângulo","Rectângulo"],resp:2,dica:"Tri = três.",visual:"triangulo"},
+    {q:"Um rectângulo tem quantos lados?",ops:["3","4","5","6"],resp:1,dica:"Conta os lados de uma porta.",visual:"retangulo"},
+    {q:"Qual forma se parece com a Lua cheia?",ops:["Quadrado","Triângulo","Círculo","Rectângulo"],resp:2,dica:"A Lua é redonda.",visual:"circulo"},
+    {q:"A forma de uma janela quadrada:",ops:["Triângulo","Quadrado","Círculo","Losango"],resp:1,dica:"Quadrada = quadrado.",visual:"quadrado"},
+    {q:"Quantos cantos tem um triângulo?",ops:["2","3","4","5"],resp:1,dica:"Cada ponta é um canto.",visual:"triangulo"},
+    {q:"Uma folha de caderno tem a forma de:",ops:["Círculo","Triângulo","Rectângulo","Losango"],resp:2,dica:"Mais longa do que larga.",visual:"retangulo"},
+    {q:"O telhado de uma casa tem geralmente a forma de:",ops:["Círculo","Triângulo","Quadrado","Rectângulo"],resp:1,dica:"O telhado termina num ponto.",visual:"triangulo"},
+    {q:"Um rectângulo tem lados opostos:",ops:["Todos iguais","Opostos iguais","Todos diferentes","Nenhum igual"],resp:1,dica:"2 lados longos e 2 curtos, opostos iguais.",visual:"retangulo"},
+  ]},
+],
+2:[
+  {id:"2_1",nome:"Números até 100",emoji:"💯",desc:"Contagem, leitura e escrita de números até 100",questoes:[
+    {q:"Como se lê 45?",ops:["Quarenta e quatro","Quarenta e cinco","Cinquenta e quatro","Cinco e quarenta"],resp:1,dica:"40+5=quarenta e cinco.",visual:null},
+    {q:"Escreve em algarismos: sessenta e dois",ops:["26","62","60","72"],resp:1,dica:"60+2=62.",visual:null},
+    {q:"Qual é o maior? 78, 87, 70, 80",ops:["78","87","70","80"],resp:1,dica:"87>80>78>70.",visual:null},
+    {q:"Quantas dezenas tem 90?",ops:["9","19","90","0"],resp:0,dica:"90=9 dezenas.",visual:null},
+    {q:"Quantas unidades tem 73?",ops:["7","3","73","70"],resp:1,dica:"73=7 dezenas e 3 unidades.",visual:null},
+    {q:"100 - 1 = ?",ops:["98","99","100","97"],resp:1,dica:"Cem menos um.",visual:null},
+    {q:"50 + 50 = ?",ops:["50","100","150","200"],resp:1,dica:"Cinquenta mais cinquenta.",visual:null},
+    {q:"Completa: 68, 69, __, 71",ops:["67","69","70","72"],resp:2,dica:"Entre 69 e 71.",visual:null},
+    {q:"Qual é o menor? 51, 15, 55, 50",ops:["51","15","55","50"],resp:1,dica:"15 é o menor.",visual:null},
+    {q:"Ordena do maior ao menor: 33,93,53,73",ops:["93,73,53,33","33,53,73,93","73,93,33,53","53,33,93,73"],resp:0,dica:"Começa pelo maior.",visual:null},
+  ]},
+  {id:"2_2",nome:"Adição até 100",emoji:"➕",desc:"Adição na forma horizontal e vertical até 100",questoes:[
+    {q:"23 + 14 = ?",ops:["36","37","38","39"],resp:1,dica:"20+10=30, 3+4=7, total=37.",visual:null},
+    {q:"45 + 30 = ?",ops:["65","75","85","70"],resp:1,dica:"45+30=75.",visual:null},
+    {q:"56 + 27 = ?",ops:["73","83","72","82"],resp:1,dica:"56+27=83.",visual:null},
+    {q:"A Beatriz tem 32 MT e ganhou mais 25 MT:",ops:["55","57","56","58"],resp:1,dica:"32+25=57.",visual:null},
+    {q:"18 + 18 = ?",ops:["36","26","46","35"],resp:0,dica:"18+18=36.",visual:null},
+    {q:"60 + 40 = ?",ops:["80","90","100","110"],resp:2,dica:"60+40=100.",visual:null},
+    {q:"47 + 13 = ?",ops:["50","60","70","80"],resp:1,dica:"47+13=60.",visual:null},
+    {q:"28 meninos + 32 meninas. Total:",ops:["58","60","62","56"],resp:1,dica:"28+32=60.",visual:null},
+    {q:"35 + 35 = ?",ops:["60","65","70","75"],resp:2,dica:"35+35=70.",visual:null},
+    {q:"72 + 18 = ?",ops:["80","90","100","88"],resp:1,dica:"72+18=90.",visual:null},
+  ]},
+  {id:"2_3",nome:"Subtracção até 100",emoji:"➖",desc:"Subtracção na forma horizontal e vertical até 100",questoes:[
+    {q:"50 - 20 = ?",ops:["20","30","40","50"],resp:1,dica:"Cinquenta menos vinte.",visual:null},
+    {q:"87 - 34 = ?",ops:["51","52","53","54"],resp:2,dica:"80-30=50, 7-4=3, total=53.",visual:null},
+    {q:"100 - 45 = ?",ops:["45","55","65","75"],resp:1,dica:"100-45=55.",visual:null},
+    {q:"Tinha 60 MT, gastei 25 MT. Sobrou:",ops:["25","35","45","55"],resp:1,dica:"60-25=35.",visual:null},
+    {q:"76 - 76 = ?",ops:["0","1","76","7"],resp:0,dica:"Qualquer número menos ele mesmo = 0.",visual:null},
+    {q:"99 - 9 = ?",ops:["80","90","99","89"],resp:1,dica:"99-9=90.",visual:null},
+    {q:"63 - 28 = ?",ops:["33","35","37","39"],resp:1,dica:"63-28=35.",visual:null},
+    {q:"80 alunos, foram embora 30. Ficaram:",ops:["40","50","60","70"],resp:1,dica:"80-30=50.",visual:null},
+    {q:"45 - 15 = ?",ops:["20","30","40","25"],resp:1,dica:"45-15=30.",visual:null},
+    {q:"70 - 1 = ?",ops:["70","69","68","71"],resp:1,dica:"70 menos 1.",visual:null},
+  ]},
+  {id:"2_4",nome:"Multiplicação até 50",emoji:"✖️",desc:"Multiplicação e números pares e ímpares",questoes:[
+    {q:"2 × 3 = ?",ops:["4","5","6","7"],resp:2,dica:"2+2+2=6.",visual:null},
+    {q:"5 × 4 = ?",ops:["15","20","25","10"],resp:1,dica:"5×4=20.",visual:null},
+    {q:"3 × 3 = ?",ops:["6","7","8","9"],resp:3,dica:"3+3+3=9.",visual:null},
+    {q:"Qual número é PAR?",ops:["3","5","7","8"],resp:3,dica:"Par = divisível por 2.",visual:null},
+    {q:"Qual número é ÍMPAR?",ops:["4","6","9","10"],resp:2,dica:"Ímpar = não divisível por 2.",visual:null},
+    {q:"4 × 5 = ?",ops:["16","20","24","15"],resp:1,dica:"4×5=20.",visual:null},
+    {q:"6 filas com 5 carteiras cada. Total:",ops:["25","30","35","11"],resp:1,dica:"6×5=30.",visual:null},
+    {q:"2 × 10 = ?",ops:["10","20","12","22"],resp:1,dica:"2×10=20.",visual:null},
+    {q:"Os números 2,4,6,8 são:",ops:["Ímpares","Pares","Ordinais","Primos"],resp:1,dica:"Terminam em 0,2,4,6,8.",visual:null},
+    {q:"7 × 2 = ?",ops:["12","13","14","15"],resp:2,dica:"7+7=14.",visual:null},
+  ]},
+  {id:"2_5",nome:"Espaço e Forma",emoji:"📐",desc:"Pontos, linhas, segmentos, figuras planas — 2ª classe",questoes:[
+    {q:"Um PONTO indica:",ops:["Uma linha","Uma posição no espaço","Um ângulo","Um círculo"],resp:1,dica:"O ponto indica posição.",visual:"ponto"},
+    {q:"Uma LINHA RECTA vai em direcção:",ops:["Curva","Recta, sem curvas","Em espiral","Redonda"],resp:1,dica:"Recta = sem curvas.",visual:"linha_recta"},
+    {q:"Um SEGMENTO DE RECTA tem:",ops:["Só início","Só fim","Início e fim","Nem início nem fim"],resp:2,dica:"Segmento tem dois pontos: início e fim.",visual:"segmento"},
+    {q:"Um quadrado tem todos os lados:",ops:["Diferentes","Iguais","Dois iguais","Três iguais"],resp:1,dica:"4 lados iguais.",visual:"quadrado"},
+    {q:"Num rectângulo, os lados opostos são:",ops:["Diferentes","Iguais","Perpendiculares","Todos iguais"],resp:1,dica:"Opostos iguais.",visual:"retangulo"},
+    {q:"Quantos vértices tem um quadrado?",ops:["2","3","4","5"],resp:2,dica:"Cada canto é um vértice.",visual:"quadrado"},
+    {q:"A circunferência é:",ops:["Uma linha recta","Uma linha curva fechada","Um triângulo","Um quadrado"],resp:1,dica:"A circunferência é como um círculo.",visual:"circulo"},
+    {q:"Um rectângulo tem quantos ângulos rectos?",ops:["2","3","4","0"],resp:2,dica:"Cada canto do rectângulo = ângulo recto.",visual:"retangulo"},
+    {q:"Linha CURVA é:",ops:["Sem curvas","Com curvas","Com ângulos","Recta"],resp:1,dica:"Curva tem dobras.",visual:"linha_curva"},
+    {q:"Uma linha recta pode ser:",ops:["Só horizontal","Só vertical","Horizontal, vertical ou inclinada","Só curva"],resp:2,dica:"Recta pode ser em qualquer direcção.",visual:"linha_recta"},
+  ]},
+  {id:"2_6",nome:"Grandezas e Medidas",emoji:"📏",desc:"Comprimento, massa e capacidade — 2ª classe",questoes:[
+    {q:"Qual instrumento serve para medir comprimento?",ops:["Balança","Régua","Copo","Relógio"],resp:1,dica:"A régua mede tamanho.",visual:null},
+    {q:"1 metro = ? centímetros",ops:["10","100","1000","1"],resp:1,dica:"1m=100cm.",visual:null},
+    {q:"Uma balança serve para medir:",ops:["Comprimento","Tempo","Massa/peso","Temperatura"],resp:2,dica:"A balança pesa.",visual:null},
+    {q:"1 quilograma = ? gramas",ops:["10","100","1000","500"],resp:2,dica:"1kg=1000g.",visual:null},
+    {q:"O litro é unidade de:",ops:["Massa","Comprimento","Capacidade","Tempo"],resp:2,dica:"Litro mede líquidos.",visual:null},
+    {q:"Uma garrafa de 1 litro. Metade é:",ops:["250ml","500ml","750ml","1000ml"],resp:1,dica:"Metade de 1000ml=500ml.",visual:null},
+    {q:"5 kg + 3 kg = ?",ops:["6 kg","7 kg","8 kg","9 kg"],resp:2,dica:"5+3=8.",visual:null},
+    {q:"Uma criança mede 120 cm. Em metros:",ops:["12 m","1,2 m","0,12 m","120 m"],resp:1,dica:"120÷100=1,2m.",visual:null},
+    {q:"Qual é maior: 2 litros ou 1500 ml?",ops:["1500 ml","2 litros","São iguais","Não sei"],resp:1,dica:"2 litros=2000ml>1500ml.",visual:null},
+    {q:"A régua mede em:",ops:["Quilos","Litros","Centímetros","Segundos"],resp:2,dica:"cm = centímetros.",visual:null},
+  ]},
+],
+3:[
+  {id:"3_1",nome:"Números até 10 000",emoji:"🔟",desc:"Leitura, escrita, composição e decomposição até 10 000",questoes:[
+    {q:"Como se lê 3456?",ops:["Três mil duzentos e cinquenta e seis","Três mil quatrocentos e cinquenta e seis","Trinta e quatro, cinquenta e seis","Três mil quarenta e cinco"],resp:1,dica:"3000+400+50+6.",visual:null},
+    {q:"Qual é o valor posicional do 4 em 4628?",ops:["4","40","400","4000"],resp:3,dica:"4 está nos milhares.",visual:null},
+    {q:"5000 + 400 + 30 + 7 = ?",ops:["5347","5473","5437","5374"],resp:2,dica:"Une os valores.",visual:null},
+    {q:"Qual é o maior? 8999, 9001, 9000, 8001",ops:["8999","9001","9000","8001"],resp:1,dica:"9001 é o maior.",visual:null},
+    {q:"10 000 - 1 = ?",ops:["9998","9999","10001","9990"],resp:1,dica:"Dez mil menos um.",visual:null},
+    {q:"7352 = 7000 + __ + 50 + 2",ops:["30","300","3000","3"],resp:1,dica:"Qual o valor das centenas?",visual:null},
+    {q:"Como se escreve 'seis mil e cem'?",ops:["6001","6010","6100","6000"],resp:2,dica:"6000+100=6100.",visual:null},
+    {q:"Ordena do menor ao maior: 4321,4213,4312,4123",ops:["4123,4213,4312,4321","4321,4312,4213,4123","4213,4123,4312,4321","4312,4123,4213,4321"],resp:0,dica:"Compara dígito a dígito.",visual:null},
+    {q:"Escreve em algarismos: dois mil trezentos e vinte e um",ops:["2032","2321","2231","2312"],resp:1,dica:"2000+300+20+1.",visual:null},
+    {q:"3000+0+50+9 = ?",ops:["3059","3509","3095","3590"],resp:0,dica:"3000+50+9=3059.",visual:null},
+  ]},
+  {id:"3_2",nome:"Números Ordinais e Romanos",emoji:"🏆",desc:"Ordinais até 50º e números romanos até L (50)",questoes:[
+    {q:"O décimo quinto em algarismo ordinal:",ops:["14º","15º","16º","50º"],resp:1,dica:"Décimo quinto=15º.",visual:null},
+    {q:"III em numeração romana equivale a:",ops:["2","3","4","13"],resp:1,dica:"I=1, II=2, III=3.",visual:null},
+    {q:"X em numeração romana vale:",ops:["5","10","15","20"],resp:1,dica:"X=10.",visual:null},
+    {q:"V em numeração romana vale:",ops:["4","5","6","10"],resp:1,dica:"V=5.",visual:null},
+    {q:"L em numeração romana vale:",ops:["5","10","50","100"],resp:2,dica:"L=50.",visual:null},
+    {q:"XIV em numeração romana vale:",ops:["14","16","9","11"],resp:0,dica:"XIV=X+IV=10+4=14.",visual:null},
+    {q:"20 em numeração romana:",ops:["XX","VV","XXX","X"],resp:0,dica:"XX=10+10=20.",visual:null},
+    {q:"O 30º em palavras:",ops:["Vigésimo","Trigésimo","Quadragésimo","Décimo"],resp:1,dica:"30º=trigésimo.",visual:null},
+    {q:"XXV em numeração romana vale:",ops:["20","25","30","15"],resp:1,dica:"XXV=10+10+5=25.",visual:null},
+    {q:"A Fátima chegou em 3º lugar. Em palavras:",ops:["Primeiro","Segundo","Terceiro","Quarto"],resp:2,dica:"3º=terceiro.",visual:null},
+  ]},
+  {id:"3_3",nome:"Espaço e Forma",emoji:"📐",desc:"Triângulos, rectas paralelas/perpendiculares, rectângulos, círculo, sólidos",questoes:[
+    {q:"Rectas PERPENDICULARES formam ângulo de:",ops:["45°","60°","90°","180°"],resp:2,dica:"Ângulo recto=90°.",visual:"angulo_recto"},
+    {q:"Rectas PARALELAS são:",ops:["Que se cruzam","Que nunca se cruzam","Que formam ângulos","Curvas"],resp:1,dica:"Paralelas = sempre à mesma distância.",visual:"paralelas"},
+    {q:"Um triângulo EQUILÁTERO tem:",ops:["3 lados diferentes","2 lados iguais","3 lados iguais","Nenhum lado igual"],resp:2,dica:"Equi=igual, látero=lado.",visual:"triangulo_equilatero"},
+    {q:"A circunferência é conjunto de pontos:",ops:["Dentro","À mesma distância do centro","Fora","No centro"],resp:1,dica:"O raio é sempre igual.",visual:"circulo"},
+    {q:"Num triângulo RECTÂNGULO existe:",ops:["Um ângulo de 90°","Dois ângulos de 90°","Três ângulos iguais","Nenhum ângulo"],resp:0,dica:"Rectângulo = tem um ângulo recto.",visual:"triangulo_retangulo"},
+    {q:"Quantos lados tem um rectângulo?",ops:["3","4","5","6"],resp:1,dica:"Conta os lados.",visual:"retangulo"},
+    {q:"Um CUBO tem quantas faces?",ops:["4","5","6","8"],resp:2,dica:"6 faces quadradas.",visual:"cubo"},
+    {q:"Uma ESFERA é como:",ops:["Uma caixa","Uma bola","Uma pirâmide","Um cone"],resp:1,dica:"A bola é esférica.",visual:"esfera"},
+    {q:"Rectas paralelas têm mesma:",ops:["Cor","Direcção e nunca se encontram","Distância variada","Inclinação diferente"],resp:1,dica:"Paralelas = mesma direcção.",visual:"paralelas"},
+    {q:"Num triângulo ISÓSCELES:",ops:["3 lados iguais","2 lados iguais","3 lados diferentes","Nenhum lado igual"],resp:1,dica:"Isósceles=dois lados iguais.",visual:"triangulo_isosceles"},
+  ]},
+  {id:"3_4",nome:"Multiplicação",emoji:"✖️",desc:"Tabuada e multiplicação — 3ª classe",questoes:[
+    {q:"6 × 7 = ?",ops:["38","40","42","44"],resp:2,dica:"6×7=42.",visual:null},
+    {q:"8 × 9 = ?",ops:["63","70","72","81"],resp:2,dica:"8×9=72.",visual:null},
+    {q:"5 × 5 = ?",ops:["20","25","30","15"],resp:1,dica:"5×5=25.",visual:null},
+    {q:"9 × 9 = ?",ops:["72","80","81","90"],resp:2,dica:"9×9=81.",visual:null},
+    {q:"7 × 8 = ?",ops:["48","54","56","63"],resp:2,dica:"7×8=56.",visual:null},
+    {q:"9 galinheiros com 8 galinhas cada. Total:",ops:["63","72","81","56"],resp:1,dica:"9×8=72.",visual:null},
+    {q:"4 × 7 = ?",ops:["24","28","32","21"],resp:1,dica:"4×7=28.",visual:null},
+    {q:"3 × 9 = ?",ops:["24","27","30","21"],resp:1,dica:"3×9=27.",visual:null},
+    {q:"6 × 6 = ?",ops:["30","36","42","24"],resp:1,dica:"6×6=36.",visual:null},
+    {q:"Propriedade comutativa: 3×5 = ?",ops:["5+3","5×3","5-3","5÷3"],resp:1,dica:"a×b = b×a",visual:null},
+  ]},
+  {id:"3_5",nome:"Divisão",emoji:"➗",desc:"Divisão de números naturais incluindo divisão com resto",questoes:[
+    {q:"12 ÷ 3 = ?",ops:["3","4","5","6"],resp:1,dica:"12÷3=4.",visual:null},
+    {q:"20 ÷ 4 = ?",ops:["4","5","6","7"],resp:1,dica:"20÷4=5.",visual:null},
+    {q:"27 ÷ 9 = ?",ops:["2","3","4","5"],resp:1,dica:"27÷9=3.",visual:null},
+    {q:"45 ÷ 5 = ?",ops:["7","8","9","10"],resp:2,dica:"45÷5=9.",visual:null},
+    {q:"13 ÷ 4 = ? (com resto)",ops:["3 R1","3 R2","3 R3","4 R0"],resp:0,dica:"4×3=12, sobra 1.",visual:null},
+    {q:"25 ÷ 6 = ? (com resto)",ops:["4 R1","4 R2","4 R3","4 R4"],resp:0,dica:"6×4=24, sobra 1.",visual:null},
+    {q:"30 laranjas ÷ 6 crianças = ?",ops:["4","5","6","7"],resp:1,dica:"30÷6=5.",visual:null},
+    {q:"72 ÷ 8 = ?",ops:["7","8","9","10"],resp:2,dica:"72÷8=9.",visual:null},
+    {q:"12÷3=4 porque 4×3=?",ops:["7","10","12","15"],resp:2,dica:"4×3=12.",visual:null},
+    {q:"56 ÷ 8 = ?",ops:["5","6","7","8"],resp:2,dica:"56÷8=7.",visual:null},
+  ]},
+  {id:"3_6",nome:"Grandezas e Medidas",emoji:"⏱️",desc:"Comprimento, massa, capacidade e tempo — 3ª classe",questoes:[
+    {q:"1 km = ? metros",ops:["10","100","1000","10000"],resp:2,dica:"1km=1000m.",visual:null},
+    {q:"1 kg = ? gramas",ops:["10","100","1000","100000"],resp:2,dica:"1kg=1000g.",visual:null},
+    {q:"1 litro = ? mililitros",ops:["10","100","1000","10000"],resp:2,dica:"1L=1000mL.",visual:null},
+    {q:"Quantos minutos tem 1 hora?",ops:["24","30","60","100"],resp:2,dica:"1h=60min.",visual:null},
+    {q:"Quantas horas tem 1 dia?",ops:["12","24","48","60"],resp:1,dica:"1 dia=24 horas.",visual:null},
+    {q:"Quantos dias tem 1 semana?",ops:["5","6","7","8"],resp:2,dica:"Segunda a Domingo=7.",visual:null},
+    {q:"500g + 500g = ?",ops:["500g","1kg","1500g","250g"],resp:1,dica:"500+500=1000g=1kg.",visual:null},
+    {q:"2km + 500m = ? m",ops:["2500m","2050m","2005m","250m"],resp:0,dica:"2km=2000m, +500m=2500m.",visual:null},
+    {q:"Aula das 7h30 às 8h30. Duração:",ops:["30 min","1 hora","1h30","2 horas"],resp:1,dica:"7h30 a 8h30 = 1 hora.",visual:null},
+    {q:"1m = ? centímetros",ops:["10","100","1000","1"],resp:1,dica:"1m=100cm.",visual:null},
+  ]},
+  {id:"3_7",nome:"Fracções",emoji:"½",desc:"Noção de fracção: numerador, denominador, partes iguais",questoes:[
+    {q:"Na fracção ¾, o NUMERADOR é:",ops:["3","4","7","1"],resp:0,dica:"Numerador = número de cima.",visual:null},
+    {q:"Na fracção ¾, o DENOMINADOR é:",ops:["3","4","7","1"],resp:1,dica:"Denominador = número de baixo.",visual:null},
+    {q:"½ significa:",ops:["1 parte de 3","1 parte de 2","2 partes de 1","1 parte de 10"],resp:1,dica:"½ = uma parte de duas iguais.",visual:null},
+    {q:"Pizza em 4 partes. Comer 1 parte é comer:",ops:["¼","½","¾","⅓"],resp:0,dica:"1 de 4 partes = ¼.",visual:null},
+    {q:"Qual fracção é maior: ½ ou ¼?",ops:["¼","½","Iguais","Não sei"],resp:1,dica:"Menor denominador = maior fracção.",visual:null},
+    {q:"⅔ significa:",ops:["2 partes de 3","3 partes de 2","2 partes de 6","6 partes de 2"],resp:0,dica:"2 de 3 partes iguais.",visual:null},
+    {q:"8 partes, come 3. A fracção é:",ops:["3/8","8/3","3/5","5/8"],resp:0,dica:"3 de 8 partes = 3/8.",visual:null},
+    {q:"Fracção com numerador = denominador é igual a:",ops:["0","½","1","2"],resp:2,dica:"Ex: 4/4=1.",visual:null},
+    {q:"5/5 = ?",ops:["0","0,5","1","5"],resp:2,dica:"Qualquer número sobre si mesmo = 1.",visual:null},
+    {q:"O denominador indica:",ops:["Partes comidas","Total de partes iguais","O numerador","O dobro"],resp:1,dica:"Denominador = total de partes.",visual:null},
+  ]},
+  {id:"3_8",nome:"Literacia Financeira",emoji:"💰",desc:"Moedas e notas moçambicanas, problemas com dinheiro",questoes:[
+    {q:"A moeda oficial de Moçambique:",ops:["Dólar","Euro","Metical","Libra"],resp:2,dica:"MT = Metical.",visual:null},
+    {q:"1 MT = ? centavos",ops:["10","100","1000","50"],resp:1,dica:"1 metical = 100 centavos.",visual:null},
+    {q:"Pão: 5 MT. Pago com 10 MT. Troco:",ops:["3 MT","5 MT","15 MT","4 MT"],resp:1,dica:"10-5=5.",visual:null},
+    {q:"Amélia tem 50 MT. Livro custa 35 MT. Sobram:",ops:["10 MT","15 MT","20 MT","25 MT"],resp:1,dica:"50-35=15.",visual:null},
+    {q:"1 manga = 3 MT. 5 mangas custam:",ops:["8 MT","10 MT","15 MT","12 MT"],resp:2,dica:"3×5=15.",visual:null},
+    {q:"Nota de 50 MT + nota de 20 MT:",ops:["60 MT","70 MT","80 MT","30 MT"],resp:1,dica:"50+20=70.",visual:null},
+    {q:"3 canetas a 8 MT cada. Total:",ops:["11 MT","16 MT","24 MT","18 MT"],resp:2,dica:"3×8=24.",visual:null},
+    {q:"10 laranjas a 2 MT cada. Total:",ops:["12 MT","20 MT","22 MT","8 MT"],resp:1,dica:"10×2=20.",visual:null},
+    {q:"Tenho 100 MT. Gasto 45 MT. Sobram:",ops:["45 MT","55 MT","65 MT","50 MT"],resp:1,dica:"100-45=55.",visual:null},
+    {q:"30 MT ÷ 6 pessoas = ?",ops:["3 MT","5 MT","6 MT","8 MT"],resp:1,dica:"30÷6=5.",visual:null},
+  ]},
+],
+4:[
+  {id:"4_1",nome:"Números até 1 000 000",emoji:"💫",desc:"Leitura, escrita e decomposição até 1 000 000",questoes:[
+    {q:"Como se lê 125 430?",ops:["Cento e vinte e cinco mil quatrocentos e trinta","Doze mil quinhentos e quarenta e três","Um milhão duzentos e cinquenta e quatro","Cento e vinte e cinco quatrocentos"],resp:0,dica:"125000+430.",visual:null},
+    {q:"Valor posicional do 3 em 234 567:",ops:["3","300","3000","30000"],resp:3,dica:"3 está nas dezenas de milhar.",visual:null},
+    {q:"500000+40000+3000+200+50+6 = ?",ops:["543 256","543 206","534 256","543 526"],resp:0,dica:"Une todos os valores.",visual:null},
+    {q:"Maior: 987 654 ou 978 456?",ops:["978 456","987 654","Iguais","Não sei"],resp:1,dica:"Compare o segundo dígito.",visual:null},
+    {q:"1 000 000 - 1 = ?",ops:["999 998","999 999","1 000 001","999 000"],resp:1,dica:"Um milhão menos um.",visual:null},
+    {q:"3 × 100 000 = ?",ops:["300","3 000","30 000","300 000"],resp:3,dica:"3 centenas de milhar.",visual:null},
+    {q:"Dígito das centenas em 456 789:",ops:["4","5","6","7"],resp:2,dica:"Terceiro da direita.",visual:null},
+    {q:"Como se escreve 'duzentos e cinquenta mil e um'?",ops:["250 001","250 100","205 001","250 010"],resp:0,dica:"250000+1=250001.",visual:null},
+    {q:"700 000 + 30 000 = ?",ops:["703 000","730 000","700 300","73 000"],resp:1,dica:"Setecentos e trinta mil.",visual:null},
+    {q:"Ordena do maior ao menor: 100000, 999999, 500000, 750000",ops:["999999,750000,500000,100000","100000,500000,750000,999999","750000,999999,100000,500000","500000,100000,999999,750000"],resp:0,dica:"Começa pelo maior.",visual:null},
+  ]},
+  {id:"4_2",nome:"Ângulos e Geometria",emoji:"📐",desc:"Ângulos, circunferência, triângulos, quadriláteros, sólidos — 4ª classe",questoes:[
+    {q:"Um ângulo RECTO mede:",ops:["45°","60°","90°","180°"],resp:2,dica:"Ângulo recto = 90°.",visual:"angulo_recto"},
+    {q:"Um ângulo AGUDO é:",ops:["Maior que 90°","Igual a 90°","Menor que 90°","Igual a 180°"],resp:2,dica:"Agudo = menor que 90°.",visual:"angulo_agudo"},
+    {q:"Um ângulo OBTUSO é:",ops:["Menor que 90°","Igual a 90°","Entre 90° e 180°","Igual a 180°"],resp:2,dica:"Obtuso = entre 90° e 180°.",visual:"angulo_obtuso"},
+    {q:"O raio é em relação ao diâmetro:",ops:["O dobro","A metade","Igual","O triplo"],resp:1,dica:"Diâmetro = 2 × raio.",visual:"circulo"},
+    {q:"Triângulo ISÓSCELES tem:",ops:["3 lados iguais","2 lados iguais","3 lados diferentes","0 lados iguais"],resp:1,dica:"Dois lados iguais.",visual:"triangulo_isosceles"},
+    {q:"Soma dos ângulos internos de qualquer triângulo:",ops:["90°","180°","270°","360°"],resp:1,dica:"Todo triângulo: 180°.",visual:"triangulo"},
+    {q:"Um QUADRADO é tipo especial de:",ops:["Triângulo","Círculo","Rectângulo","Losango"],resp:2,dica:"Rectângulo com todos os lados iguais.",visual:"quadrado"},
+    {q:"Faces de um CUBO:",ops:["4","5","6","8"],resp:2,dica:"6 faces quadradas.",visual:"cubo"},
+    {q:"Um CILINDRO tem quantas bases circulares?",ops:["0","1","2","3"],resp:2,dica:"Base em cima e em baixo.",visual:"cilindro"},
+    {q:"PIRÂMIDE de base quadrada tem quantas faces triangulares?",ops:["2","3","4","5"],resp:2,dica:"4 faces laterais.",visual:"piramide"},
+  ]},
+  {id:"4_3",nome:"Adição e Subtracção",emoji:"➕",desc:"Adição e subtracção de números grandes (até 6 dígitos)",questoes:[
+    {q:"234 567 + 123 456 = ?",ops:["357 023","358 023","357 123","368 023"],resp:1,dica:"Some coluna a coluna.",visual:null},
+    {q:"500 000 - 234 567 = ?",ops:["265 433","264 433","265 533","275 433"],resp:0,dica:"500000-234567.",visual:null},
+    {q:"Nampula (663 212) - Beira (592 090) = ?",ops:["70 122","71 122","71 012","70 022"],resp:1,dica:"663212-592090.",visual:null},
+    {q:"345 678 + 654 322 = ?",ops:["999 000","1 000 000","1 000 100","999 900"],resp:1,dica:"345678+654322=1000000.",visual:null},
+    {q:"400 000 + 350 000 = ?",ops:["640 000","700 000","750 000","800 000"],resp:2,dica:"4+3,5=7,5 centenas de milhar.",visual:null},
+    {q:"999 999 + 1 = ?",ops:["999 000","1 000 000","1 000 001","999 999"],resp:1,dica:"O próximo após 999999.",visual:null},
+    {q:"700 000 - 1 = ?",ops:["699 999","699 998","700 001","698 999"],resp:0,dica:"700000-1=699999.",visual:null},
+    {q:"125 000 + 75 000 = ?",ops:["190 000","200 000","210 000","220 000"],resp:1,dica:"125+75=200 mil.",visual:null},
+    {q:"450 000 - 150 000 = ?",ops:["200 000","250 000","300 000","350 000"],resp:2,dica:"450-150=300.",visual:null},
+    {q:"Cálculo mental: 600 000 + 400 000 = ?",ops:["900 000","1 000 000","1 100 000","10 000 000"],resp:1,dica:"6+4=10 centenas de milhar=1000000.",visual:null},
+  ]},
+  {id:"4_4",nome:"Multiplicação e Divisão",emoji:"✖️",desc:"Multiplicação e divisão de números maiores — 4ª classe",questoes:[
+    {q:"345 × 4 = ?",ops:["1 280","1 380","1 480","1 580"],resp:1,dica:"345×4=1380.",visual:null},
+    {q:"6 × 500 = ?",ops:["300","3 000","30 000","3 300"],resp:1,dica:"6×500=3000.",visual:null},
+    {q:"1 260 ÷ 6 = ?",ops:["180","200","210","220"],resp:2,dica:"1260÷6=210.",visual:null},
+    {q:"48 × 25 = ?",ops:["1 100","1 200","1 300","1 400"],resp:1,dica:"48×25=1200.",visual:null},
+    {q:"12 turmas × 35 alunos = ?",ops:["400","420","440","460"],resp:1,dica:"12×35=420.",visual:null},
+    {q:"840 ÷ 7 = ?",ops:["100","110","120","130"],resp:2,dica:"840÷7=120.",visual:null},
+    {q:"25 × 40 = ?",ops:["100","1000","10000","100000"],resp:1,dica:"25×4=100, ×10=1000.",visual:null},
+    {q:"Propriedade distributiva: 6×(10+5) = ?",ops:["60+5","60+30","6×10+6×5","6×10+5"],resp:2,dica:"6×10+6×5=60+30=90.",visual:null},
+    {q:"432 ÷ 4 = ?",ops:["88","98","108","118"],resp:2,dica:"432÷4=108.",visual:null},
+    {q:"1200 kg ÷ sacos de 20 kg = ?",ops:["50","60","70","80"],resp:1,dica:"1200÷20=60.",visual:null},
+  ]},
+  {id:"4_5",nome:"Fracções",emoji:"½",desc:"Tipos de fracções, adição e subtracção — 4ª classe",questoes:[
+    {q:"Fracção PRÓPRIA tem:",ops:["Numerador > denominador","Numerador = denominador","Numerador < denominador","Denominador = 0"],resp:2,dica:"Própria: numerador < denominador.",visual:null},
+    {q:"Fracção IMPRÓPRIA tem:",ops:["Numerador < denominador","Numerador = denominador","Numerador > denominador","Denominador = 1"],resp:2,dica:"Imprópria: numerador ≥ denominador.",visual:null},
+    {q:"½ + ½ = ?",ops:["½","1","¼","2"],resp:1,dica:"½+½=2/2=1.",visual:null},
+    {q:"¾ - ¼ = ?",ops:["¼","½","¾","1"],resp:1,dica:"3/4-1/4=2/4=½.",visual:null},
+    {q:"Simplifica 4/8:",ops:["¼","⅓","½","⅔"],resp:2,dica:"4/8=1/2.",visual:null},
+    {q:"Número misto de 7/3:",ops:["1⅔","2⅓","3⅓","2⅔"],resp:1,dica:"7÷3=2 resto 1, então 2⅓.",visual:null},
+    {q:"⅖ + ⅖ = ?",ops:["1/5","2/5","3/5","4/5"],resp:3,dica:"2/5+2/5=4/5.",visual:null},
+    {q:"Maior: ⅗ ou ⅖?",ops:["⅖","⅗","Iguais","Não sei"],resp:1,dica:"3>2, mesmo denominador.",visual:null},
+    {q:"Fracção equivalente a ½:",ops:["2/3","2/4","3/5","3/4"],resp:1,dica:"1×2/2×2=2/4.",visual:null},
+    {q:"Machamba em 5 partes. Mandioca em 3. Fracção:",ops:["2/5","3/5","5/3","5/2"],resp:1,dica:"3 de 5 partes=3/5.",visual:null},
+  ]},
+  {id:"4_6",nome:"Números Decimais",emoji:"🔢",desc:"Noção, adição e subtracção de números decimais",questoes:[
+    {q:"0,5 = ?",ops:["5/100","5/10","5","50/10"],resp:1,dica:"0,5=5 décimas=5/10.",visual:null},
+    {q:"0,3 + 0,4 = ?",ops:["0,1","0,7","1,0","7,0"],resp:1,dica:"3+4=7 décimas=0,7.",visual:null},
+    {q:"1,5 - 0,7 = ?",ops:["0,6","0,7","0,8","0,9"],resp:2,dica:"15-7=8 décimas=0,8.",visual:null},
+    {q:"Maior: 1,4 ou 1,8?",ops:["1,4","1,8","Iguais","Não sei"],resp:1,dica:"8>4 nas décimas.",visual:null},
+    {q:"2,5 + 1,3 = ?",ops:["3,5","3,8","4,0","3,2"],resp:1,dica:"2,5+1,3=3,8.",visual:null},
+    {q:"3,0 - 1,5 = ?",ops:["1,0","1,5","2,0","2,5"],resp:1,dica:"3,0-1,5=1,5.",visual:null},
+    {q:"0,25 em palavras:",ops:["Vinte e cinco centésimos","Dois décimos e cinco","Vinte e cinco décimos","Dois e meio"],resp:0,dica:"0,25=25 centésimas.",visual:null},
+    {q:"4,7 - 2,3 = ?",ops:["2,0","2,4","2,7","3,0"],resp:1,dica:"4,7-2,3=2,4.",visual:null},
+    {q:"Pão: 5,50 MT. Pago 10 MT. Troco:",ops:["4,00 MT","4,50 MT","5,00 MT","5,50 MT"],resp:1,dica:"10-5,50=4,50.",visual:null},
+    {q:"1,25 em fracção:",ops:["125/10","125/100","125/1000","12,5/10"],resp:1,dica:"1,25=125 centésimas.",visual:null},
+  ]},
+  {id:"4_7",nome:"Grandezas e Medidas",emoji:"📏",desc:"Comprimento, área, massa e tempo — 4ª classe",questoes:[
+    {q:"Área de rectângulo 6m × 4m:",ops:["10 m²","20 m²","24 m²","48 m²"],resp:2,dica:"A=c×l=6×4=24.",visual:null},
+    {q:"1 tonelada = ? kg",ops:["10","100","1000","10000"],resp:2,dica:"1t=1000kg.",visual:null},
+    {q:"Minutos em 3 horas:",ops:["30","90","180","300"],resp:2,dica:"3×60=180min.",visual:null},
+    {q:"Área de quadrado lado 5m:",ops:["10 m²","20 m²","25 m²","30 m²"],resp:2,dica:"A=5²=25.",visual:null},
+    {q:"1h30min em minutos:",ops:["80","90","100","130"],resp:1,dica:"60+30=90min.",visual:null},
+    {q:"Perímetro de quadrado lado 8cm:",ops:["16 cm","24 cm","32 cm","64 cm"],resp:2,dica:"P=4×8=32.",visual:null},
+    {q:"2500 g = ? kg",ops:["0,25 kg","2,5 kg","25 kg","250 kg"],resp:1,dica:"2500÷1000=2,5kg.",visual:null},
+    {q:"Aula 07:45 a 09:15. Duração:",ops:["1h","1h15","1h30","2h"],resp:2,dica:"De 07:45 a 09:15=1h30.",visual:null},
+    {q:"5km + 300m = ? m",ops:["5300m","5030m","530m","5003m"],resp:0,dica:"5km=5000m, +300m=5300m.",visual:null},
+    {q:"1km = ? m",ops:["10","100","1000","10000"],resp:2,dica:"1km=1000m.",visual:null},
+  ]},
+  {id:"4_8",nome:"Literacia Financeira",emoji:"💳",desc:"Poupança, despesas, receitas e orçamento — 4ª classe",questoes:[
+    {q:"RECEITA é:",ops:["Dinheiro gasto","Dinheiro recebido","Dívida","Imposto"],resp:1,dica:"Receita = dinheiro que entra.",visual:null},
+    {q:"DESPESA é:",ops:["Dinheiro recebido","Dinheiro gasto","Lucro","Poupança"],resp:1,dica:"Despesa = dinheiro que sai.",visual:null},
+    {q:"Recebi 500 MT, gastei 350 MT. Poupança:",ops:["100 MT","150 MT","200 MT","850 MT"],resp:1,dica:"500-350=150.",visual:null},
+    {q:"Comprei a 30 MT, vendi a 50 MT. Lucro:",ops:["10 MT","20 MT","30 MT","80 MT"],resp:1,dica:"50-30=20.",visual:null},
+    {q:"Rendimento 8000 MT, gasta 6500 MT. Poupança:",ops:["1000 MT","1500 MT","2000 MT","2500 MT"],resp:1,dica:"8000-6500=1500.",visual:null},
+    {q:"5 kg arroz a 80 MT/kg. Total:",ops:["350 MT","400 MT","450 MT","500 MT"],resp:1,dica:"5×80=400.",visual:null},
+    {q:"200 MT/mês. Em 6 meses:",ops:["600 MT","1000 MT","1200 MT","1400 MT"],resp:2,dica:"200×6=1200.",visual:null},
+    {q:"PREJUÍZO acontece quando:",ops:["Receita > Despesa","Receita = Despesa","Receita < Despesa","Poupança > 0"],resp:2,dica:"Prejuízo = gasta mais do que recebe.",visual:null},
+    {q:"10% de juro sobre 1000 MT:",ops:["10 MT","50 MT","100 MT","1000 MT"],resp:2,dica:"10% de 1000=100.",visual:null},
+    {q:"ORÇAMENTO é:",ops:["Dinheiro guardado","Plano de receitas e despesas","Imposto","Salário"],resp:1,dica:"Orçamento = planear o dinheiro.",visual:null},
+  ]},
+],
+5:[
+  {id:"5_1",nome:"Números até 1 000 000 000",emoji:"🔢",desc:"Leitura e escrita de números até mil milhões — 5ª classe",questoes:[
+    {q:"Como se lê 1 000 000 000?",ops:["Um milhão","Cem milhões","Mil milhões","Dois mil"],resp:2,dica:"9 zeros = mil milhões.",visual:null},
+    {q:"Valor posicional do 5 em 500 000 000:",ops:["5 mil","5 milhões","50 milhões","500 milhões (centenas de milhões)"],resp:3,dica:"Centenas de milhões.",visual:null},
+    {q:"Arredonda 4789 ao milhar mais próximo:",ops:["4000","5000","4800","4700"],resp:1,dica:"789>500, arredonda para cima.",visual:null},
+    {q:"250 000 000 + 750 000 000 = ?",ops:["900 000 000","1 000 000 000","1 100 000 000","800 000 000"],resp:1,dica:"250+750=1000 milhões.",visual:null},
+    {q:"Como se escreve 'dois mil milhões'?",ops:["2 000 000","20 000 000","2 000 000 000","200 000 000"],resp:2,dica:"Mil milhões = 9 zeros.",visual:null},
+    {q:"999 999 999 + 1 = ?",ops:["1 000 000 000","999 999 998","1 000 000 001","999 999 000"],resp:0,dica:"O próximo após 999999999.",visual:null},
+    {q:"Arredonda 3 456 789 à centena de milhar:",ops:["3 000 000","3 400 000","3 500 000","3 460 000"],resp:2,dica:"456789>50000, sobe.",visual:null},
+    {q:"Dígito dos milhões em 123 456 789:",ops:["1","2","3","7"],resp:2,dica:"123[3]456789.",visual:null},
+    {q:"Moçambique tem ≈ 32 000 000 hab. Arredonda ao milhão:",ops:["30 000 000","32 000 000","35 000 000","40 000 000"],resp:1,dica:"Já está arredondado.",visual:null},
+    {q:"Ordena do menor: 987654321, 879654321, 987546321",ops:["879654321 < 987546321 < 987654321","987654321 < 987546321 < 879654321","São iguais","Nenhum"],resp:0,dica:"Compare dígito a dígito.",visual:null},
+  ]},
+  {id:"5_2",nome:"Espaço e Forma",emoji:"📐",desc:"Ângulos, triângulos, polígonos, sólidos — 5ª classe",questoes:[
+    {q:"Soma dos ângulos internos de qualquer triângulo:",ops:["90°","180°","270°","360°"],resp:1,dica:"Regra fundamental.",visual:"triangulo"},
+    {q:"Polígono REGULAR tem:",ops:["Lados diferentes","Todos os lados e ângulos iguais","Só ângulos iguais","Só lados iguais"],resp:1,dica:"Regular = tudo igual.",visual:"poligono_regular"},
+    {q:"Um HEXÁGONO tem quantos lados?",ops:["5","6","7","8"],resp:1,dica:"Hexa=6.",visual:"hexagono"},
+    {q:"Um PENTÁGONO tem quantos lados?",ops:["4","5","6","7"],resp:1,dica:"Penta=5.",visual:"pentagono"},
+    {q:"Soma dos ângulos de um quadrilátero:",ops:["180°","270°","360°","540°"],resp:2,dica:"Qualquer quadrilátero: 360°.",visual:"quadrilatero"},
+    {q:"Sólido com base circular e lateral curva que termina em ponto:",ops:["Cubo","Cilindro","Cone","Esfera"],resp:2,dica:"Cone = base redonda, topo em ponta.",visual:"cone"},
+    {q:"Arestas de um cubo:",ops:["6","8","12","16"],resp:2,dica:"Cubo: 12 arestas.",visual:"cubo"},
+    {q:"MEDIANA de um triângulo liga:",ops:["Dois vértices","Um vértice ao meio do lado oposto","Dois meios de lados","Dois ângulos"],resp:1,dica:"Mediana = vértice ao meio do lado oposto.",visual:"triangulo_mediana"},
+    {q:"Polígono com 8 lados:",ops:["Heptágono","Octógono","Hexágono","Decágono"],resp:1,dica:"Octo=8.",visual:"octagono"},
+    {q:"BISSECTRIZ divide um ângulo em:",ops:["Dois ângulos iguais","Dois ângulos diferentes","Três partes","Quatro partes"],resp:0,dica:"Bissectriz = divide ao meio.",visual:"angulo_recto"},
+  ]},
+  {id:"5_3",nome:"Multiplicação e Divisão",emoji:"✖️",desc:"Multiplicação e divisão com propriedades — 5ª classe",questoes:[
+    {q:"1234 × 5 = ?",ops:["6070","6170","6270","6370"],resp:1,dica:"1234×5=6170.",visual:null},
+    {q:"25 × 40 = ?",ops:["100","1000","10000","900"],resp:1,dica:"25×4=100, ×10=1000.",visual:null},
+    {q:"4500 ÷ 9 = ?",ops:["400","500","600","700"],resp:1,dica:"4500÷9=500.",visual:null},
+    {q:"(4+6) × 3 = ?",ops:["22","30","28","36"],resp:1,dica:"10×3=30.",visual:null},
+    {q:"6 × (100+50) = ?",ops:["650","750","900","1050"],resp:2,dica:"6×100+6×50=600+300=900.",visual:null},
+    {q:"12 × 12 = ?",ops:["120","134","144","154"],resp:2,dica:"12×12=144.",visual:null},
+    {q:"1000 ÷ 25 = ?",ops:["25","40","50","100"],resp:1,dica:"1000÷25=40.",visual:null},
+    {q:"24 escolas × 850 alunos = ?",ops:["20000","20400","21000","24850"],resp:1,dica:"24×850=20400.",visual:null},
+    {q:"Elemento NEUTRO da multiplicação:",ops:["0","1","2","10"],resp:1,dica:"Qualquer número × 1 = ele mesmo.",visual:null},
+    {q:"Elemento ABSORVENTE da multiplicação:",ops:["0","1","2","10"],resp:0,dica:"Qualquer número × 0 = 0.",visual:null},
+  ]},
+  {id:"5_4",nome:"Grandezas e Medidas",emoji:"⚖️",desc:"Massa, capacidade e área — 5ª classe",questoes:[
+    {q:"1 tonelada = ? kg",ops:["10","100","1000","10000"],resp:2,dica:"1t=1000kg.",visual:null},
+    {q:"1 hectolitro (hl) = ? litros",ops:["10","100","1000","10"],resp:1,dica:"1hl=100L.",visual:null},
+    {q:"Área do paralelogramo base 8cm, altura 5cm:",ops:["26cm²","40cm²","13cm²","35cm²"],resp:1,dica:"A=base×altura=8×5=40.",visual:null},
+    {q:"2,5 toneladas = ? kg",ops:["250","2500","25000","250000"],resp:1,dica:"2,5×1000=2500.",visual:null},
+    {q:"Área do triângulo base 10cm, altura 6cm:",ops:["30cm²","60cm²","16cm²","100cm²"],resp:0,dica:"A=b×h÷2=10×6÷2=30.",visual:null},
+    {q:"3hl + 50L = ? litros",ops:["350L","53L","305L","3050L"],resp:0,dica:"3hl=300L, +50L=350L.",visual:null},
+    {q:"Área do rectângulo 12m × 8m:",ops:["40m²","80m²","96m²","120m²"],resp:2,dica:"12×8=96.",visual:null},
+    {q:"1500 ml = ? litros",ops:["0,15L","1,5L","15L","150L"],resp:1,dica:"1500÷1000=1,5L.",visual:null},
+    {q:"Área do quadrado lado 9m:",ops:["36m²","72m²","81m²","18m²"],resp:2,dica:"9²=81.",visual:null},
+    {q:"500g + 1,5kg = ? kg",ops:["1,5kg","2kg","2,5kg","1kg"],resp:1,dica:"0,5+1,5=2kg.",visual:null},
+  ]},
+  {id:"5_5",nome:"Fracções",emoji:"½",desc:"Equivalentes, comparação, adição e subtracção com diferentes denominadores",questoes:[
+    {q:"½ e 2/4 são fracções:",ops:["Diferentes","Equivalentes","Impróprias","Mistas"],resp:1,dica:"½=2/4 (multiplica por 2/2).",visual:null},
+    {q:"Fracção equivalente a ⅓:",ops:["2/5","2/6","3/6","4/6"],resp:1,dica:"⅓×2/2=2/6.",visual:null},
+    {q:"Maior: ⅔ ou ¾?",ops:["⅔","¾","Iguais","Não sei"],resp:1,dica:"⅔=8/12, ¾=9/12. 9>8.",visual:null},
+    {q:"½ + ⅓ = ?",ops:["2/5","5/6","3/6","2/6"],resp:1,dica:"Denominador 6: 3/6+2/6=5/6.",visual:null},
+    {q:"¾ - ½ = ?",ops:["¼","½","⅛","⅔"],resp:0,dica:"¾-2/4=1/4.",visual:null},
+    {q:"⅔ + ¼ = ?",ops:["3/6","11/12","6/8","5/6"],resp:1,dica:"8/12+3/12=11/12.",visual:null},
+    {q:"5/6 - ⅓ = ?",ops:["4/6","3/6=½","2/6","1/6"],resp:1,dica:"5/6-2/6=3/6=½.",visual:null},
+    {q:"6÷3=2 e portanto 6/3=?",ops:["1","2","3","6"],resp:1,dica:"6÷3=2.",visual:null},
+    {q:"Machamba: ⅓ milho + ¼ feijão. Total plantado:",ops:["5/12","7/12","4/12","2/7"],resp:1,dica:"4/12+3/12=7/12.",visual:null},
+    {q:"Para comparar ⅔ e ¾, usamos o:",ops:["MDC","MMC","Numerador","Denominador"],resp:1,dica:"MMC = mínimo múltiplo comum.",visual:null},
+  ]},
+  {id:"5_6",nome:"Números Decimais",emoji:"📊",desc:"Decimais com 2 e 3 casas, adição e subtracção — 5ª classe",questoes:[
+    {q:"0,125 em fracção:",ops:["125/100","125/1000","12,5/100","1,25/10"],resp:1,dica:"0,125=125 milésimos.",visual:null},
+    {q:"1,25 + 2,75 = ?",ops:["3,00","4,00","3,75","4,25"],resp:1,dica:"1,25+2,75=4,00.",visual:null},
+    {q:"5,000 - 2,375 = ?",ops:["2,625","2,725","3,625","2,525"],resp:0,dica:"5-2,375=2,625.",visual:null},
+    {q:"0,3 × 10 = ?",ops:["0,03","0,3","3","30"],resp:2,dica:"×10 move vírgula 1 casa.",visual:null},
+    {q:"Maior: 0,09 ou 0,1?",ops:["0,09","0,1","Iguais","Não sei"],resp:1,dica:"0,1=0,10>0,09.",visual:null},
+    {q:"3,14 + 1,86 = ?",ops:["4,00","5,00","4,50","5,14"],resp:1,dica:"3,14+1,86=5,00.",visual:null},
+    {q:"10 - 3,765 = ?",ops:["6,235","7,235","6,335","7,335"],resp:0,dica:"10,000-3,765=6,235.",visual:null},
+    {q:"0,125 × 8 = ?",ops:["0,1","1","1,025","10"],resp:1,dica:"0,125×8=1,000.",visual:null},
+    {q:"Leite: 45,50 MT. Pão: 7,25 MT. Total:",ops:["52,00 MT","52,25 MT","52,75 MT","53,00 MT"],resp:2,dica:"45,50+7,25=52,75.",visual:null},
+    {q:"Arredonda 3,756 às décimas:",ops:["3,7","3,8","4,0","3,75"],resp:1,dica:"3,756: 5 nas centésimas arredonda para cima.",visual:null},
+  ]},
+  {id:"5_7",nome:"Literacia Financeira",emoji:"🏦",desc:"Poupança, investimento, juro simples, movimentos bancários",questoes:[
+    {q:"JURO SIMPLES calcula-se com:",ops:["Capital + Tempo","Capital × Taxa × Tempo","Capital ÷ Taxa","Capital - Taxa"],resp:1,dica:"J=C×T%×n.",visual:null},
+    {q:"Capital 2000 MT, 5%/ano, 2 anos. Juro:",ops:["100 MT","200 MT","400 MT","500 MT"],resp:1,dica:"J=2000×5%×2=200.",visual:null},
+    {q:"Produto 500 MT com 20% desconto. Preço final:",ops:["300 MT","400 MT","480 MT","520 MT"],resp:1,dica:"20%×500=100, 500-100=400.",visual:null},
+    {q:"DEPÓSITO bancário significa:",ops:["Retirar dinheiro","Colocar dinheiro no banco","Pagar dívida","Transferir"],resp:1,dica:"Depositar = pôr dinheiro.",visual:null},
+    {q:"Tenho 1500 MT. Levanto 800 MT. Saldo:",ops:["700 MT","800 MT","1300 MT","2300 MT"],resp:0,dica:"1500-800=700.",visual:null},
+    {q:"Ganho 4500 MT, gasto 3800 MT. Poupança:",ops:["600 MT","700 MT","800 MT","4500 MT"],resp:1,dica:"4500-3800=700.",visual:null},
+    {q:"TRANSFERÊNCIA bancária é:",ops:["Depositar em espécie","Enviar entre contas","Pedir empréstimo","Pagar juros"],resp:1,dica:"Transferir = mover entre contas.",visual:null},
+    {q:"DESCONTO é:",ops:["Aumento no preço","Redução no preço","Taxa de juro","Imposto"],resp:1,dica:"Desconto = diminuição.",visual:null},
+    {q:"POUPANÇA é importante porque:",ops:["Aumenta despesas","Permite guardar para o futuro","Diminui rendimento","Não tem utilidade"],resp:1,dica:"Poupar = preparar o futuro.",visual:null},
+    {q:"CONTA BANCÁRIA serve para:",ops:["Guardar em casa","Guardar e movimentar com segurança","Comprar acções","Pagar impostos"],resp:1,dica:"Banco = seguro para o dinheiro.",visual:null},
+  ]},
+],
+6:[
+  {id:"6_1",nome:"Números até 1 Bilião",emoji:"♾️",desc:"Leitura e escrita até 1 000 000 000 000, adição e subtracção",questoes:[
+    {q:"1 000 000 000 000 lê-se:",ops:["Um bilião","Mil biliões","Um milhão de milhões","Cem mil milhões"],resp:0,dica:"12 zeros = um bilião.",visual:null},
+    {q:"600 000 000 + 400 000 000 = ?",ops:["900 000 000","1 000 000 000","1 100 000 000","10 000 000 000"],resp:1,dica:"600+400=1000 milhões.",visual:null},
+    {q:"5678 + 3456 = ?",ops:["9034","9134","9234","9334"],resp:1,dica:"5678+3456=9134.",visual:null},
+    {q:"1000 - 357 = ?",ops:["643","653","743","633"],resp:0,dica:"1000-357=643.",visual:null},
+    {q:"Numeração romana: XLIV = ?",ops:["44","54","34","46"],resp:0,dica:"XL=40, IV=4, total=44.",visual:null},
+    {q:"Numeração romana: MCM = ?",ops:["1100","1800","1900","2100"],resp:2,dica:"M=1000, CM=900, total=1900.",visual:null},
+    {q:"2024 em numeração romana:",ops:["MMXXIV","MMXXIV","MMDXXIV","MMXIV"],resp:0,dica:"MM=2000, XX=20, IV=4.",visual:null},
+    {q:"Maior: 987 654 321 098 ou 987 654 312 098?",ops:["987 654 312 098","987 654 321 098","Iguais","Não sei"],resp:1,dica:"Compare posição a posição.",visual:null},
+    {q:"500 000 000 000 - 1 = ?",ops:["499 999 999 998","499 999 999 999","500 000 000 001","499 999 000 000"],resp:1,dica:"Quinhentos mil milhões menos um.",visual:null},
+    {q:"Dígito dos mil milhões em 3 456 789 012:",ops:["3","4","5","6"],resp:0,dica:"O primeiro dígito.",visual:null},
+  ]},
+  {id:"6_2",nome:"Geometria",emoji:"📐",desc:"Altura, mediana, bissectriz, circunferência, Pi, quadriláteros, polígonos",questoes:[
+    {q:"ALTURA de um triângulo é:",ops:["Um lado qualquer","Perpendicular de um vértice ao lado oposto","A mediana","A bissectriz"],resp:1,dica:"Altura = perpendicular ao lado oposto.",visual:"triangulo_altura"},
+    {q:"Pi (π) é aproximadamente:",ops:["3,0","3,14","3,5","4,0"],resp:1,dica:"π≈3,14.",visual:"circulo"},
+    {q:"Perímetro da circunferência (C=π×d), d=10cm:",ops:["31,4cm","21,4cm","41,4cm","3,14cm"],resp:0,dica:"C=π×d=3,14×10=31,4.",visual:"circulo"},
+    {q:"TRAPÉZIO é quadrilátero com:",ops:["4 lados iguais","2 pares paralelos","1 par de lados paralelos","Nenhum lado paralelo"],resp:2,dica:"Trapézio = apenas 1 par paralelo.",visual:"trapezio"},
+    {q:"PARALELOGRAMO tem:",ops:["1 par paralelo","2 pares de lados paralelos","Todos 90°","Todos lados iguais"],resp:1,dica:"Paralelogramo = 2 pares paralelos.",visual:"paralelogramo"},
+    {q:"Soma dos ângulos de qualquer quadrilátero:",ops:["180°","270°","360°","540°"],resp:2,dica:"Qualquer quadrilátero = 360°.",visual:"quadrilatero"},
+    {q:"LOSANGO tem:",ops:["4 ângulos rectos","4 lados iguais","Lados opostos desiguais","Só 2 lados iguais"],resp:1,dica:"Losango = 4 lados iguais.",visual:"losango"},
+    {q:"Raio = 7cm. Diâmetro = ?",ops:["3,5cm","7cm","14cm","21cm"],resp:2,dica:"d=2×r=2×7=14.",visual:"circulo"},
+    {q:"MEDIANA une:",ops:["Dois vértices","Vértice ao ponto médio do lado oposto","Dois meios","Centro ao vértice"],resp:1,dica:"Mediana = vértice ao meio do lado oposto.",visual:"triangulo_mediana"},
+    {q:"Polígono IRREGULAR tem:",ops:["Todos lados iguais","Todos ângulos iguais","Lados ou ângulos diferentes","Sempre 4 lados"],resp:2,dica:"Irregular = nem todos iguais.",visual:"poligono_irregular"},
+  ]},
+  {id:"6_3",nome:"Multiplicação e Divisão",emoji:"✖️",desc:"Propriedades, expressões numéricas, MDC e MMC",questoes:[
+    {q:"Propriedade COMUTATIVA: 15×8=",ops:["8+15","8×15","15+8","15-8"],resp:1,dica:"a×b=b×a.",visual:null},
+    {q:"Propriedade ASSOCIATIVA: (3×4)×5 = 3×(4×5) =",ops:["55","60","65","70"],resp:1,dica:"12×5=60.",visual:null},
+    {q:"Elemento ABSORVENTE da multiplicação:",ops:["0","1","-1","∞"],resp:0,dica:"Qualquer número × 0 = 0.",visual:null},
+    {q:"7×(100-3) = ?",ops:["679","686","693","700"],resp:0,dica:"7×100-7×3=700-21=679.",visual:null},
+    {q:"4 + 3 × 5 = ? (multiplica primeiro)",ops:["35","19","23","17"],resp:1,dica:"4+15=19.",visual:null},
+    {q:"(4+3) × 5 = ?",ops:["19","35","23","17"],resp:1,dica:"7×5=35.",visual:null},
+    {q:"18 ÷ (6+3) = ?",ops:["1","2","3","6"],resp:1,dica:"18÷9=2.",visual:null},
+    {q:"5² + 3² = ?",ops:["25","34","64","10"],resp:1,dica:"25+9=34.",visual:null},
+    {q:"mdc(24, 36) = ?",ops:["4","6","8","12"],resp:3,dica:"Máximo divisor comum de 24 e 36.",visual:null},
+    {q:"mmc(4, 6) = ?",ops:["2","6","12","24"],resp:2,dica:"Mínimo múltiplo comum de 4 e 6.",visual:null},
+  ]},
+  {id:"6_4",nome:"Potenciação",emoji:"💥",desc:"Potências de base natural, leitura e cálculo",questoes:[
+    {q:"2³ = ?",ops:["5","6","8","9"],resp:2,dica:"2×2×2=8.",visual:null},
+    {q:"5² = ?",ops:["10","25","50","52"],resp:1,dica:"5×5=25.",visual:null},
+    {q:"3⁴ = ?",ops:["12","27","81","64"],resp:2,dica:"3×3×3×3=81.",visual:null},
+    {q:"10³ = ?",ops:["30","100","1000","10000"],resp:2,dica:"10×10×10=1000.",visual:null},
+    {q:"Na potência 7⁵, a BASE é:",ops:["5","7","75","35"],resp:1,dica:"Base = número que se multiplica.",visual:null},
+    {q:"Na potência 7⁵, o EXPOENTE é:",ops:["5","7","75","35"],resp:0,dica:"Expoente = quantas vezes.",visual:null},
+    {q:"4² + 3² = ?",ops:["25","13","7","49"],resp:0,dica:"16+9=25.",visual:null},
+    {q:"2¹⁰ = ?",ops:["20","102","1024","2010"],resp:2,dica:"2^10=1024.",visual:null},
+    {q:"Qualquer número elevado a 0 é igual a:",ops:["0","1","O próprio número","Indefinido"],resp:1,dica:"a⁰=1 (para a≠0).",visual:null},
+    {q:"√25 = ? (raiz quadrada de 25)",ops:["4","5","6","7"],resp:1,dica:"5×5=25.",visual:null},
+  ]},
+  {id:"6_5",nome:"Grandezas e Medidas",emoji:"📐",desc:"Perímetro da circunferência, área do trapézio e círculo, unidades de superfície",questoes:[
+    {q:"Fórmula da área do TRAPÉZIO:",ops:["base×altura","(B+b)×h÷2","π×r²","lado²"],resp:1,dica:"A=(base maior+base menor)×altura÷2.",visual:null},
+    {q:"Trapézio: bases 8m e 4m, altura 5m. Área:",ops:["20m²","30m²","40m²","60m²"],resp:1,dica:"(8+4)×5÷2=30.",visual:null},
+    {q:"Área do CÍRCULO:",ops:["2πr","πd","πr²","2πd"],resp:2,dica:"A=π×r².",visual:null},
+    {q:"Círculo raio 7cm. Área≈? (π≈3,14)",ops:["43,96cm²","153,86cm²","21,98cm²","87,92cm²"],resp:1,dica:"π×7²=3,14×49=153,86.",visual:null},
+    {q:"1m² = ? dm²",ops:["10","100","1000","10000"],resp:1,dica:"1m=10dm, 1m²=100dm².",visual:null},
+    {q:"1km² = ? m²",ops:["1000","10000","100000","1000000"],resp:3,dica:"1km=1000m, 1km²=1000²=1000000m².",visual:null},
+    {q:"5000m² = ? ha",ops:["0,05ha","0,5ha","5ha","50ha"],resp:1,dica:"1ha=10000m², 5000÷10000=0,5ha.",visual:null},
+    {q:"Área do triângulo base 12m, altura 8m:",ops:["48m²","96m²","20m²","24m²"],resp:0,dica:"A=12×8÷2=48.",visual:null},
+    {q:"Área de figura composta = ?",ops:["Subtracção das partes","Soma das áreas das partes","Multiplicação","Divisão"],resp:1,dica:"Aditividade das áreas.",visual:null},
+    {q:"Perímetro da circunferência, raio 5cm:",ops:["10π cm","5π cm","25π cm","2π cm"],resp:0,dica:"C=2πr=2×π×5=10π≈31,4cm.",visual:null},
+  ]},
+  {id:"6_6",nome:"Fracções e Percentagens",emoji:"💯",desc:"Multiplicação, divisão de fracções; percentagens",questoes:[
+    {q:"⅖ × ¾ = ?",ops:["5/9","6/20=3/10","8/20=2/5","2/9"],resp:1,dica:"(2×3)÷(5×4)=6/20=3/10.",visual:null},
+    {q:"⅔ ÷ ¼ = ?",ops:["⅙","8/3","2/12","1/6"],resp:1,dica:"⅔÷¼=⅔×4=8/3.",visual:null},
+    {q:"30% de 200 = ?",ops:["30","60","90","120"],resp:1,dica:"30÷100×200=60.",visual:null},
+    {q:"50 é que percentagem de 200?",ops:["10%","25%","50%","75%"],resp:1,dica:"50÷200×100=25%.",visual:null},
+    {q:"Produto 400 MT, aumento 15%. Novo preço:",ops:["415 MT","440 MT","460 MT","480 MT"],resp:2,dica:"15%×400=60, 400+60=460.",visual:null},
+    {q:"Comprou 250 MT, vendeu 325 MT. Lucro %:",ops:["20%","25%","30%","75%"],resp:2,dica:"75÷250×100=30%.",visual:null},
+    {q:"mdc(18,24) = ?",ops:["3","4","6","8"],resp:2,dica:"MDC de 18 e 24 = 6.",visual:null},
+    {q:"mmc(6,9) = ?",ops:["3","18","54","9"],resp:1,dica:"MMC de 6 e 9 = 18.",visual:null},
+    {q:"¾ de 120 = ?",ops:["30","60","80","90"],resp:3,dica:"¾×120=90.",visual:null},
+    {q:"75% como fracção simplificada:",ops:["75/100","¾","3/5","7/10"],resp:1,dica:"75/100=3/4.",visual:null},
+  ]},
+  {id:"6_7",nome:"Equações",emoji:"⚖️",desc:"Equações lineares, proposições verdadeiras e falsas",questoes:[
+    {q:"x + 5 = 12. x = ?",ops:["5","7","12","17"],resp:1,dica:"x=12-5=7.",visual:null},
+    {q:"x - 8 = 15. x = ?",ops:["7","8","15","23"],resp:3,dica:"x=15+8=23.",visual:null},
+    {q:"3x = 21. x = ?",ops:["3","6","7","8"],resp:2,dica:"x=21÷3=7.",visual:null},
+    {q:"x/4 = 6. x = ?",ops:["2","10","24","42"],resp:2,dica:"x=6×4=24.",visual:null},
+    {q:"'5 + 3 = 9' é:",ops:["Verdadeira","Falsa","Impossível","Indefinida"],resp:1,dica:"5+3=8, não 9.",visual:null},
+    {q:"'7 × 8 = 56' é:",ops:["Verdadeira","Falsa","Impossível","Indefinida"],resp:0,dica:"7×8=56. ✓",visual:null},
+    {q:"2x + 3 = 11. x = ?",ops:["3","4","5","6"],resp:1,dica:"2x=8, x=4.",visual:null},
+    {q:"O triplo de um número é 45. O número:",ops:["10","12","15","20"],resp:2,dica:"3x=45, x=15.",visual:null},
+    {q:"5x - 10 = 20. x = ?",ops:["2","4","6","8"],resp:2,dica:"5x=30, x=6.",visual:null},
+    {q:"Verifica x=3 em 4x-1=11:",ops:["Sim, é solução","Não é solução","Talvez","Não sei"],resp:0,dica:"4×3-1=12-1=11. ✓",visual:null},
+  ]},
+  {id:"6_8",nome:"Educação Financeira",emoji:"🏦",desc:"Movimentos bancários, seguros, poupança, percentagens financeiras",questoes:[
+    {q:"DÉBITO bancário significa:",ops:["Entrada de dinheiro","Saída de dinheiro","Taxa de juro","Saldo positivo"],resp:1,dica:"Débito = dinheiro que sai.",visual:null},
+    {q:"CRÉDITO bancário significa:",ops:["Saída de dinheiro","Entrada de dinheiro","Dívida","Despesa"],resp:1,dica:"Crédito = dinheiro que entra.",visual:null},
+    {q:"SEGURO é contrato que:",ops:["Garante lucro certo","Protege contra riscos e perdas","Aumenta capital","Elimina impostos"],resp:1,dica:"Seguro = protecção contra riscos.",visual:null},
+    {q:"Capital 5000 MT, 8%/ano, 3 anos. Juro simples:",ops:["1000 MT","1200 MT","1400 MT","1600 MT"],resp:1,dica:"J=5000×8%×3=1200.",visual:null},
+    {q:"Montante = Capital + Juro. C=2000, J=300. M=?",ops:["300 MT","1700 MT","2300 MT","2600 MT"],resp:2,dica:"M=2000+300=2300.",visual:null},
+    {q:"Produto 600 MT, desconto 25%. Paga-se:",ops:["150 MT","450 MT","575 MT","625 MT"],resp:1,dica:"25%×600=150, 600-150=450.",visual:null},
+    {q:"INFLAÇÃO significa:",ops:["Diminuição dos preços","Aumento geral dos preços","Redução de salários","Aumento da poupança"],resp:1,dica:"Inflação = preços sobem.",visual:null},
+    {q:"Salário 8000 MT, aumento 10%. Novo salário:",ops:["800 MT","8800 MT","8100 MT","8080 MT"],resp:1,dica:"10%×8000=800, 8000+800=8800.",visual:null},
+    {q:"Saldo = Créditos - Débitos. 5000 créditos, 3200 débitos:",ops:["8200 MT","1800 MT","2200 MT","3200 MT"],resp:1,dica:"5000-3200=1800.",visual:null},
+    {q:"PRÉMIO DE SEGURO é:",ops:["Lucro do banco","Valor pago pelo seguro","A indemnização","O saldo"],resp:1,dica:"Prémio = mensalidade do seguro.",visual:null},
+  ]},
+],
+};
+
+// ===== ESTADO =====
+let currentEnc=null,currentAluno=null,currentTema=null;
+let questoesBaralhadas=[],questaoIdx=0,certasRound=0,erradasRound=0,pontosRound=0;
+let respondeu=false,micAtivo=false,recognition=null,chatHistory=[];
+const synth=window.speechSynthesis;
+
+// ===== STORAGE =====
+function getEncs(){try{return JSON.parse(localStorage.getItem('tmoz_encs')||'[]')}catch{return[]}}
+function saveEncs(e){localStorage.setItem('tmoz_encs',JSON.stringify(e))}
+function getAlunos(){try{return JSON.parse(localStorage.getItem('tmoz_alunos')||'[]')}catch{return[]}}
+function saveAlunos(a){localStorage.setItem('tmoz_alunos',JSON.stringify(a))}
+function getProgresso(id){try{return JSON.parse(localStorage.getItem('tmoz_prog_'+id)||'{}')}catch{return{}}}
+function saveProgresso(id,p){localStorage.setItem('tmoz_prog_'+id,JSON.stringify(p))}
+
+// ===== INIT =====
+window.onload=function(){populateEncSelect();populateAlunoSelect()};
+
+function populateEncSelect(){
+  const s=document.getElementById('selectEnc'),encs=getEncs();
+  s.innerHTML='<option value="">— Selecciona o teu nome —</option>';
+  encs.forEach((e,i)=>s.innerHTML+=`<option value="${i}">${e.nome}</option>`);
+}
+function populateAlunoSelect(){
+  const s=document.getElementById('selectAluno'),alunos=getAlunos();
+  s.innerHTML='<option value="">— Selecciona o teu nome —</option>';
+  alunos.forEach((a,i)=>s.innerHTML+=`<option value="${i}">${a.nome} (${a.classe}ª classe)</option>`);
+}
+
+// ===== TABS LOGIN =====
+function switchTab(tab){
+  document.getElementById('tabAluno').style.display=tab==='aluno'?'block':'none';
+  document.getElementById('tabEnc').style.display=tab==='enc'?'block':'none';
+  document.querySelectorAll('.tabs-login .tab-btn').forEach((b,i)=>b.classList.toggle('ativo',(i===0&&tab==='aluno')||(i===1&&tab==='enc')));
+}
+function switchEncTab(sub){
+  document.getElementById('encEntrar').style.display=sub==='entrar'?'block':'none';
+  document.getElementById('encRegistar').style.display=sub==='registar'?'block':'none';
+  document.getElementById('btnEncEntrar').classList.toggle('ativo',sub==='entrar');
+  document.getElementById('btnEncRegistar').classList.toggle('ativo',sub==='registar');
+}
+
+// ===== ENCARREGADO =====
+function registarEnc(){
+  const nome=document.getElementById('nomeEncNovo').value.trim();
+  const c1=document.getElementById('codigoEncNovo').value.trim();
+  const c2=document.getElementById('codigoEncConf').value.trim();
+  const err=document.getElementById('erroEncReg');
+  if(!nome||!c1||!c2){err.textContent='Preenche todos os campos.';err.style.display='block';return}
+  if(c1!==c2){err.textContent='Os códigos não coincidem.';err.style.display='block';return}
+  if(c1.length<4){err.textContent='Código mínimo de 4 dígitos.';err.style.display='block';return}
+  const encs=getEncs();
+  if(encs.find(e=>e.nome.toLowerCase()===nome.toLowerCase())){err.textContent='Nome já existe.';err.style.display='block';return}
+  encs.push({nome,codigo:c1});saveEncs(encs);
+  err.style.display='none';populateEncSelect();switchEncTab('entrar');showToast('✅ Conta criada!');
+}
+function entrarEnc(){
+  const idx=document.getElementById('selectEnc').value;
+  const cod=document.getElementById('codigoEnc').value.trim();
+  const err=document.getElementById('erroEnc');
+  if(idx===''||!cod){err.style.display='block';return}
+  const encs=getEncs(),enc=encs[parseInt(idx)];
+  if(!enc||enc.codigo!==cod){err.style.display='block';return}
+  err.style.display='none';currentEnc={...enc,idx:parseInt(idx)};
+  document.getElementById('telaLogin').style.display='none';
+  document.getElementById('painelEnc').style.display='block';
+  document.getElementById('nomeEncHeader').textContent=currentEnc.nome;
+  renderAlunos();
+}
+function addAluno(){
+  const nome=document.getElementById('nomeNovoAluno').value.trim();
+  const classe=document.getElementById('classeNovoAluno').value;
+  const err=document.getElementById('erroAddAluno');
+  if(!nome||!classe){err.style.display='block';return}
+  err.style.display='none';
+  const alunos=getAlunos();
+  alunos.push({id:'a'+Date.now(),nome,classe:parseInt(classe),encIdx:currentEnc.idx,
+    pontos:0,xp:0,nivel:1,streak:0,maxStreak:0,totalCertas:0,totalErradas:0,
+    medalhas:[],temasConcluidos:{},erros:{}});
+  saveAlunos(alunos);
+  document.getElementById('nomeNovoAluno').value='';
+  document.getElementById('classeNovoAluno').value='';
+  populateAlunoSelect();renderAlunos();showToast('✅ '+nome+' registado!');
+}
+function renderAlunos(){
+  const alunos=getAlunos().filter(a=>a.encIdx===currentEnc.idx);
+  const div=document.getElementById('listaAlunos');
+  if(!alunos.length){div.innerHTML='<p style="color:var(--cinza);font-size:13px">Sem alunos registados.</p>';return}
+  div.innerHTML=alunos.map(a=>{
+    const temas=CURRICULO[a.classe]||[];
+    const conc=Object.keys(a.temasConcluidos||{}).length;
+    const pct=temas.length?Math.round(conc/temas.length*100):0;
+    return `<div class="aluno-item">
+      <div><div class="aluno-nome">👤 ${a.nome}</div>
+        <div style="font-size:11px;color:var(--cinza);margin-top:2px">${a.classe}ª · ⭐${a.pontos} pts · ${pct}%</div>
+        <div class="progresso-bar" style="width:150px;margin-top:4px"><div class="progresso-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
+        <span class="aluno-classe">${a.classe}ª</span>
+        <button class="btn-sm btn-view" onclick="verRelatorio('${a.id}')">📊</button>
+        <button class="btn-sm btn-remove" onclick="removerAluno('${a.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function removerAluno(id){
+  if(!confirm('Apagar este aluno?')) return;
+  saveAlunos(getAlunos().filter(a=>a.id!==id));
+  populateAlunoSelect();renderAlunos();
+}
+function verRelatorio(id){
+  const a=getAlunos().find(x=>x.id===id);if(!a)return;
+  const temas=CURRICULO[a.classe]||[],prog=getProgresso(a.id);
+  let fortes=[],fracos=[];
+  temas.forEach(t=>{
+    const p=prog[t.id];if(!p)return;
+    const tot=p.certas+p.erradas;if(!tot)return;
+    const pct=Math.round(p.certas/tot*100);
+    if(pct>=70)fortes.push({nome:t.nome,pct});else fracos.push({nome:t.nome,pct});
+  });
+  document.getElementById('nomeRelatorio').textContent=a.nome;
+  document.getElementById('conteudoRelatorio').innerHTML=`
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-num">${a.pontos}</div><div class="stat-label">Pontos</div></div>
+      <div class="stat-box"><div class="stat-num">${a.totalCertas||0}</div><div class="stat-label">Certas</div></div>
+      <div class="stat-box"><div class="stat-num">${a.maxStreak||0}</div><div class="stat-label">🔥 Streak</div></div>
+    </div>
+    <div style="margin-top:14px"><h4 style="color:var(--verde2);margin-bottom:7px">✅ Pontos fortes</h4>
+      ${fortes.length?fortes.map(t=>`<div class="tema-forte"><span>${t.nome}</span><span style="font-weight:800;color:var(--verde)">${t.pct}%</span></div>`).join(''):'<p style="font-size:13px;color:var(--cinza)">Ainda nenhum.</p>'}
+    </div>
+    <div style="margin-top:10px"><h4 style="color:var(--vermelho);margin-bottom:7px">⚠️ A melhorar</h4>
+      ${fracos.length?fracos.map(t=>`<div class="tema-fraco"><span>${t.nome}</span><span style="font-weight:800;color:var(--vermelho)">${t.pct}%</span></div>`).join(''):'<p style="font-size:13px;color:var(--cinza)">Óptimo! Sem temas fracos.</p>'}
+    </div>`;
+  document.getElementById('cardRelatorio').style.display='block';
+  document.getElementById('cardRelatorio').scrollIntoView({behavior:'smooth'});
+}
+
+// ===== ALUNO =====
+function entrarAluno(){
+  const idx=document.getElementById('selectAluno').value;
+  const err=document.getElementById('erroAluno');
+  if(idx===''){err.style.display='block';return}
+  currentAluno=getAlunos()[parseInt(idx)];
+  if(!currentAluno){err.style.display='block';return}
+  err.style.display='none';
+  document.getElementById('telaLogin').style.display='none';
+  document.getElementById('telaAluno').style.display='block';
+  atualizarHeaderAluno();renderTemas();switchAlunoTab('estudar');
+}
+
+const NIVEL_NOMES=['','Aprendiz','Explorador','Estudioso','Sábio','Mestre'];
+const NIVEL_EMOJIS=['','🌱','🌿','⭐','🌟','🏆'];
+const XP_NIVEIS=[0,0,100,300,600,1000];
+
+function atualizarHeaderAluno(){
+  const a=currentAluno;
+  document.getElementById('nomeAlunoHeader').textContent=a.nome;
+  document.getElementById('nivelHeader').textContent=NIVEL_NOMES[a.nivel]||'Aprendiz';
+  document.getElementById('pontosHeader').textContent=a.pontos;
+  document.getElementById('avatarHeader').textContent=NIVEL_EMOJIS[a.nivel]||'🌱';
+  const xpA=a.xp-(XP_NIVEIS[a.nivel]||0),xpP=(XP_NIVEIS[a.nivel+1]||1000)-(XP_NIVEIS[a.nivel]||0);
+  document.getElementById('xpFill').style.width=Math.min(100,Math.round(xpA/xpP*100))+'%';
+}
+
+function switchAlunoTab(tab){
+  ['estudar','conquistas','chat','progresso'].forEach(t=>{
+    document.getElementById('sec'+t[0].toUpperCase()+t.slice(1)).style.display=t===tab?'block':'none';
+    document.getElementById('tab'+t[0].toUpperCase()+t.slice(1)).classList.toggle('ativo',t===tab);
+  });
+  if(tab==='conquistas')renderConquistas();
+  if(tab==='progresso')renderProgresso();
+}
+
+function renderTemas(){
+  const temas=CURRICULO[currentAluno.classe]||[];
+  const prog=getProgresso(currentAluno.id);
+  document.getElementById('listaTemas').innerHTML=
+    `<div style="padding:10px 2px 6px;font-family:'Baloo 2',cursive;font-size:19px;font-weight:800;color:var(--verde2)">${currentAluno.classe}ª Classe · ${temas.length} temas</div>
+    <div class="temas-grid">${temas.map(t=>{
+      const p=prog[t.id],certas=p?p.certas:0,total=t.questoes.length,pct=Math.round(certas/total*100);
+      const est=pct>=80?'⭐⭐⭐':pct>=50?'⭐⭐':pct>0?'⭐':'';
+      return `<div class="tema-card ${pct>=70?'completo':''}" onclick="iniciarTema('${t.id}')">
+        <div class="tema-estrelas">${est}</div>
+        <div class="tema-emoji">${t.emoji}</div>
+        <div class="tema-nome">${t.nome}</div>
+        <div class="tema-prog">${certas}/${total} certas · ${pct}%</div>
+        <div class="progresso-bar" style="margin-top:6px"><div class="progresso-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('')}</div>`;
+}
+
+// ===== QUESTÕES =====
+function iniciarTema(temaId){
+  const temas=CURRICULO[currentAluno.classe]||[];
+  currentTema=temas.find(t=>t.id===temaId);if(!currentTema)return;
+  questoesBaralhadas=[...currentTema.questoes].sort(()=>Math.random()-.5);
+  questaoIdx=0;certasRound=0;erradasRound=0;pontosRound=0;
+  document.getElementById('telaAluno').style.display='none';
+  document.getElementById('telaQuestao').style.display='block';
+  document.getElementById('questTemaNome').textContent=currentTema.emoji+' '+currentTema.nome;
+  mostrarQuestao();
+}
+
+function mostrarQuestao(){
+  const q=questoesBaralhadas[questaoIdx];
+  respondeu=false;
+  document.getElementById('questContador').textContent=(questaoIdx+1)+'/'+questoesBaralhadas.length;
+  document.getElementById('progressQuestFill').style.width=(questaoIdx/questoesBaralhadas.length*100)+'%';
+  document.getElementById('streakBadge').textContent='🔥 '+currentAluno.streak;
+  document.getElementById('feedbackBox').style.display='none';
+  document.getElementById('btnProx').style.display='none';
+  document.getElementById('dicaBox').style.display='none';
+  document.getElementById('questEnunciado').textContent=q.q;
+  const cw=document.getElementById('canvasWrap');
+  if(q.visual){cw.style.display='block';setTimeout(()=>desenharVisual(q.visual),50)}else{cw.style.display='none'}
+  const correctOp=q.ops[q.resp];
+  const shuffled=[...q.ops].sort(()=>Math.random()-.5);
+  const newResp=shuffled.indexOf(correctOp);
+  document.getElementById('opcoesGrid').innerHTML=shuffled.map((op,i)=>
+    `<button class="opcao-btn" onclick="responder(${i},${newResp},this)">${op}</button>`
+  ).join('');
+}
+
+function responder(escolhida,correcta,btn){
+  if(respondeu)return;respondeu=true;
+  const q=questoesBaralhadas[questaoIdx];
+  const certa=escolhida===correcta;
+  document.querySelectorAll('.opcao-btn').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===correcta)b.classList.add('certa');
+    else if(i===escolhida)b.classList.add('errada');
+  });
+  const fb=document.getElementById('feedbackBox');
+  if(certa){
+    certasRound++;currentAluno.streak++;
+    if(currentAluno.streak>currentAluno.maxStreak)currentAluno.maxStreak=currentAluno.streak;
+    currentAluno.totalCertas++;
+    const pts=10+(currentAluno.streak>3?5:0);
+    pontosRound+=pts;currentAluno.pontos+=pts;currentAluno.xp+=pts;
+    fb.className='feedback-box feedback-certo';
+    const msgs=['🎉 Excelente!','✅ Muito bem!','👏 Correcto!','🌟 Parabéns!','💪 Óptimo!'];
+    fb.textContent=msgs[Math.floor(Math.random()*msgs.length)]+' +'+pts+' pts';
+    animarPontos('+'+pts);checkMedalhas();
+  } else {
+    erradasRound++;currentAluno.streak=0;
+    currentAluno.totalErradas=(currentAluno.totalErradas||0)+1;
+    if(!currentAluno.erros)currentAluno.erros={};
+    currentAluno.erros[currentTema.id]=(currentAluno.erros[currentTema.id]||0)+1;
+    fb.className='feedback-box feedback-errado';
+    fb.textContent='❌ Errado. Correcto: '+q.ops[q.resp];
+  }
+  fb.style.display='block';
+  atualizarNivel();
+  const prog=getProgresso(currentAluno.id);
+  if(!prog[currentTema.id])prog[currentTema.id]={certas:0,erradas:0};
+  if(certa)prog[currentTema.id].certas++;else prog[currentTema.id].erradas++;
+  saveProgresso(currentAluno.id,prog);salvarAluno();
+  document.getElementById('btnProx').style.display='block';
+  document.getElementById('streakBadge').textContent='🔥 '+currentAluno.streak;
+}
+
+function proxQuestao(){
+  questaoIdx++;
+  if(questaoIdx>=questoesBaralhadas.length)mostrarResultado();
+  else mostrarQuestao();
+}
+function mostrarDica(){
+  const q=questoesBaralhadas[questaoIdx];
+  document.getElementById('dicaTexto').textContent=q.dica;
+  document.getElementById('dicaBox').style.display='block';
+}
+function mostrarResultado(){
+  document.getElementById('telaQuestao').style.display='none';
+  document.getElementById('telaResultado').style.display='block';
+  const pct=Math.round(certasRound/questoesBaralhadas.length*100);
+  document.getElementById('resultEmoji').textContent=pct>=80?'🏆':pct>=60?'🌟':pct>=40?'👍':'💪';
+  document.getElementById('resultTitulo').textContent=pct>=80?'Excelente!':pct>=60?'Muito bem!':pct>=40?'Bom esforço!':'Continua!';
+  document.getElementById('resultSub').textContent=`${certasRound} de ${questoesBaralhadas.length} certas (${pct}%)`;
+  document.getElementById('rsCertas').textContent=certasRound;
+  document.getElementById('rsPontos').textContent=pontosRound;
+  document.getElementById('rsStreak').textContent=currentAluno.maxStreak;
+  if(pct>=70){if(!currentAluno.temasConcluidos)currentAluno.temasConcluidos={};currentAluno.temasConcluidos[currentTema.id]=true;salvarAluno()}
+}
+function repetirTema(){document.getElementById('telaResultado').style.display='none';iniciarTema(currentTema.id)}
+function voltarTemas(){
+  ['telaQuestao','telaResultado'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('telaAluno').style.display='block';
+  atualizarHeaderAluno();renderTemas();
+}
+
+// ===== GEOMETRIA =====
+function desenharVisual(tipo){
+  const canvas=document.getElementById('geoCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.lineWidth=2.5;ctx.font='12px Nunito';
+
+  const verde='#00a86b',amarelo='#f5a623',azul='#2980b9',texto='#1a3a2a',fill='#e8f8f0';
+
+  const d={
+    circulo:()=>{
+      ctx.beginPath();ctx.arc(W/2,H/2,62,0,2*Math.PI);
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(W/2,H/2);ctx.lineTo(W/2+62,H/2);
+      ctx.strokeStyle=amarelo;ctx.lineWidth=1.5;ctx.stroke();
+      ctx.fillStyle=verde;ctx.beginPath();ctx.arc(W/2,H/2,4,0,2*Math.PI);ctx.fill();
+      ctx.fillStyle=texto;ctx.fillText('r',W/2+28,H/2-5);ctx.fillText('O',W/2+4,H/2-5);
+    },
+    quadrado:()=>{
+      const s=90,x=(W-s)/2,y=(H-s)/2;
+      ctx.fillStyle=fill;ctx.fillRect(x,y,s,s);ctx.strokeStyle=verde;ctx.strokeRect(x,y,s,s);
+      ctx.fillStyle=texto;ctx.fillText('l',x+s/2-3,y-5);ctx.fillText('l',x-13,y+s/2+4);
+    },
+    retangulo:()=>{
+      const rw=120,rh=70,rx=(W-rw)/2,ry=(H-rh)/2;
+      ctx.fillStyle=fill;ctx.fillRect(rx,ry,rw,rh);ctx.strokeStyle=verde;ctx.strokeRect(rx,ry,rw,rh);
+      ctx.fillStyle=texto;ctx.fillText('comprimento',rx+10,ry-5);ctx.fillText('larg',rx-30,ry+rh/2+4);
+    },
+    triangulo:()=>{
+      ctx.beginPath();ctx.moveTo(W/2,18);ctx.lineTo(18,H-18);ctx.lineTo(W-18,H-18);ctx.closePath();
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+    },
+    triangulo_equilatero:()=>{
+      const cx=W/2,cy=H/2,r=68;
+      ctx.beginPath();
+      for(let i=0;i<3;i++){const a=-Math.PI/2+i*2*Math.PI/3;ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a))}
+      ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=amarelo;ctx.fillText('equilátero',W/2-30,H-6);
+    },
+    triangulo_isosceles:()=>{
+      ctx.beginPath();ctx.moveTo(W/2,14);ctx.lineTo(W/2-80,H-18);ctx.lineTo(W/2+80,H-18);ctx.closePath();
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=amarelo;ctx.fillText('isósceles',W/2-28,H-4);
+    },
+    triangulo_retangulo:()=>{
+      ctx.beginPath();ctx.moveTo(28,H-18);ctx.lineTo(28,18);ctx.lineTo(W-18,H-18);ctx.closePath();
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.strokeStyle=amarelo;ctx.beginPath();ctx.moveTo(28,H-38);ctx.lineTo(48,H-38);ctx.lineTo(48,H-18);ctx.stroke();
+      ctx.fillStyle=texto;ctx.fillText('90°',32,H-20);
+    },
+    triangulo_mediana:()=>{
+      ctx.beginPath();ctx.moveTo(W/2,18);ctx.lineTo(18,H-18);ctx.lineTo(W-18,H-18);ctx.closePath();
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.setLineDash([5,4]);ctx.strokeStyle=amarelo;
+      ctx.beginPath();ctx.moveTo(W/2,18);ctx.lineTo((18+W-18)/2,H-18);ctx.stroke();
+      ctx.setLineDash([]);ctx.fillStyle=amarelo;ctx.fillText('mediana',W/2-18,H/2+5);
+    },
+    triangulo_altura:()=>{
+      ctx.beginPath();ctx.moveTo(W/2,18);ctx.lineTo(18,H-18);ctx.lineTo(W-18,H-18);ctx.closePath();
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.setLineDash([5,4]);ctx.strokeStyle=amarelo;
+      ctx.beginPath();ctx.moveTo(W/2,18);ctx.lineTo(W/2,H-18);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle=texto;ctx.fillText('h',W/2+5,H/2);
+    },
+    angulo_recto:()=>{
+      ctx.strokeStyle=verde;ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(48,H-38);ctx.lineTo(48,24);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(48,H-38);ctx.lineTo(W-24,H-38);ctx.stroke();
+      ctx.strokeStyle=amarelo;ctx.beginPath();ctx.moveTo(48,H-58);ctx.lineTo(68,H-58);ctx.lineTo(68,H-38);ctx.stroke();
+      ctx.fillStyle=texto;ctx.fillText('90°',72,H-40);
+    },
+    angulo_agudo:()=>{
+      ctx.strokeStyle=verde;ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(38,H-38);ctx.lineTo(W-18,H-38);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(38,H-38);ctx.lineTo(120,28);ctx.stroke();
+      ctx.fillStyle=texto;ctx.fillText('<90°',68,H-50);
+    },
+    angulo_obtuso:()=>{
+      ctx.strokeStyle=verde;ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(80,H-38);ctx.lineTo(W-18,H-38);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(80,H-38);ctx.lineTo(20,H-100);ctx.stroke();
+      ctx.fillStyle=texto;ctx.fillText('>90°',30,H-55);
+    },
+    paralelas:()=>{
+      [55,115].forEach(y=>{
+        ctx.beginPath();ctx.moveTo(18,y);ctx.lineTo(W-18,y);ctx.strokeStyle=verde;ctx.stroke();
+        ctx.beginPath();ctx.moveTo(W/2-6,y-8);ctx.lineTo(W/2+6,y);ctx.lineTo(W/2-6,y+8);ctx.strokeStyle=azul;ctx.stroke();
+      });
+      ctx.fillStyle=amarelo;ctx.fillText('paralelas',W/2-28,H-10);
+    },
+    segmento:()=>{
+      ctx.beginPath();ctx.moveTo(38,H/2);ctx.lineTo(W-38,H/2);ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=verde;
+      [38,W-38].forEach(x=>{ctx.beginPath();ctx.arc(x,H/2,5,0,2*Math.PI);ctx.fill()});
+      ctx.fillStyle=texto;ctx.fillText('A',24,H/2+4);ctx.fillText('B',W-24,H/2+4);
+    },
+    linha_recta:()=>{
+      ctx.beginPath();ctx.moveTo(18,H/2);ctx.lineTo(W-18,H/2);ctx.strokeStyle=verde;ctx.stroke();
+      [[W-28,H/2-7,W-8,H/2,W-28,H/2+7],[28,H/2-7,8,H/2,28,H/2+7]].forEach(pts=>{
+        ctx.beginPath();ctx.moveTo(pts[0],pts[1]);ctx.lineTo(pts[2],pts[3]);ctx.lineTo(pts[4],pts[5]);ctx.strokeStyle=verde;ctx.stroke();
+      });
+      ctx.fillStyle=texto;ctx.fillText('recta',W/2-16,H/2-9);
+    },
+    linha_curva:()=>{
+      ctx.beginPath();ctx.moveTo(18,H/2);ctx.bezierCurveTo(W/4,18,3*W/4,H-18,W-18,H/2);
+      ctx.strokeStyle=verde;ctx.stroke();ctx.fillStyle=texto;ctx.fillText('curva',W/2-16,H/2-10);
+    },
+    ponto:()=>{
+      ctx.fillStyle=verde;ctx.beginPath();ctx.arc(W/2,H/2,8,0,2*Math.PI);ctx.fill();
+      ctx.fillStyle=texto;ctx.fillText('P',W/2+12,H/2+4);
+    },
+    cubo:()=>{
+      const x=55,y=28,s=80,d=28;
+      ctx.fillStyle=fill;ctx.strokeStyle=verde;
+      ctx.fillRect(x,y+d,s,s);ctx.strokeRect(x,y+d,s,s);
+      ctx.beginPath();ctx.moveTo(x,y+d);ctx.lineTo(x+d,y);ctx.lineTo(x+s+d,y);ctx.lineTo(x+s,y+d);ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.moveTo(x+s,y+d);ctx.lineTo(x+s+d,y);ctx.lineTo(x+s+d,y+s);ctx.lineTo(x+s,y+s+d);ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.fillStyle=texto;ctx.fillText('Cubo',x+s/2-12,H-5);
+    },
+    cilindro:()=>{
+      const cx=W/2,r=52,top=22,bot=H-22;
+      ctx.fillStyle=fill;ctx.strokeStyle=verde;
+      ctx.fillRect(cx-r,top+12,r*2,bot-top-12);ctx.strokeRect(cx-r,top+12,r*2,bot-top-12);
+      [[top+12],[bot]].forEach(([y])=>{ctx.beginPath();ctx.ellipse(cx,y,r,13,0,0,2*Math.PI);ctx.fill();ctx.stroke()});
+      ctx.fillStyle=texto;ctx.fillText('Cilindro',cx-22,H-4);
+    },
+    cone:()=>{
+      const cx=W/2,bot=H-18,r=68,top=14;
+      ctx.fillStyle=fill;ctx.strokeStyle=verde;
+      ctx.beginPath();ctx.moveTo(cx,top);ctx.lineTo(cx-r,bot);ctx.lineTo(cx+r,bot);ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.ellipse(cx,bot,r,11,0,0,Math.PI);ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.ellipse(cx,bot,r,11,0,Math.PI,2*Math.PI);ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle=texto;ctx.fillText('Cone',cx-14,7);
+    },
+    piramide:()=>{
+      const cx=W/2,top=14;
+      const base=[[28,H-18],[W-28,H-18],[W-58,H-58],[58,H-58]];
+      ctx.fillStyle=fill;ctx.strokeStyle=verde;
+      base.forEach((p,i)=>{const n=base[(i+1)%4];ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(n[0],n[1]);ctx.stroke()});
+      base.forEach(p=>{ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(cx,top);ctx.stroke()});
+      ctx.fillStyle=texto;ctx.fillText('Pirâmide',cx-26,H-3);
+    },
+    esfera:()=>{
+      ctx.beginPath();ctx.arc(W/2,H/2,68,0,2*Math.PI);
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.beginPath();ctx.ellipse(W/2,H/2,68,18,0,0,2*Math.PI);ctx.strokeStyle=azul;ctx.setLineDash([5,3]);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle=texto;ctx.fillText('Esfera',W/2-18,H-6);
+    },
+    hexagono:()=>{
+      const cx=W/2,cy=H/2,r=62;
+      ctx.beginPath();for(let i=0;i<6;i++){const a=Math.PI/6+i*Math.PI/3;ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a))}
+      ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=texto;ctx.fillText('Hexágono',cx-28,H-5);
+    },
+    pentagono:()=>{
+      const cx=W/2,cy=H/2+8,r=62;
+      ctx.beginPath();for(let i=0;i<5;i++){const a=-Math.PI/2+i*2*Math.PI/5;ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a))}
+      ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=texto;ctx.fillText('Pentágono',cx-28,H-4);
+    },
+    octagono:()=>{
+      const cx=W/2,cy=H/2,r=62;
+      ctx.beginPath();for(let i=0;i<8;i++){const a=Math.PI/8+i*Math.PI/4;ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a))}
+      ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=texto;ctx.fillText('Octógono',cx-28,H-4);
+    },
+    poligono_regular:()=>{
+      const cx=W/2,cy=H/2,r=62;
+      ctx.beginPath();for(let i=0;i<6;i++){const a=-Math.PI/2+i*2*Math.PI/6;ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a))}
+      ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=amarelo;ctx.fillText('Regular',cx-20,H-4);
+    },
+    poligono_irregular:()=>{
+      ctx.beginPath();ctx.moveTo(58,28);ctx.lineTo(W-38,48);ctx.lineTo(W-18,H-28);ctx.lineTo(48,H-18);ctx.lineTo(28,H/2);ctx.closePath();
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=amarelo;ctx.fillText('Irregular',W/2-22,H-4);
+    },
+    quadrilatero:()=>{
+      ctx.beginPath();ctx.moveTo(38,38);ctx.lineTo(W-28,48);ctx.lineTo(W-48,H-28);ctx.lineTo(28,H-38);ctx.closePath();
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=texto;ctx.fillText('Quadrilátero',W/2-38,H-4);
+    },
+    trapezio:()=>{
+      ctx.beginPath();ctx.moveTo(58,38);ctx.lineTo(W-58,38);ctx.lineTo(W-18,H-28);ctx.lineTo(18,H-28);ctx.closePath();
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=amarelo;ctx.fillText('Trapézio',W/2-26,H-8);
+    },
+    paralelogramo:()=>{
+      ctx.beginPath();ctx.moveTo(58,33);ctx.lineTo(W-28,33);ctx.lineTo(W-58,H-33);ctx.lineTo(28,H-33);ctx.closePath();
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=amarelo;ctx.fillText('Paralelogramo',W/2-42,H-8);
+    },
+    losango:()=>{
+      ctx.beginPath();ctx.moveTo(W/2,18);ctx.lineTo(W-18,H/2);ctx.lineTo(W/2,H-18);ctx.lineTo(18,H/2);ctx.closePath();
+      ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=verde;ctx.stroke();
+      ctx.fillStyle=amarelo;ctx.fillText('Losango',W/2-22,H-4);
+    },
+  };
+  ctx.lineWidth=2.5;
+  if(d[tipo])d[tipo]();
+  else{ctx.fillStyle=fill;ctx.fillRect(0,0,W,H);ctx.font='44px serif';ctx.textAlign='center';ctx.fillText('📐',W/2,H/2+14);ctx.textAlign='left'}
+}
+
+// ===== VOZ =====
+function lerPergunta(){
+  if(!synth)return;
+  synth.cancel();
+  const q=questoesBaralhadas[questaoIdx];
+  const u=new SpeechSynthesisUtterance(q.q);u.lang='pt-PT';u.rate=0.9;
+  document.getElementById('btnLer').classList.add('ativo');
+  u.onend=()=>document.getElementById('btnLer').classList.remove('ativo');
+  synth.speak(u);
+}
+function toggleMic(){
+  if(micAtivo){recognition&&recognition.stop();micAtivo=false;document.getElementById('btnMicrofone').classList.remove('ativo')}
+  else startMic();
+}
+function startMic(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){showToast('🎤 Não suportado neste browser.');return}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();recognition.lang='pt-PT';recognition.continuous=false;recognition.interimResults=false;
+  recognition.onstart=()=>{micAtivo=true;document.getElementById('btnMicrofone').classList.add('ativo')};
+  recognition.onend=()=>{micAtivo=false;document.getElementById('btnMicrofone').classList.remove('ativo')};
+  recognition.onresult=(e)=>{
+    const t=e.results[0][0].transcript.trim().toLowerCase();
+    showToast('🎤 "'+t+'"');
+    document.querySelectorAll('.opcao-btn:not(:disabled)').forEach((b,i)=>{
+      if(b.textContent.toLowerCase().includes(t)||t.includes(b.textContent.toLowerCase().substring(0,4)))b.click();
+    });
+  };
+  recognition.onerror=()=>{micAtivo=false;document.getElementById('btnMicrofone').classList.remove('ativo')};
+  recognition.start();
+}
+
+// ===== MEDALHAS =====
+const MEDALHAS=[
+  {id:'p1',nome:'1ª Resposta',emoji:'🎯',c:a=>a.totalCertas>=1},
+  {id:'c10',nome:'10 Certas',emoji:'⭐',c:a=>a.totalCertas>=10},
+  {id:'c50',nome:'50 Certas',emoji:'🌟',c:a=>a.totalCertas>=50},
+  {id:'s5',nome:'Streak 5',emoji:'🔥',c:a=>a.maxStreak>=5},
+  {id:'s10',nome:'Streak 10',emoji:'💥',c:a=>a.maxStreak>=10},
+  {id:'p100',nome:'100 Pontos',emoji:'💯',c:a=>a.pontos>=100},
+  {id:'p500',nome:'500 Pontos',emoji:'🏅',c:a=>a.pontos>=500},
+  {id:'t1',nome:'1 Tema Concluído',emoji:'📚',c:a=>Object.keys(a.temasConcluidos||{}).length>=1},
+  {id:'t3',nome:'3 Temas',emoji:'🎓',c:a=>Object.keys(a.temasConcluidos||{}).length>=3},
+  {id:'tm',nome:'Mestre da Classe',emoji:'🏆',c:a=>{const ts=CURRICULO[a.classe]||[];return Object.keys(a.temasConcluidos||{}).length>=ts.length}},
+];
+function checkMedalhas(){
+  MEDALHAS.forEach(m=>{
+    if(!currentAluno.medalhas.includes(m.id)&&m.c(currentAluno)){
+      currentAluno.medalhas.push(m.id);salvarAluno();showToast('🎖️ Medalha: '+m.nome+'!');
+    }
+  });
+}
+function renderConquistas(){
+  const a=currentAluno;
+  document.getElementById('nivelEmoji').textContent=NIVEL_EMOJIS[a.nivel]||'🌱';
+  document.getElementById('nivelNome').textContent=NIVEL_NOMES[a.nivel]||'Aprendiz';
+  const prox=XP_NIVEIS[a.nivel+1];
+  document.getElementById('nivelProx').textContent=prox?`Faltam ${Math.max(0,prox-a.xp)} XP para ${NIVEL_NOMES[a.nivel+1]}`:'🏆 Nível máximo!';
+  document.getElementById('statPontos').textContent=a.pontos;
+  document.getElementById('statCorretas').textContent=a.totalCertas||0;
+  document.getElementById('statStreak').textContent=a.maxStreak||0;
+  document.getElementById('medalhasGrid').innerHTML=MEDALHAS.map(m=>
+    `<div class="medalha ${a.medalhas.includes(m.id)?'desbloqueada':''}">
+      <div class="medalha-icon">${m.emoji}</div>
+      <div class="medalha-nome">${m.nome}</div>
+    </div>`
+  ).join('');
+}
+
+// ===== PROGRESSO =====
+function renderProgresso(){
+  const temas=CURRICULO[currentAluno.classe]||[];
+  const prog=getProgresso(currentAluno.id);
+  document.getElementById('progressoTemas').innerHTML=temas.map(t=>{
+    const p=prog[t.id],c=p?p.certas:0,e=p?p.erradas:0,tot=c+e,pct=tot>0?Math.round(c/tot*100):0;
+    return `<div style="margin-bottom:11px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:3px">
+        <span>${t.emoji} ${t.nome}</span>
+        <span style="color:${pct>=70?'var(--verde)':pct>=40?'var(--amarelo)':'var(--vermelho)'}">${tot>0?pct+'%':'—'}</span>
+      </div>
+      <div class="progresso-bar"><div class="progresso-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:11px;color:var(--cinza);margin-top:2px">${c} certas, ${e} erradas</div>
+    </div>`;
+  }).join('')||'<p style="color:var(--cinza);font-size:13px">Ainda não estudaste nenhum tema.</p>';
+  const erros=currentAluno.erros||{};
+  const fracos=temas.filter(t=>(erros[t.id]||0)>2);
+  document.getElementById('temasRever').innerHTML=fracos.length?
+    fracos.map(t=>`<div style="background:#fde8e8;border-radius:10px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-weight:700;font-size:13px" onclick="iniciarTema('${t.id}')">${t.emoji} ${t.nome} — ${erros[t.id]} erros → <span style="color:var(--verde)">Rever →</span></div>`).join(''):
+    '✅ Óptimo! Sem temas com muitos erros.';
+}
+
+// ===== CHAT IA =====
+// ===== CHAT VISUAIS: detecta pedidos de imagem/desenho =====
+const CHAT_VISUAIS = {
+  perpendicular:   /perpendicular|perpendiculares|ângulo.?recto|angulo.?recto|cruzam.?90|90.?grau/i,
+  paralelas:       /paralelas?|nunca.?cruzam|mesma.?direcção/i,
+  triangulo:       /triângulo\s*(qualquer|geral)?(?!.*(equi|isós|rect))/i,
+  triangulo_equilatero: /equilátero|equilatero/i,
+  triangulo_isosceles:  /isósceles|isosceles/i,
+  triangulo_retangulo:  /triângulo.?rect|rect.?triângulo/i,
+  circulo:         /c[íi]rculo|circunfer[êe]ncia|raio|diâmetro|diametro/i,
+  quadrado:        /quadrado/i,
+  retangulo:       /rect[âa]ngulo/i,
+  cubo:            /cubo/i,
+  cilindro:        /cilindro/i,
+  cone:            /\bcone\b/i,
+  piramide:        /pir[âa]mide/i,
+  esfera:          /esfera/i,
+  hexagono:        /hex[áa]gono/i,
+  pentagono:       /pent[áa]gono/i,
+  octagono:        /oct[áa]gono|oct[oô]gono/i,
+  trapezio:        /trap[ée]zio/i,
+  paralelogramo:   /paralelogramo/i,
+  losango:         /losango/i,
+  angulo_agudo:    /[âa]ngulo.?agudo/i,
+  angulo_obtuso:   /[âa]ngulo.?obtuso/i,
+  fracao:          /frac[çc][aã]o|fra[çc][aã]o|numerador|denominador|\d+\/\d+/i,
+  reta_numerica:   /recta.?num[eé]rica|reta.?num[eé]rica|linha.?num[eé]rica/i,
+  soma_area:       /[áa]rea.*(rect|quad|tri)|per[íi]metro/i,
+};
+
+function detectarVisualChat(msg){
+  for(const [tipo, re] of Object.entries(CHAT_VISUAIS)){
+    if(re.test(msg)) return tipo;
+  }
+  return null;
+}
+
+function desenharVisualChat(tipo){
+  const W=280, H=180;
+  const c=document.createElement('canvas');
+  c.width=W; c.height=H;
+  c.style.cssText='border-radius:10px;border:1px solid #d0ece0;margin-top:8px;max-width:100%';
+  const ctx=c.getContext('2d');
+  ctx.lineWidth=2.5; ctx.font='12px Nunito,sans-serif';
+  const verde='#00a86b', amarelo='#f5a623', azul='#2980b9', texto='#1a3a2a', fill='#e8f8f0';
+
+  // Reutiliza a mesma lógica de desenharVisual mas num canvas novo
+  const tmp=document.getElementById('geoCanvas');
+  const origW=tmp.width, origH=tmp.height;
+  tmp.width=W; tmp.height=H;
+  desenharVisual(tipo);
+  ctx.drawImage(tmp,0,0);
+  tmp.width=origW; tmp.height=origH;
+
+  return c;
+}
+
+// Desenho especial para fracção
+function desenharFracao(texto){
+  const match = texto.match(/(\d+)\s*\/\s*(\d+)/);
+  if(!match) return null;
+  const num=parseInt(match[1]), den=parseInt(match[2]);
+  if(den<1||den>12||num>den) return null;
+  const W=280,H=180;
+  const c=document.createElement('canvas');
+  c.width=W;c.height=H;
+  c.style.cssText='border-radius:10px;border:1px solid #d0ece0;margin-top:8px;max-width:100%';
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  // Desenhar círculo dividido em partes
+  const cx=100,cy=H/2,r=65;
+  for(let i=0;i<den;i++){
+    const a1=-Math.PI/2+i*2*Math.PI/den, a2=-Math.PI/2+(i+1)*2*Math.PI/den;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a1,a2);ctx.closePath();
+    ctx.fillStyle=i<num?'#00a86b':'#e8f8f0';
+    ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+  }
+  ctx.strokeStyle='#007a4d';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(cx,cy,r,0,2*Math.PI);ctx.stroke();
+  // Fracção em texto
+  ctx.fillStyle='#1a3a2a';ctx.font='bold 36px Nunito,sans-serif';ctx.textAlign='center';
+  ctx.fillText(num,195,cy-10);
+  ctx.fillStyle='#007a4d';ctx.fillRect(175,cy,40,2);
+  ctx.fillStyle='#1a3a2a';ctx.fillText(den,195,cy+30);
+  ctx.font='13px Nunito,sans-serif';
+  ctx.fillText(`${num} de ${den} partes`,195,H-10);
+  ctx.textAlign='left';
+  return c;
+}
+
+// Detectar se aluno disse que percebeu
+function alunoPercebeu(msg){
+  const m = msg.toLowerCase().trim();
+  // Mensagens curtas de confirmação (menos de 6 palavras) indicam que percebeu
+  const palavrasCurtas = m.split(/\s+/).length <= 5;
+  const padroes = /perceb|entend|j[aá] sei|ficou.?claro|obrigad|compreend|tá.?bom|\bok\b|esta.?certo|está.?certo|sim.?(percebi|entendi|está|certo)|ja.?sei|já.?sei|certo|fixe|ótimo|otimo/i;
+  return padroes.test(m) || (palavrasCurtas && /^(ok|sim|certo|ótimo|obrigad|entendi|percebi|fixe|exato|exacto|claro|perfeito|legal)/.test(m));
+}
+
+async function chamarAPI(msgs, sistemaExtra){
+  const sistema = `És o Prof. Moz, tutor de Matemática para alunos da ${currentAluno.classe}ª classe do ensino primário de Moçambique. Usa linguagem simples e encorajadora. Usa exemplos moçambicanos (meticais, mangas, machambas, Maputo, Beira, Nampula). Responde sempre em Português. Sê breve (máx 3 parágrafos). Usa emojis para motivar. O currículo segue os livros "Aprender Matemática" do MEC de Moçambique. Quando o aluno pedir para VER ou MOSTRAR uma figura geométrica, descreve brevemente — o desenho aparece automaticamente no ecrã.`+(sistemaExtra||'');
+  const resp = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:sistema,messages:msgs})
+  });
+  if(!resp.ok) throw new Error('HTTP '+resp.status);
+  const d=await resp.json();
+  return d.content?.[0]?.text||'';
+}
+
+async function enviarChat(){
+  const input=document.getElementById('chatInput');
+  const msg=input.value.trim();if(!msg)return;
+  input.value='';
+  adicionarMsg(msg,'user');
+  const tipoVisual=detectarVisualChat(msg);
+  const percebeu=alunoPercebeu(msg);
+  adicionarMsg('⏳ A pensar...','ia','loader');
+  chatHistory.push({role:'user',content:msg});
+  try{
+    // Detectar tema da última conversa para fazer perguntas relevantes
+    const ultimoTema = chatHistory.slice(-6).map(m=>m.content).join(' ');
+    const extra=percebeu
+      ? ` INSTRUÇÃO OBRIGATÓRIA: O aluno confirmou que percebeu. NÃO faças mais elogios. Em vez disso, diz "Vamos testar! 🎯" e faz EXACTAMENTE 3 perguntas de escolha múltipla sobre o tema que estivemos a discutir. Formato obrigatório:
+1) [pergunta]? a) [opção] b) [opção] c) [opção]
+2) [pergunta]? a) [opção] b) [opção] c) [opção]  
+3) [pergunta]? a) [opção] b) [opção] c) [opção]
+Aguarda as respostas do aluno.`
+      : '';
+    const texto=await chamarAPI(chatHistory,extra);
+    if(!texto) throw new Error('empty');
+    chatHistory.push({role:'assistant',content:texto});
+    document.querySelector('.loader')?.remove();
+    adicionarMsg(texto,'ia');
+    if(tipoVisual){
+      try{
+        const cv=tipoVisual==='fracao'?desenharFracao(msg):desenharVisualChat(tipoVisual);
+        if(cv)adicionarMsgCanvas(cv);
+      }catch(e){}
+    }
+  }catch(e){
+    console.error('Chat erro:',e);
+    document.querySelector('.loader')?.remove();
+    adicionarMsg('⚠️ Não consegui ligar ao servidor. Verifica a ligação e tenta outra vez.','ia');
+  }
+}
+function adicionarMsg(texto,tipo,cls=''){
+  const div=document.createElement('div');
+  div.className=`msg msg-${tipo} ${cls}`;div.textContent=texto;
+  const msgs=document.getElementById('chatMsgs');
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+
+function adicionarMsgCanvas(canvas){
+  const div=document.createElement('div');
+  div.className='msg msg-ia';
+  div.style.cssText='padding:8px;background:#f0faf5;border:1px solid #d0ece0;align-self:flex-start;border-radius:4px 14px 14px 14px';
+  div.appendChild(canvas);
+  const msgs=document.getElementById('chatMsgs');
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+
+// ===== UTILITÁRIOS =====
+function atualizarNivel(){
+  let novo=1;
+  for(let i=1;i<=5;i++){if(currentAluno.xp>=(XP_NIVEIS[i]||99999))novo=i}
+  if(novo>currentAluno.nivel){currentAluno.nivel=novo;showToast('🌟 Subiste para '+NIVEL_NOMES[novo]+'!')}
+}
+function salvarAluno(){
+  const alunos=getAlunos(),idx=alunos.findIndex(a=>a.id===currentAluno.id);
+  if(idx>=0){alunos[idx]=currentAluno;saveAlunos(alunos)}
+}
+function animarPontos(txt){
+  const el=document.createElement('div');
+  el.className='points-anim';el.textContent=txt;
+  el.style.cssText=`position:fixed;top:${window.innerHeight/3}px;left:${window.innerWidth/2-20}px;font-size:20px;font-weight:800;color:var(--verde);pointer-events:none;z-index:9999;animation:floatUp .8s ease forwards`;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),900);
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+function sair(){
+  currentAluno=null;currentEnc=null;chatHistory=[];
+  ['telaAluno','painelEnc','telaQuestao','telaResultado'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('telaLogin').style.display='flex';
+  document.getElementById('codigoEnc').value='';
+  populateEncSelect();populateAlunoSelect();
+}
+</script>
+</body>
+</html>
