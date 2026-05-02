@@ -1,0 +1,26 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Corre a cada 5 dias (à meia-noite UTC)
+    - cron: '0 0 */5 * *'
+  workflow_dispatch: # Permite correr manualmente também
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        run: |
+          echo "A enviar ping ao Supabase..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            https://sacgiyeekwzxcgyceocz.supabase.co/rest/v1/)
+          echo "Status recebido: $STATUS"
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 500 ]; then
+            echo "✅ Ping bem-sucedido!"
+          else
+            echo "❌ Erro no ping: $STATUS"
+            exit 1
+          fi
